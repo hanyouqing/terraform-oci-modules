@@ -1,0 +1,102 @@
+# =============================================================================
+# Terraform CLI Configuration
+# =============================================================================
+# 
+# Copy this file to .terraformrc (or terraform.rc on Windows):
+#   cp .terraformrc.example .terraformrc
+#
+# This file configures Terraform CLI behavior, including provider installation
+# and plugin caching.
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Provider Installation Configuration
+# -----------------------------------------------------------------------------
+
+provider_installation {
+  # Development overrides (for local provider development)
+  # Uncomment and modify if you're developing providers locally
+  # dev_overrides {
+  #   "oracle/oci" = "/path/to/local/provider"
+  # }
+  
+  # Direct installation from Terraform Registry
+  direct {
+    # Exclude specific providers from direct installation (if needed)
+    # exclude = ["hashicorp/*"]
+  }
+  
+  # Filesystem mirror (for air-gapped environments or custom mirrors)
+  # Uncomment and configure if using a filesystem mirror
+  # filesystem_mirror {
+  #   path    = "/path/to/provider/mirror"
+  #   include = ["oracle/oci"]
+  # }
+  
+  # Network mirror (for custom provider registries)
+  # Uncomment and configure if using a network mirror
+  # network_mirror {
+  #   url = "https://terraform.example.com/providers/"
+  #   include = ["oracle/oci"]
+  # }
+}
+
+# -----------------------------------------------------------------------------
+# Plugin Cache Directory
+# -----------------------------------------------------------------------------
+
+# Directory where Terraform will cache downloaded providers
+# Uncomment to enable provider caching (recommended for faster init)
+# plugin_cache_dir = "$HOME/.terraform.d/plugin-cache"
+
+# -----------------------------------------------------------------------------
+# Credentials Configuration
+# -----------------------------------------------------------------------------
+
+# Credentials helper configuration (optional)
+# Uncomment if using a credentials helper
+# credentials_helper "oci" {
+#   args = []
+# }
+
+# -----------------------------------------------------------------------------
+# Disable Checkpoint
+# -----------------------------------------------------------------------------
+
+# Disable checkpoint telemetry (optional)
+# Uncomment to disable Terraform checkpoint checks
+# disable_checkpoint = true
+
+# -----------------------------------------------------------------------------
+# Disable Signature Verification
+# -----------------------------------------------------------------------------
+
+# Disable provider signature verification (NOT RECOMMENDED for production)
+# Only use in development/testing environments
+# Uncomment to disable signature verification
+# disable_checkpoint_signature = true
+
+# -----------------------------------------------------------------------------
+# Provider Configuration
+# -----------------------------------------------------------------------------
+
+# Provider-specific configuration (optional)
+# This can be used to set default provider configurations
+# Uncomment and modify as needed
+# provider "oci" {
+#   region = "us-ashburn-1"
+# }
+
+# -----------------------------------------------------------------------------
+# Notes
+# -----------------------------------------------------------------------------
+#
+# For OCI provider authentication, Terraform will use:
+# 1. Environment variables (OCI_TENANCY_OCID, OCI_USER_OCID, etc.)
+# 2. OCI config file (~/.oci/config)
+# 3. Instance principal (when running on OCI compute instances)
+# 4. Resource principal (for Functions/Container Instances)
+#
+# Recommended: Use environment variables or OCI config file for local development
+# See .env.sh.example for environment variable configuration
+#

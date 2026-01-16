@@ -1,0 +1,14 @@
+output "bastion_id" {
+  description = "OCID of the bastion"
+  value       = oci_bastion_bastion.this.id
+}
+
+output "bastion_name" {
+  description = "Name of the bastion"
+  value       = oci_bastion_bastion.this.name
+}
+
+output "session_ids" {
+  description = "OCIDs of the bastion sessions"
+  value       = { for k, v in oci_bastion_session.this : k => v.id }
+}
