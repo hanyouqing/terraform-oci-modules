@@ -11,13 +11,13 @@ terraform {
 module "bastion" {
   source = "../../"
 
-  compartment_id    = var.compartment_id
+  compartment_id   = var.compartment_id
   target_subnet_id = var.target_subnet_id
   bastion_type     = var.bastion_type
   name             = var.name
 
   client_cidr_block_allow_list = var.client_cidr_block_allow_list
-  max_session_ttl_in_seconds  = var.max_session_ttl_in_seconds
+  max_session_ttl_in_seconds   = var.max_session_ttl_in_seconds
 
   sessions = var.sessions
 

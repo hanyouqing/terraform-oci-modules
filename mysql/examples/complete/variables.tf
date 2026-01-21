@@ -10,14 +10,14 @@ variable "tenancy_ocid" {
 
 variable "mysql_systems" {
   type = map(object({
-    display_name        = string
-    availability_domain = string
-    shape_name          = string
-    subnet_id           = string
-    admin_username      = string
-    admin_password      = string
-    mysql_version       = optional(string, "8.0.35")
-    configuration_id    = optional(string, null)
+    display_name            = string
+    availability_domain     = string
+    shape_name              = string
+    subnet_id               = string
+    admin_username          = string
+    admin_password          = string
+    mysql_version           = optional(string, "8.0.35")
+    configuration_id        = optional(string, null)
     data_storage_size_in_gb = number
     backup_policy = object({
       is_enabled        = optional(bool, true)

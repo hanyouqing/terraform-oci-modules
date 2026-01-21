@@ -11,11 +11,11 @@ variable "region" {
 
 variable "buckets" {
   type = map(object({
-    name         = string
-    namespace    = optional(string, null)
-    access_type  = optional(string, "NoPublicAccess")
-    storage_tier = optional(string, "Standard")
-    versioning   = optional(string, "Disabled")
+    name          = string
+    namespace     = optional(string, null)
+    access_type   = optional(string, "NoPublicAccess")
+    storage_tier  = optional(string, "Standard")
+    versioning    = optional(string, "Disabled")
     freeform_tags = optional(map(string), {})
     defined_tags  = optional(map(map(string)), {})
   }))
@@ -37,18 +37,53 @@ variable "lifecycle_policies" {
   }))
   description = "Map of lifecycle policies to create"
   default     = {}
+
+  validation {
+    condition = alltrue([
+      for policy in var.lifecycle_policies : contains(keys(var.buckets), policy.bucket_key)
+    ])
+    error_message = "All lifecycle_policies must reference an existing bucket_key"
+  }
+
+  validation {
+    condition = alltrue([
+      for policy in var.lifecycle_policies : contains(["ARCHIVE", "DELETE"], policy.action)
+    ])
+    error_message = "action must be either 'ARCHIVE' or 'DELETE'"
+  }
+
+  validation {
+    condition = alltrue([
+      for policy in var.lifecycle_policies : contains(["DAYS", "YEARS"], policy.time_unit)
+    ])
+    error_message = "time_unit must be either 'DAYS' or 'YEARS'"
+  }
 }
 
 variable "preauth_requests" {
   type = map(object({
-    bucket_key  = string
-    name        = string
-    object      = string
-    access_type = string
+    bucket_key   = string
+    name         = string
+    object       = string
+    access_type  = string
     time_expires = string
   }))
   description = "Map of pre-authenticated requests to create"
   default     = {}
+
+  validation {
+    condition = alltrue([
+      for req in var.preauth_requests : contains(keys(var.buckets), req.bucket_key)
+    ])
+    error_message = "All preauth_requests must reference an existing bucket_key"
+  }
+
+  validation {
+    condition = alltrue([
+      for req in var.preauth_requests : contains(["ObjectRead", "ObjectWrite", "ObjectReadWrite", "AnyObjectRead", "AnyObjectWrite", "AnyObjectReadWrite"], req.access_type)
+    ])
+    error_message = "access_type must be one of: ObjectRead, ObjectWrite, ObjectReadWrite, AnyObjectRead, AnyObjectWrite, AnyObjectReadWrite"
+  }
 }
 
 variable "project" {

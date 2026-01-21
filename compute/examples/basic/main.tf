@@ -26,7 +26,7 @@ module "compute" {
   assign_public_ip = true
   ssh_public_keys  = var.ssh_public_keys
 
-  enable_monitoring = true
+  enable_monitoring       = true
   enable_management_agent = false
 
   project     = "always-free"

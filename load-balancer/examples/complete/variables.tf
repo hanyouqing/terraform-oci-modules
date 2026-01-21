@@ -54,16 +54,16 @@ variable "backend_sets" {
       interval_ms         = number
       timeout_in_millis   = number
       retries             = number
-      response_body_regex  = string
+      response_body_regex = string
     })
     ssl_configuration = optional(object({
-      certificate_ids                  = optional(list(string), [])
-      certificate_name                 = optional(string, "")
-      verify_depth                     = optional(number, 1)
-      verify_peer_certificate         = optional(bool, false)
-      protocols                        = optional(list(string), [])
-      cipher_suite_name                = optional(string, "")
-      server_order_preference          = optional(string, "")
+      certificate_ids                   = optional(list(string), [])
+      certificate_name                  = optional(string, "")
+      verify_depth                      = optional(number, 1)
+      verify_peer_certificate           = optional(bool, false)
+      protocols                         = optional(list(string), [])
+      cipher_suite_name                 = optional(string, "")
+      server_order_preference           = optional(string, "")
       trusted_certificate_authority_ids = optional(list(string), [])
     }))
   }))
@@ -89,15 +89,15 @@ variable "listeners" {
   type = map(object({
     default_backend_set_name = string
     port                     = number
-    protocol                  = string
+    protocol                 = string
     ssl_configuration = optional(object({
-      certificate_ids                  = optional(list(string), [])
-      certificate_name                 = optional(string, "")
-      verify_depth                     = optional(number, 1)
-      verify_peer_certificate         = optional(bool, false)
-      protocols                        = optional(list(string), [])
-      cipher_suite_name                = optional(string, "")
-      server_order_preference          = optional(string, "")
+      certificate_ids                   = optional(list(string), [])
+      certificate_name                  = optional(string, "")
+      verify_depth                      = optional(number, 1)
+      verify_peer_certificate           = optional(bool, false)
+      protocols                         = optional(list(string), [])
+      cipher_suite_name                 = optional(string, "")
+      server_order_preference           = optional(string, "")
       trusted_certificate_authority_ids = optional(list(string), [])
     }))
     connection_configuration = object({

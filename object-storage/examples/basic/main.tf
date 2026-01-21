@@ -16,11 +16,11 @@ module "object_storage" {
 
   buckets = {
     app-bucket = {
-      name         = "always-free-app-bucket"
-      namespace    = null
-      access_type  = "NoPublicAccess"
-      storage_tier = "Standard"
-      versioning   = "Disabled"
+      name          = "always-free-app-bucket"
+      namespace     = null
+      access_type   = "NoPublicAccess"
+      storage_tier  = "Standard"
+      versioning    = "Disabled"
       freeform_tags = {}
       defined_tags  = {}
     }

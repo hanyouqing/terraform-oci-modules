@@ -1,0 +1,188 @@
+# =============================================================================
+# Terraform Docs Configuration
+# =============================================================================
+#
+# terraform-docs automatically generates documentation from Terraform modules.
+# It extracts variables, outputs, resources, and modules to create
+# comprehensive documentation.
+#
+# Usage:
+#   terraform-docs markdown table .
+#   terraform-docs markdown document .
+#   terraform-docs json .
+#
+# Documentation: https://terraform-docs.io/
+# =============================================================================
+
+formatter: "markdown"
+version: "0.16.0"
+
+# =============================================================================
+# Content Configuration
+# =============================================================================
+
+# Include header in output
+header-from: "main.tf"
+
+# Include footer in output
+footer-from: ""
+
+# Show requirements (required_providers, required_version)
+show:
+  data-sources: true
+  header: true
+  inputs: true
+  modules: true
+  outputs: true
+  providers: true
+  requirements: true
+  resources: true
+
+# Hide sensitive values
+hide:
+  empty: false
+  header: false
+  inputs: false
+  outputs: false
+  providers: false
+  requirements: false
+  resources: false
+  sensitivity: false
+
+# Sort configuration
+sort:
+  enabled: true
+  by: "name"  # Options: "name", "required", "type"
+
+# =============================================================================
+# Output Configuration
+# =============================================================================
+
+# Output file (empty = stdout)
+output-file: "README.md"
+
+# Output mode
+output-mode: "inject"  # Options: "inject", "replace", "create"
+
+# Output template (optional, uses default if not specified)
+# output-template: |
+#   # {{ .Name }}
+#   
+#   {{ .Header }}
+#   
+#   ## Requirements
+#   {{ .Requirements }}
+#   
+#   ## Providers
+#   {{ .Providers }}
+#   
+#   ## Modules
+#   {{ .Modules }}
+#   
+#   ## Resources
+#   {{ .Resources }}
+#   
+#   ## Inputs
+#   {{ .Inputs }}
+#   
+#   ## Outputs
+#   {{ .Outputs }}
+
+# =============================================================================
+# Section Configuration
+# =============================================================================
+
+# Section names (customize if needed)
+section:
+  header: "##"
+  footer: ""
+  inputs: "## Inputs"
+  modules: "## Modules"
+  outputs: "## Outputs"
+  providers: "## Providers"
+  requirements: "## Requirements"
+  resources: "## Resources"
+
+# =============================================================================
+# Input/Output Configuration
+# =============================================================================
+
+# Show input descriptions
+input:
+  enabled: true
+  description: true
+  default: true
+  required: true
+  type: true
+
+# Show output descriptions
+output:
+  enabled: true
+  description: true
+  sensitive: true
+  type: true
+
+# =============================================================================
+# Provider Configuration
+# =============================================================================
+
+# Show provider requirements
+provider:
+  enabled: true
+  version: true
+  alias: true
+
+# =============================================================================
+# Resource Configuration
+# =============================================================================
+
+# Show resources
+resource:
+  enabled: true
+
+# =============================================================================
+# Module Configuration
+# =============================================================================
+
+# Show modules
+module:
+  enabled: true
+
+# =============================================================================
+# Escape Characters
+# =============================================================================
+
+# Escape special characters in markdown
+escape: true
+
+# =============================================================================
+# Indent
+# =============================================================================
+
+# Indentation for nested content
+indent: 2
+
+# =============================================================================
+# Notes
+# =============================================================================
+#
+# Usage Examples:
+#
+# 1. Generate markdown table format:
+#    terraform-docs markdown table .
+#
+# 2. Generate markdown document format:
+#    terraform-docs markdown document .
+#
+# 3. Generate JSON:
+#    terraform-docs json .
+#
+# 4. Inject into README.md:
+#    terraform-docs markdown table --output-file README.md .
+#
+# 5. Replace existing section in README.md:
+#    terraform-docs markdown table --output-mode replace --output-file README.md .
+#
+# To use this config file:
+#    terraform-docs --config .terraform-docs.yml .
+#

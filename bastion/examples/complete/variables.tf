@@ -34,14 +34,14 @@ variable "max_session_ttl_in_seconds" {
 
 variable "sessions" {
   type = map(object({
-    display_name                              = string
-    public_key_content                        = string
-    session_type                              = string
-    target_resource_id                        = string
+    display_name                               = string
+    public_key_content                         = string
+    session_type                               = string
+    target_resource_id                         = string
     target_resource_operating_system_user_name = string
-    target_resource_port                      = number
-    target_resource_private_ip_address        = string
-    session_ttl_in_seconds                    = number
+    target_resource_port                       = number
+    target_resource_private_ip_address         = string
+    session_ttl_in_seconds                     = number
   }))
   description = "Bastion sessions"
   default     = {}

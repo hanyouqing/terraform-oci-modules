@@ -6,16 +6,16 @@ variable "compartment_id" {
 variable "region" {
   type        = string
   description = "OCI region"
-  default     = "us-ashburn-1"
+  default     = "ap-seoul-1"
 }
 
 variable "buckets" {
   type = map(object({
-    name         = string
-    namespace    = optional(string, null)
-    access_type  = optional(string, "NoPublicAccess")
-    storage_tier = optional(string, "Standard")
-    versioning   = optional(string, "Disabled")
+    name          = string
+    namespace     = optional(string, null)
+    access_type   = optional(string, "NoPublicAccess")
+    storage_tier  = optional(string, "Standard")
+    versioning    = optional(string, "Disabled")
     freeform_tags = optional(map(string), {})
     defined_tags  = optional(map(map(string)), {})
   }))
@@ -41,10 +41,10 @@ variable "lifecycle_policies" {
 
 variable "preauth_requests" {
   type = map(object({
-    bucket_key  = string
-    name        = string
-    object      = string
-    access_type = string
+    bucket_key   = string
+    name         = string
+    object       = string
+    access_type  = string
     time_expires = string
   }))
   description = "Pre-authenticated requests"

@@ -11,7 +11,7 @@ terraform {
 module "bastion" {
   source = "../../"
 
-  compartment_id    = var.compartment_id
+  compartment_id   = var.compartment_id
   target_subnet_id = var.target_subnet_id
   bastion_type     = "STANDARD"
   name             = "always-free-bastion"

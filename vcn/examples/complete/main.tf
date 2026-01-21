@@ -23,26 +23,26 @@ module "vcn" {
   vcn_dns_label    = var.vcn_dns_label
   enable_ipv6      = var.enable_ipv6
 
-  create_internet_gateway = true
+  create_internet_gateway       = true
   internet_gateway_display_name = "production-igw"
-  internet_gateway_enabled = true
+  internet_gateway_enabled      = true
 
-  create_nat_gateway      = true
-  nat_gateway_display_name = "production-nat"
+  create_nat_gateway        = true
+  nat_gateway_display_name  = "production-nat"
   nat_gateway_block_traffic = false
 
-  create_service_gateway  = true
+  create_service_gateway       = true
   service_gateway_display_name = "production-sgw"
-  service_gateway_services = var.service_gateway_services
+  service_gateway_services     = var.service_gateway_services
 
-  create_drg              = var.create_drg
-  drg_display_name        = var.drg_display_name
-  attach_drg_to_vcn       = var.attach_drg_to_vcn
+  create_drg        = var.create_drg
+  drg_display_name  = var.drg_display_name
+  attach_drg_to_vcn = var.attach_drg_to_vcn
 
-  enable_vcn_flow_logs    = var.enable_vcn_flow_logs
+  enable_vcn_flow_logs            = var.enable_vcn_flow_logs
   vcn_flow_log_retention_duration = var.vcn_flow_log_retention_duration
 
-  public_subnets = var.public_subnets
+  public_subnets  = var.public_subnets
   private_subnets = var.private_subnets
 
   network_security_groups = var.network_security_groups

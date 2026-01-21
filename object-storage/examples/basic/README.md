@@ -14,7 +14,7 @@ This example creates a minimal Always Free object storage bucket.
 terraform init
 terraform plan \
   -var="compartment_id=ocid1.compartment.oc1..xxxxx" \
-  -var="region=us-ashburn-1"
+  -var="region=ap-seoul-1"
 terraform apply
 ```
 

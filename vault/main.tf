@@ -1,18 +1,8 @@
-terraform {
-  required_version = ">= 1.14.2"
-  required_providers {
-    oci = {
-      source  = "oracle/oci"
-      version = "~> 7.30"
-    }
-  }
-}
-
 resource "oci_kms_vault" "this" {
-  compartment_id   = var.compartment_id
-  display_name     = var.vault_display_name
-  vault_type       = var.vault_type
-  freeform_tags    = merge(
+  compartment_id = var.compartment_id
+  display_name   = var.vault_display_name
+  vault_type     = var.vault_type
+  freeform_tags = merge(
     var.freeform_tags,
     {
       "Module"      = "terraform-oci-modules/vault"
@@ -20,7 +10,7 @@ resource "oci_kms_vault" "this" {
       "Environment" = var.environment
     }
   )
-  defined_tags     = var.defined_tags
+  defined_tags = var.defined_tags
 }
 
 resource "oci_kms_key" "this" {
@@ -52,9 +42,9 @@ resource "oci_vault_secret" "this" {
     content      = each.value.secret_content
     content_type = each.value.content_type
   }
-  vault_id    = oci_kms_vault.this.id
+  vault_id     = oci_kms_vault.this.id
   display_name = each.value.display_name
-  key_id      = each.value.key_id
+  key_id       = each.value.key_id
 
   freeform_tags = merge(
     var.freeform_tags,

@@ -22,10 +22,10 @@ module "logging" {
 
   logs = {
     compute-logs = {
-      log_group_key     = "app-logs"
-      display_name      = "compute-logs"
-      log_type          = "SERVICE"
-      is_enabled        = true
+      log_group_key      = "app-logs"
+      display_name       = "compute-logs"
+      log_type           = "SERVICE"
+      is_enabled         = true
       retention_duration = 30
     }
   }

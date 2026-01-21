@@ -20,15 +20,15 @@ module "block_storage" {
 
   volumes = {
     data-volume = {
-      display_name        = "always-free-data-volume"
-      availability_domain = data.oci_identity_availability_domains.ads.availability_domains[0].name
-      size_in_gbs         = 50
-      vpus_per_gb         = "10"
+      display_name         = "always-free-data-volume"
+      availability_domain  = data.oci_identity_availability_domains.ads.availability_domains[0].name
+      size_in_gbs          = 50
+      vpus_per_gb          = "10"
       is_auto_tune_enabled = false
-      backup_policy_id    = null
-      backup_type         = "FULL"
-      freeform_tags       = {}
-      defined_tags        = {}
+      backup_policy_id     = null
+      backup_type          = "FULL"
+      freeform_tags        = {}
+      defined_tags         = {}
     }
   }
 

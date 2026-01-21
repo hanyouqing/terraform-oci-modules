@@ -17,10 +17,10 @@ module "vault" {
 
   keys = {
     master-key = {
-      display_name   = "always-free-master-key"
-      algorithm      = "AES"
-      length         = 32
-      curve_id       = null
+      display_name    = "always-free-master-key"
+      algorithm       = "AES"
+      length          = 32
+      curve_id        = null
       protection_mode = "SOFTWARE"
     }
   }

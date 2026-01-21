@@ -1,18 +1,8 @@
-terraform {
-  required_version = ">= 1.14.2"
-  required_providers {
-    oci = {
-      source  = "oracle/oci"
-      version = "~> 7.30"
-    }
-  }
-}
-
 resource "oci_load_balancer_load_balancer" "this" {
   compartment_id = var.compartment_id
-  display_name    = var.display_name
-  shape           = var.shape
-  is_private      = var.is_private
+  display_name   = var.display_name
+  shape          = var.shape
+  is_private     = var.is_private
 
   shape_details {
     minimum_bandwidth_in_mbps = var.shape_details.minimum_bandwidth_in_mbps
@@ -42,26 +32,26 @@ resource "oci_load_balancer_backend_set" "this" {
   policy           = each.value.policy
 
   health_checker {
-    protocol          = each.value.health_checker.protocol
-    port              = each.value.health_checker.port
-    url_path          = each.value.health_checker.url_path
-    interval_ms       = each.value.health_checker.interval_ms
-    timeout_in_millis = each.value.health_checker.timeout_in_millis
-    retries           = each.value.health_checker.retries
+    protocol            = each.value.health_checker.protocol
+    port                = each.value.health_checker.port
+    url_path            = each.value.health_checker.url_path
+    interval_ms         = each.value.health_checker.interval_ms
+    timeout_in_millis   = each.value.health_checker.timeout_in_millis
+    retries             = each.value.health_checker.retries
     response_body_regex = each.value.health_checker.response_body_regex
   }
 
   dynamic "ssl_configuration" {
     for_each = each.value.ssl_configuration != null ? [each.value.ssl_configuration] : []
     content {
-      certificate_ids                       = ssl_configuration.value.certificate_ids
-      certificate_name                      = ssl_configuration.value.certificate_name
-      verify_depth                          = ssl_configuration.value.verify_depth
-      verify_peer_certificate               = ssl_configuration.value.verify_peer_certificate
-      protocols                             = ssl_configuration.value.protocols
-      cipher_suite_name                     = ssl_configuration.value.cipher_suite_name
-      server_order_preference               = ssl_configuration.value.server_order_preference
-      trusted_certificate_authority_ids      = ssl_configuration.value.trusted_certificate_authority_ids
+      certificate_ids                   = ssl_configuration.value.certificate_ids
+      certificate_name                  = ssl_configuration.value.certificate_name
+      verify_depth                      = ssl_configuration.value.verify_depth
+      verify_peer_certificate           = ssl_configuration.value.verify_peer_certificate
+      protocols                         = ssl_configuration.value.protocols
+      cipher_suite_name                 = ssl_configuration.value.cipher_suite_name
+      server_order_preference           = ssl_configuration.value.server_order_preference
+      trusted_certificate_authority_ids = ssl_configuration.value.trusted_certificate_authority_ids
     }
   }
 }
@@ -91,14 +81,14 @@ resource "oci_load_balancer_listener" "this" {
   dynamic "ssl_configuration" {
     for_each = each.value.ssl_configuration != null ? [each.value.ssl_configuration] : []
     content {
-      certificate_ids                       = ssl_configuration.value.certificate_ids
-      certificate_name                      = ssl_configuration.value.certificate_name
-      verify_depth                          = ssl_configuration.value.verify_depth
-      verify_peer_certificate               = ssl_configuration.value.verify_peer_certificate
-      protocols                             = ssl_configuration.value.protocols
-      cipher_suite_name                     = ssl_configuration.value.cipher_suite_name
-      server_order_preference               = ssl_configuration.value.server_order_preference
-      trusted_certificate_authority_ids      = ssl_configuration.value.trusted_certificate_authority_ids
+      certificate_ids                   = ssl_configuration.value.certificate_ids
+      certificate_name                  = ssl_configuration.value.certificate_name
+      verify_depth                      = ssl_configuration.value.verify_depth
+      verify_peer_certificate           = ssl_configuration.value.verify_peer_certificate
+      protocols                         = ssl_configuration.value.protocols
+      cipher_suite_name                 = ssl_configuration.value.cipher_suite_name
+      server_order_preference           = ssl_configuration.value.server_order_preference
+      trusted_certificate_authority_ids = ssl_configuration.value.trusted_certificate_authority_ids
     }
   }
 

@@ -60,6 +60,18 @@ All modules are designed to work within OCI Always Free tier limits:
 - **Email Delivery**: 3,000 emails per month
 - **Logging**: Free for Always Free tier
 
+## Configuration Files
+
+This project includes configuration files for development tools:
+
+- **`.tflint.hcl`** - TFLint configuration for Terraform linting
+- **`.tfsec.yml`** - TFSec configuration for security scanning
+- **`.terraform-docs.yml`** - Terraform-docs configuration for documentation generation
+- **`.env.sh.example`** - Environment variables template
+- **`.terraformrc.example`** - Terraform CLI configuration template
+
+See [CONFIG.md](CONFIG.md) for detailed configuration guide.
+
 ## Quick Start
 
 ### 1. Configure Environment Variables
@@ -85,7 +97,7 @@ show_config
 - `TF_VAR_compartment_id` - Compartment OCID for resources
 
 **Optional Variables:**
-- `OCI_REGION` - OCI region (default: us-ashburn-1)
+- `OCI_REGION` - OCI region (default: ap-seoul-1)
 - `TF_VAR_project` - Project name (default: oci-modules)
 - `TF_VAR_environment` - Environment name (default: development)
 
@@ -214,19 +226,26 @@ Key variables:
 
 ### Linting
 
-- `make lint` - Run tflint on all modules
-- `make lint-module MODULE=vpc` - Lint a specific module
+- `make lint` - Run tflint on all modules (uses `.tflint.hcl` config)
+- `make lint-init` - Initialize tflint plugins
+- `make lint-module MODULE=vcn` - Lint a specific module
+
+**Configuration:** `.tflint.hcl` - Configure tflint rules and plugins
 
 ### Security
 
 - `make security` - Run security scans (tfsec and checkov)
-- `make tfsec` - Run tfsec security scanner
+- `make tfsec` - Run tfsec security scanner (uses `.tfsec.yml` config)
 - `make checkov` - Run checkov security scanner
+
+**Configuration:** `.tfsec.yml` - Configure tfsec exclusions and severity levels
 
 ### Documentation
 
-- `make docs` - Generate documentation for all modules
-- `make docs-module MODULE=vpc` - Generate docs for a specific module
+- `make docs` - Generate documentation for all modules (uses `.terraform-docs.yml` config)
+- `make docs-module MODULE=vcn` - Generate docs for a specific module
+
+**Configuration:** `.terraform-docs.yml` - Configure terraform-docs output format and content
 
 ### Terraform Operations
 

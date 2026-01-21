@@ -1,0 +1,152 @@
+# =============================================================================
+# TFSec Configuration
+# =============================================================================
+#
+# TFSec is a static analysis security scanner for Terraform code.
+# It scans Terraform templates to check for security misconfigurations.
+#
+# Usage:
+#   tfsec .
+#   tfsec --exclude-downloaded-modules
+#   tfsec --format json
+#
+# Documentation: https://aquasecurity.github.io/tfsec/
+# =============================================================================
+
+# =============================================================================
+# Exclude Checks
+# =============================================================================
+# 
+# Uncomment specific checks to exclude them from scanning
+# Format: OCI-XXX (e.g., OCI-001, OCI-002)
+# 
+
+# Example: Exclude specific checks
+# excluded_checks:
+#   - OCI-001  # Example check ID
+#   - OCI-002
+
+# =============================================================================
+# Minimum Severity
+# =============================================================================
+# 
+# Only show issues with severity >= minimum_severity
+# Options: CRITICAL, HIGH, MEDIUM, LOW, INFO
+# 
+minimum_severity: LOW
+
+# =============================================================================
+# Include Passed Checks
+# =============================================================================
+# 
+# Include passed checks in the output
+# 
+include_passed: false
+
+# =============================================================================
+# Include Ignored Checks
+# =============================================================================
+# 
+# Include ignored checks in the output
+# 
+include_ignored: false
+
+# =============================================================================
+# Exclude Directories
+# =============================================================================
+# 
+# Directories to exclude from scanning
+# 
+excluded_directories:
+  - ".terraform"
+  - ".terraform/**"
+  - "**/.terraform"
+  - "**/.terraform/**"
+  - ".git"
+  - ".git/**"
+  - "**/examples/**"  # Uncomment to exclude examples from security scanning
+
+# =============================================================================
+# Exclude Downloaded Modules
+# =============================================================================
+# 
+# Exclude downloaded modules from scanning
+# 
+exclude_downloaded_modules: true
+
+# =============================================================================
+# Custom Severity Overrides
+# =============================================================================
+# 
+# Override severity levels for specific checks
+# 
+# severity_overrides:
+#   OCI-001: HIGH
+#   OCI-002: MEDIUM
+
+# =============================================================================
+# Workspace
+# =============================================================================
+# 
+# Terraform workspace to use
+# 
+# workspace: default
+
+# =============================================================================
+# Format
+# =============================================================================
+# 
+# Output format
+# Options: default, json, csv, checkstyle, junit, sarif, text
+# 
+# format: default
+
+# =============================================================================
+# No Color
+# =============================================================================
+# 
+# Disable colored output
+# 
+# no_color: false
+
+# =============================================================================
+# Soft Fail
+# =============================================================================
+# 
+# Return exit code 0 even if issues are found
+# 
+# soft_fail: false
+
+# =============================================================================
+# OCI-Specific Configuration
+# =============================================================================
+# 
+# OCI provider specific settings
+# 
+
+# Check for Always Free tier compliance
+check_always_free: true
+
+# Warn about resources that may incur costs
+warn_costly_resources: true
+
+# =============================================================================
+# Notes
+# =============================================================================
+#
+# Common OCI Security Checks:
+# - OCI-001: Ensure no public access to Object Storage buckets
+# - OCI-002: Ensure VCN security lists restrict ingress
+# - OCI-003: Ensure compute instances use secure boot
+# - OCI-004: Ensure database connections use SSL/TLS
+# - OCI-005: Ensure load balancers use HTTPS listeners
+#
+# To ignore a specific check in code, use:
+#   # tfsec:ignore:OCI-001
+#   resource "oci_objectstorage_bucket" "example" {
+#     ...
+#   }
+#
+# To ignore a check for a specific line:
+#   public_access_type = "ObjectRead"  # tfsec:ignore:OCI-001
+#

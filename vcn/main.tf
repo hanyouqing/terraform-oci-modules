@@ -1,13 +1,3 @@
-terraform {
-  required_version = ">= 1.14.2"
-  required_providers {
-    oci = {
-      source  = "oracle/oci"
-      version = "~> 7.30"
-    }
-  }
-}
-
 data "oci_identity_availability_domains" "ads" {
   compartment_id = var.tenancy_ocid
 }
@@ -138,10 +128,13 @@ resource "oci_core_route_table" "public" {
   vcn_id         = oci_core_vcn.this.id
   display_name   = "${each.value.display_name}-route-table"
 
-  route_rules {
-    network_entity_id = var.create_internet_gateway ? oci_core_internet_gateway.this[0].id : null
-    destination       = "0.0.0.0/0"
-    destination_type  = "CIDR_BLOCK"
+  dynamic "route_rules" {
+    for_each = var.create_internet_gateway ? [1] : []
+    content {
+      network_entity_id = oci_core_internet_gateway.this[0].id
+      destination       = "0.0.0.0/0"
+      destination_type  = "CIDR_BLOCK"
+    }
   }
 
   freeform_tags = merge(

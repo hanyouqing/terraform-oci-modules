@@ -6,5 +6,5 @@ variable "compartment_id" {
 variable "region" {
   type        = string
   description = "OCI region"
-  default     = "us-ashburn-1"
+  default     = "ap-seoul-1"
 }

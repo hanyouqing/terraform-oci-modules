@@ -58,22 +58,79 @@ validate-examples: ## Validate all examples
 lint: ## Run tflint on all modules
 	@echo "Running tflint..."
 	@if command -v tflint > /dev/null; then \
-		tflint --recursive; \
+		if [ -f .tflint.hcl ]; then \
+			tflint --config .tflint.hcl --recursive; \
+		else \
+			tflint --recursive; \
+		fi; \
 	else \
 		echo "tflint not installed. Run 'make install-tflint' to install."; \
+		exit 1; \
+	fi
+
+lint-init: ## Initialize tflint plugins
+	@echo "Initializing tflint plugins..."
+	@if command -v tflint > /dev/null; then \
+		tflint --init; \
+	else \
+		echo "tflint not installed. Run 'make install-tflint' to install."; \
+		exit 1; \
+	fi
+
+lint-module: ## Lint a specific module (usage: make lint-module MODULE=vcn)
+	@if [ -z "$(MODULE)" ]; then \
+		echo "Error: MODULE variable is required. Usage: make lint-module MODULE=vcn"; \
+		exit 1; \
+	fi
+	@if command -v tflint > /dev/null; then \
+		if [ -f .tflint.hcl ]; then \
+			tflint --config .tflint.hcl $(MODULE); \
+		else \
+			tflint $(MODULE); \
+		fi; \
+	else \
+		echo "tflint not installed. Run 'make install-tflint' to install."; \
+		exit 1; \
 	fi
 
 security: ## Run security scans (tfsec and checkov)
 	@echo "Running security scans..."
 	@if command -v tfsec > /dev/null; then \
-		tfsec .; \
+		if [ -f .tfsec.yml ]; then \
+			tfsec --config-file .tfsec.yml .; \
+		else \
+			tfsec .; \
+		fi; \
 	else \
 		echo "tfsec not installed. Run 'make install-tfsec' to install."; \
+		exit 1; \
 	fi
 	@if command -v checkov > /dev/null; then \
 		checkov -d .; \
 	else \
 		echo "checkov not installed. Run 'make install-checkov' to install."; \
+	fi
+
+tfsec: ## Run tfsec security scanner only
+	@echo "Running tfsec..."
+	@if command -v tfsec > /dev/null; then \
+		if [ -f .tfsec.yml ]; then \
+			tfsec --config-file .tfsec.yml .; \
+		else \
+			tfsec .; \
+		fi; \
+	else \
+		echo "tfsec not installed. Run 'make install-tfsec' to install."; \
+		exit 1; \
+	fi
+
+checkov: ## Run checkov security scanner only
+	@echo "Running checkov..."
+	@if command -v checkov > /dev/null; then \
+		checkov -d .; \
+	else \
+		echo "checkov not installed. Run 'make install-checkov' to install."; \
+		exit 1; \
 	fi
 
 docs: ## Generate documentation for all modules
@@ -82,11 +139,32 @@ docs: ## Generate documentation for all modules
 		for dir in */; do \
 			if [ -d "$$dir" ] && [ -f "$$dir/main.tf" ]; then \
 				echo "Generating docs for $$dir..."; \
-				terraform-docs markdown table $$dir > $$dir/README.md || true; \
+				if [ -f .terraform-docs.yml ]; then \
+					terraform-docs --config .terraform-docs.yml $$dir || true; \
+				else \
+					terraform-docs markdown table $$dir > $$dir/README.md || true; \
+				fi; \
 			fi; \
 		done; \
 	else \
 		echo "terraform-docs not installed. Run 'make install-terraform-docs' to install."; \
+		exit 1; \
+	fi
+
+docs-module: ## Generate docs for a specific module (usage: make docs-module MODULE=vcn)
+	@if [ -z "$(MODULE)" ]; then \
+		echo "Error: MODULE variable is required. Usage: make docs-module MODULE=vcn"; \
+		exit 1; \
+	fi
+	@if command -v terraform-docs > /dev/null; then \
+		if [ -f .terraform-docs.yml ]; then \
+			terraform-docs --config .terraform-docs.yml $(MODULE); \
+		else \
+			terraform-docs markdown table $(MODULE) > $(MODULE)/README.md; \
+		fi; \
+	else \
+		echo "terraform-docs not installed. Run 'make install-terraform-docs' to install."; \
+		exit 1; \
 	fi
 
 init: ## Initialize Terraform in current directory

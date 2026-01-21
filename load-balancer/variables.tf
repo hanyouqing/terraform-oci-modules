@@ -36,6 +36,16 @@ variable "shape_details" {
     minimum_bandwidth_in_mbps = 10
     maximum_bandwidth_in_mbps = 10
   }
+
+  validation {
+    condition     = var.shape_details.minimum_bandwidth_in_mbps <= var.shape_details.maximum_bandwidth_in_mbps
+    error_message = "minimum_bandwidth_in_mbps must be less than or equal to maximum_bandwidth_in_mbps"
+  }
+
+  validation {
+    condition     = var.shape_details.minimum_bandwidth_in_mbps >= 10 && var.shape_details.maximum_bandwidth_in_mbps <= 10000
+    error_message = "bandwidth must be between 10 and 10000 Mbps for flexible load balancer"
+  }
 }
 
 variable "subnet_ids" {
@@ -59,16 +69,16 @@ variable "backend_sets" {
       interval_ms         = number
       timeout_in_millis   = number
       retries             = number
-      response_body_regex  = string
+      response_body_regex = string
     })
     ssl_configuration = optional(object({
-      certificate_ids                  = optional(list(string), [])
-      certificate_name                 = optional(string, "")
-      verify_depth                     = optional(number, 1)
-      verify_peer_certificate         = optional(bool, false)
-      protocols                        = optional(list(string), [])
-      cipher_suite_name                = optional(string, "")
-      server_order_preference          = optional(string, "")
+      certificate_ids                   = optional(list(string), [])
+      certificate_name                  = optional(string, "")
+      verify_depth                      = optional(number, 1)
+      verify_peer_certificate           = optional(bool, false)
+      protocols                         = optional(list(string), [])
+      cipher_suite_name                 = optional(string, "")
+      server_order_preference           = optional(string, "")
       trusted_certificate_authority_ids = optional(list(string), [])
     }))
   }))
@@ -88,21 +98,42 @@ variable "backends" {
   }))
   description = "Map of backends to create"
   default     = {}
+
+  validation {
+    condition = alltrue([
+      for backend in var.backends : contains(keys(var.backend_sets), backend.backendset_name)
+    ])
+    error_message = "All backends must reference an existing backend_set name"
+  }
+
+  validation {
+    condition = alltrue([
+      for backend in var.backends : backend.port > 0 && backend.port <= 65535
+    ])
+    error_message = "port must be between 1 and 65535"
+  }
+
+  validation {
+    condition = alltrue([
+      for backend in var.backends : backend.weight >= 1 && backend.weight <= 100
+    ])
+    error_message = "weight must be between 1 and 100"
+  }
 }
 
 variable "listeners" {
   type = map(object({
     default_backend_set_name = string
     port                     = number
-    protocol                  = string
+    protocol                 = string
     ssl_configuration = optional(object({
-      certificate_ids                  = optional(list(string), [])
-      certificate_name                 = optional(string, "")
-      verify_depth                     = optional(number, 1)
-      verify_peer_certificate         = optional(bool, false)
-      protocols                        = optional(list(string), [])
-      cipher_suite_name                = optional(string, "")
-      server_order_preference          = optional(string, "")
+      certificate_ids                   = optional(list(string), [])
+      certificate_name                  = optional(string, "")
+      verify_depth                      = optional(number, 1)
+      verify_peer_certificate           = optional(bool, false)
+      protocols                         = optional(list(string), [])
+      cipher_suite_name                 = optional(string, "")
+      server_order_preference           = optional(string, "")
       trusted_certificate_authority_ids = optional(list(string), [])
     }))
     connection_configuration = object({
@@ -111,6 +142,34 @@ variable "listeners" {
   }))
   description = "Map of listeners to create"
   default     = {}
+
+  validation {
+    condition = alltrue([
+      for listener in var.listeners : contains(keys(var.backend_sets), listener.default_backend_set_name)
+    ])
+    error_message = "All listeners must reference an existing backend_set name"
+  }
+
+  validation {
+    condition = alltrue([
+      for listener in var.listeners : listener.port > 0 && listener.port <= 65535
+    ])
+    error_message = "port must be between 1 and 65535"
+  }
+
+  validation {
+    condition = alltrue([
+      for listener in var.listeners : contains(["HTTP", "HTTPS", "TCP"], listener.protocol)
+    ])
+    error_message = "protocol must be HTTP, HTTPS, or TCP"
+  }
+
+  validation {
+    condition = alltrue([
+      for listener in var.listeners : listener.connection_configuration.idle_timeout_in_seconds >= 1 && listener.connection_configuration.idle_timeout_in_seconds <= 300
+    ])
+    error_message = "idle_timeout_in_seconds must be between 1 and 300 seconds"
+  }
 }
 
 variable "project" {

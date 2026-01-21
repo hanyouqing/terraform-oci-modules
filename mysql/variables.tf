@@ -5,14 +5,14 @@ variable "compartment_id" {
 
 variable "mysql_systems" {
   type = map(object({
-    display_name        = string
-    availability_domain = string
-    shape_name          = string
-    subnet_id           = string
-    admin_username      = string
-    admin_password      = string
-    mysql_version       = optional(string, "8.0.35")
-    configuration_id    = optional(string, null)
+    display_name            = string
+    availability_domain     = string
+    shape_name              = string
+    subnet_id               = string
+    admin_username          = string
+    admin_password          = string
+    mysql_version           = optional(string, "8.0.35")
+    configuration_id        = optional(string, null)
     data_storage_size_in_gb = number
     backup_policy = object({
       is_enabled        = optional(bool, true)
@@ -25,9 +25,16 @@ variable "mysql_systems" {
 
   validation {
     condition = alltrue([
-      for mysql in var.mysql_systems : mysql.data_storage_size_in_gb >= 50 && mysql.data_storage_size_in_gb <= 50
+      for mysql in var.mysql_systems : mysql.data_storage_size_in_gb == 50
     ])
     error_message = "For Always Free, data_storage_size_in_gb must be 50 GB"
+  }
+
+  validation {
+    condition = alltrue([
+      for mysql in var.mysql_systems : mysql.backup_policy.retention_in_days >= 1 && mysql.backup_policy.retention_in_days <= 35
+    ])
+    error_message = "backup_policy.retention_in_days must be between 1 and 35 days"
   }
 }
 

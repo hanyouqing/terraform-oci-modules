@@ -1,13 +1,3 @@
-terraform {
-  required_version = ">= 1.14.2"
-  required_providers {
-    oci = {
-      source  = "oracle/oci"
-      version = "~> 7.30"
-    }
-  }
-}
-
 data "oci_identity_availability_domains" "ads" {
   compartment_id = var.tenancy_ocid
 }
@@ -22,7 +12,9 @@ data "oci_core_images" "this" {
 }
 
 locals {
-  image_id = var.image_id != null ? var.image_id : data.oci_core_images.this.images[0].id
+  image_id = var.image_id != null ? var.image_id : (
+    length(data.oci_core_images.this.images) > 0 ? data.oci_core_images.this.images[0].id : null
+  )
 
   always_free_shapes = [
     "VM.Standard.E2.1.Micro",
@@ -129,11 +121,13 @@ resource "oci_core_volume_attachment" "boot" {
 resource "oci_core_volume" "block" {
   for_each = var.block_volumes
 
-  compartment_id      = var.compartment_id
-  availability_domain = each.value.availability_domain != null ? each.value.availability_domain : oci_core_instance.this[0].availability_domain
-  display_name        = each.value.display_name
-  size_in_gbs         = each.value.size_in_gbs
-  vpus_per_gb         = each.value.vpus_per_gb
+  compartment_id = var.compartment_id
+  availability_domain = each.value.availability_domain != null ? each.value.availability_domain : (
+    var.instance_count > 0 ? oci_core_instance.this[0].availability_domain : null
+  )
+  display_name         = each.value.display_name
+  size_in_gbs          = each.value.size_in_gbs
+  vpus_per_gb          = each.value.vpus_per_gb
   is_auto_tune_enabled = each.value.is_auto_tune_enabled
 
   freeform_tags = merge(
@@ -148,8 +142,8 @@ resource "oci_core_volume_attachment" "block" {
   for_each = var.block_volumes
 
   attachment_type = "paravirtualized"
-  instance_id      = oci_core_instance.this[each.value.instance_index].id
-  volume_id        = oci_core_volume.block[each.key].id
-  display_name     = "${each.value.display_name}-attachment"
-  device           = each.value.device != null ? each.value.device : null
+  instance_id     = oci_core_instance.this[each.value.instance_index].id
+  volume_id       = oci_core_volume.block[each.key].id
+  display_name    = "${each.value.display_name}-attachment"
+  device          = each.value.device != null ? each.value.device : null
 }

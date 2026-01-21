@@ -17,10 +17,10 @@ variable "vault_type" {
 
 variable "keys" {
   type = map(object({
-    display_name   = string
-    algorithm      = string
-    length         = optional(number, null)
-    curve_id       = optional(string, null)
+    display_name    = string
+    algorithm       = string
+    length          = optional(number, null)
+    curve_id        = optional(string, null)
     protection_mode = string
   }))
   description = "Keys"
@@ -29,7 +29,7 @@ variable "keys" {
 
 variable "secrets" {
   type = map(object({
-    display_name  = string
+    display_name   = string
     secret_content = string
     content_type   = string
     key_id         = string

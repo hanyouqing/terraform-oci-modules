@@ -98,9 +98,9 @@ variable "private_subnets" {
 
 variable "network_security_groups" {
   type = map(object({
-    display_name   = string
-    freeform_tags  = optional(map(string), {})
-    defined_tags   = optional(map(map(string)), {})
+    display_name  = string
+    freeform_tags = optional(map(string), {})
+    defined_tags  = optional(map(map(string)), {})
   }))
   description = "Network Security Groups"
   default     = {}
@@ -108,25 +108,25 @@ variable "network_security_groups" {
 
 variable "nsg_ingress_rules" {
   type = map(object({
-    nsg_key           = string
-    protocol          = string
-    description       = optional(string, "")
-    source            = string
-    source_type       = string
-    is_stateless      = optional(bool, false)
-    tcp_options       = optional(object({
+    nsg_key      = string
+    protocol     = string
+    description  = optional(string, "")
+    source       = string
+    source_type  = string
+    is_stateless = optional(bool, false)
+    tcp_options = optional(object({
       destination_port_min = number
       destination_port_max = number
       source_port_min      = optional(number, null)
       source_port_max      = optional(number, null)
     }), null)
-    udp_options       = optional(object({
+    udp_options = optional(object({
       destination_port_min = number
       destination_port_max = number
       source_port_min      = optional(number, null)
       source_port_max      = optional(number, null)
     }), null)
-    icmp_options      = optional(object({
+    icmp_options = optional(object({
       type = number
       code = optional(number, null)
     }), null)
@@ -137,25 +137,25 @@ variable "nsg_ingress_rules" {
 
 variable "nsg_egress_rules" {
   type = map(object({
-    nsg_key           = string
-    protocol          = string
-    description       = optional(string, "")
-    destination       = string
-    destination_type  = string
-    is_stateless      = optional(bool, false)
-    tcp_options       = optional(object({
+    nsg_key          = string
+    protocol         = string
+    description      = optional(string, "")
+    destination      = string
+    destination_type = string
+    is_stateless     = optional(bool, false)
+    tcp_options = optional(object({
       destination_port_min = number
       destination_port_max = number
       source_port_min      = optional(number, null)
       source_port_max      = optional(number, null)
     }), null)
-    udp_options       = optional(object({
+    udp_options = optional(object({
       destination_port_min = number
       destination_port_max = number
       source_port_min      = optional(number, null)
       source_port_max      = optional(number, null)
     }), null)
-    icmp_options      = optional(object({
+    icmp_options = optional(object({
       type = number
       code = optional(number, null)
     }), null)

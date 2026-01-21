@@ -51,6 +51,41 @@ module "bastion" {
 | terraform | >= 1.14.2 |
 | oci | ~> 6.0 |
 
+## Cost Estimate
+
+The following cost estimates are based on typical configurations and OCI standard pricing. Actual costs may vary based on region and session usage.
+
+### Always Free Tier
+
+The following Bastion resources are **free** for both free and paid accounts:
+- **Bastion Hosts**: Unlimited
+- **Bastion Sessions**: Unlimited
+- **Session Duration**: Up to 3 hours per session
+- **Concurrent Sessions**: Limited by bastion type
+
+### Cost Breakdown
+
+| Resource | Configuration | Estimated Cost (USD/month) |
+|----------|--------------|---------------------------|
+| **Bastion Service** | | |
+| Standard Bastion | 1 bastion host | **$0** (Free) |
+| Standard Bastion Sessions | Unlimited sessions | **$0** (Free) |
+| **Total** | Any configuration | **$0** (Free) |
+
+> **Notes:**
+> - Bastion service is completely free for all account types
+> - No charges for bastion hosts, sessions, or data transfer
+> - Session duration is limited to 3 hours per session
+> - Standard bastion supports up to 50 concurrent sessions
+> - No cost optimization needed - service is free
+
+### Cost Optimization Tips
+
+1. **No cost optimization needed** - Bastion service is free
+2. **Use Standard bastion** for most use cases (free)
+3. **Reuse sessions** when possible to avoid session creation overhead
+4. **Monitor session usage** to ensure compliance with concurrent session limits
+
 ## Examples
 
 See the [examples](../examples/bastion/) directory for complete examples.

@@ -1,13 +1,3 @@
-terraform {
-  required_version = ">= 1.14.2"
-  required_providers {
-    oci = {
-      source  = "oracle/oci"
-      version = "~> 7.30"
-    }
-  }
-}
-
 data "oci_identity_availability_domains" "ads" {
   compartment_id = var.tenancy_ocid
 }
@@ -15,13 +5,13 @@ data "oci_identity_availability_domains" "ads" {
 resource "oci_core_volume" "this" {
   for_each = var.volumes
 
-  compartment_id      = var.compartment_id
-  availability_domain = each.value.availability_domain
-  display_name        = each.value.display_name
-  size_in_gbs         = each.value.size_in_gbs
-  vpus_per_gb         = each.value.vpus_per_gb
+  compartment_id       = var.compartment_id
+  availability_domain  = each.value.availability_domain
+  display_name         = each.value.display_name
+  size_in_gbs          = each.value.size_in_gbs
+  vpus_per_gb          = each.value.vpus_per_gb
   is_auto_tune_enabled = each.value.is_auto_tune_enabled
-  backup_policy_id    = each.value.backup_policy_id
+  backup_policy_id     = each.value.backup_policy_id
 
   freeform_tags = merge(
     var.freeform_tags,
@@ -58,7 +48,7 @@ resource "oci_core_volume_backup_policy" "this" {
   for_each = var.backup_policies
 
   compartment_id = var.compartment_id
-  display_name    = each.value.display_name
+  display_name   = each.value.display_name
 
   dynamic "schedules" {
     for_each = each.value.schedules

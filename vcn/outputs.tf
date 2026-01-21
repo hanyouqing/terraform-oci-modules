@@ -97,3 +97,42 @@ output "vcn_flow_log_id" {
   description = "OCID of the VCN Flow Log"
   value       = var.enable_vcn_flow_logs ? oci_core_vcn_flow_log.this[0].id : null
 }
+
+output "zzz_reminders" {
+  description = "Important reminders and next steps for VCN module"
+  value = {
+    next_steps = [
+      "Review security list rules to ensure appropriate ingress/egress rules",
+      "Configure Network Security Groups (NSGs) if using micro-segmentation",
+      "Verify route tables are correctly configured for public/private subnets",
+      "Test connectivity from compute instances in public and private subnets",
+      "Monitor NAT Gateway data processing costs if enabled"
+    ]
+    verification = [
+      "Verify VCN is created: oci network vcn get --vcn-id ${oci_core_vcn.this.id}",
+      "Check subnets: oci network subnet list --compartment-id ${var.compartment_id}",
+      "Verify Internet Gateway: ${var.create_internet_gateway ? "oci network internet-gateway get --ig-id ${oci_core_internet_gateway.this[0].id}" : "Not created"}",
+      "Verify NAT Gateway: ${var.create_nat_gateway ? "oci network nat-gateway get --nat-gateway-id ${oci_core_nat_gateway.this[0].id}" : "Not created"}"
+    ]
+    security_notes = [
+      "Default security lists allow all traffic - restrict as needed",
+      "Use NSGs for fine-grained network security (recommended)",
+      "Private subnets should not have direct internet access (use NAT Gateway)",
+      "Review and restrict security list rules to minimum required"
+    ]
+    cost_optimization = [
+      "NAT Gateway costs ~$32-35/month + data processing fees",
+      "Disable NAT Gateway if private subnets don't need internet access",
+      "Use Service Gateway for OCI service access (free alternative to NAT)",
+      "Monitor Flow Logs storage costs if enabled"
+    ]
+    important_resources = {
+      vcn_id               = oci_core_vcn.this.id
+      internet_gateway_id  = var.create_internet_gateway ? oci_core_internet_gateway.this[0].id : null
+      nat_gateway_id       = var.create_nat_gateway ? oci_core_nat_gateway.this[0].id : null
+      service_gateway_id   = var.create_service_gateway ? oci_core_service_gateway.this[0].id : null
+      public_subnet_count  = length(oci_core_subnet.public)
+      private_subnet_count = length(oci_core_subnet.private)
+    }
+  }
+}

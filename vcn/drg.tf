@@ -17,7 +17,7 @@ resource "oci_core_drg" "this" {
 resource "oci_core_drg_attachment" "vcn" {
   count = var.create_drg && var.attach_drg_to_vcn ? 1 : 0
 
-  drg_id             = oci_core_drg.this[0].id
+  drg_id = oci_core_drg.this[0].id
   network_details {
     id   = oci_core_vcn.this.id
     type = "VCN"
@@ -35,7 +35,7 @@ resource "oci_core_drg_attachment" "vcn" {
 resource "oci_core_drg_route_table" "this" {
   for_each = var.drg_route_tables
 
-  drg_id      = oci_core_drg.this[0].id
+  drg_id       = oci_core_drg.this[0].id
   display_name = each.value.display_name
 
   freeform_tags = merge(
@@ -49,8 +49,8 @@ resource "oci_core_drg_route_table" "this" {
 resource "oci_core_drg_route_distribution" "this" {
   for_each = var.drg_route_distributions
 
-  drg_id      = oci_core_drg.this[0].id
-  display_name = each.value.display_name
+  drg_id            = oci_core_drg.this[0].id
+  display_name      = each.value.display_name
   distribution_type = each.value.distribution_type
 
   freeform_tags = merge(

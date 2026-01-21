@@ -14,10 +14,10 @@ variable "log_groups" {
 
 variable "logs" {
   type = map(object({
-    log_group_key     = string
-    display_name      = string
-    log_type          = string
-    is_enabled        = bool
+    log_group_key      = string
+    display_name       = string
+    log_type           = string
+    is_enabled         = bool
     retention_duration = number
   }))
   description = "Map of logs to create"

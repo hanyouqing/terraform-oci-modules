@@ -122,12 +122,12 @@ variable "boot_volume_vpus_per_gb" {
 
 variable "block_volumes" {
   type = map(object({
-    display_name        = string
-    size_in_gbs         = number
-    availability_domain = optional(string, null)
-    instance_index      = number
-    device              = optional(string, null)
-    vpus_per_gb         = optional(string, "10")
+    display_name         = string
+    size_in_gbs          = number
+    availability_domain  = optional(string, null)
+    instance_index       = number
+    device               = optional(string, null)
+    vpus_per_gb          = optional(string, "10")
     is_auto_tune_enabled = optional(bool, false)
   }))
   description = "Block volumes"

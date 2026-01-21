@@ -140,9 +140,9 @@ variable "defined_tags" {
 
 variable "network_security_groups" {
   type = map(object({
-    display_name   = string
-    freeform_tags  = optional(map(string), {})
-    defined_tags   = optional(map(map(string)), {})
+    display_name  = string
+    freeform_tags = optional(map(string), {})
+    defined_tags  = optional(map(map(string)), {})
   }))
   description = "Map of Network Security Groups to create"
   default     = {}
@@ -150,25 +150,25 @@ variable "network_security_groups" {
 
 variable "nsg_ingress_rules" {
   type = map(object({
-    nsg_key           = string
-    protocol          = string
-    description       = optional(string, "")
-    source            = string
-    source_type       = string
-    is_stateless      = optional(bool, false)
-    tcp_options       = optional(object({
+    nsg_key      = string
+    protocol     = string
+    description  = optional(string, "")
+    source       = string
+    source_type  = string
+    is_stateless = optional(bool, false)
+    tcp_options = optional(object({
       destination_port_min = number
       destination_port_max = number
       source_port_min      = optional(number, null)
       source_port_max      = optional(number, null)
     }), null)
-    udp_options       = optional(object({
+    udp_options = optional(object({
       destination_port_min = number
       destination_port_max = number
       source_port_min      = optional(number, null)
       source_port_max      = optional(number, null)
     }), null)
-    icmp_options      = optional(object({
+    icmp_options = optional(object({
       type = number
       code = optional(number, null)
     }), null)
@@ -179,25 +179,25 @@ variable "nsg_ingress_rules" {
 
 variable "nsg_egress_rules" {
   type = map(object({
-    nsg_key           = string
-    protocol          = string
-    description       = optional(string, "")
-    destination       = string
-    destination_type  = string
-    is_stateless      = optional(bool, false)
-    tcp_options       = optional(object({
+    nsg_key          = string
+    protocol         = string
+    description      = optional(string, "")
+    destination      = string
+    destination_type = string
+    is_stateless     = optional(bool, false)
+    tcp_options = optional(object({
       destination_port_min = number
       destination_port_max = number
       source_port_min      = optional(number, null)
       source_port_max      = optional(number, null)
     }), null)
-    udp_options       = optional(object({
+    udp_options = optional(object({
       destination_port_min = number
       destination_port_max = number
       source_port_min      = optional(number, null)
       source_port_max      = optional(number, null)
     }), null)
-    icmp_options      = optional(object({
+    icmp_options = optional(object({
       type = number
       code = optional(number, null)
     }), null)
@@ -222,6 +222,11 @@ variable "attach_drg_to_vcn" {
   type        = bool
   description = "Whether to attach DRG to VCN"
   default     = false
+
+  validation {
+    condition     = var.create_drg || !var.attach_drg_to_vcn
+    error_message = "attach_drg_to_vcn can only be true when create_drg is true"
+  }
 }
 
 variable "drg_route_tables" {
@@ -230,15 +235,32 @@ variable "drg_route_tables" {
   }))
   description = "Map of DRG route tables to create"
   default     = {}
+
+  validation {
+    condition     = var.create_drg || length(var.drg_route_tables) == 0
+    error_message = "drg_route_tables can only be used when create_drg is true"
+  }
 }
 
 variable "drg_route_distributions" {
   type = map(object({
-    display_name     = string
+    display_name      = string
     distribution_type = string
   }))
   description = "Map of DRG route distributions to create"
   default     = {}
+
+  validation {
+    condition     = var.create_drg || length(var.drg_route_distributions) == 0
+    error_message = "drg_route_distributions can only be used when create_drg is true"
+  }
+
+  validation {
+    condition = alltrue([
+      for dist in var.drg_route_distributions : contains(["IMPORT", "EXPORT"], dist.distribution_type)
+    ])
+    error_message = "distribution_type must be either 'IMPORT' or 'EXPORT'"
+  }
 }
 
 variable "local_peering_gateways" {
@@ -261,4 +283,9 @@ variable "vcn_flow_log_retention_duration" {
   type        = number
   description = "Retention duration in days for VCN Flow Logs"
   default     = 30
+
+  validation {
+    condition     = var.vcn_flow_log_retention_duration >= 1 && var.vcn_flow_log_retention_duration <= 365
+    error_message = "vcn_flow_log_retention_duration must be between 1 and 365 days"
+  }
 }

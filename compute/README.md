@@ -118,6 +118,53 @@ module "compute_a1" {
 | instance_public_ips | Public IP addresses of the compute instances |
 | block_volume_ids | OCIDs of the block volumes |
 
+## Cost Estimate
+
+The following cost estimates are based on typical configurations and OCI standard pricing. Actual costs may vary based on region, usage patterns, and data transfer volumes.
+
+### Always Free Tier
+
+The following compute resources are **free** within Always Free tier limits:
+- **VM.Standard.E2.1.Micro**: Up to 2 instances (AMD processor, 1/8 OCPU, 1 GB memory)
+- **VM.Standard.A1.Flex**: Up to 4 OCPUs and 24 GB memory total (Arm processor)
+- **Boot Volumes**: Included in Always Free (up to 200 GB total including block volumes)
+- **Public IP Addresses**: Free when attached to Always Free instances
+
+### Cost Breakdown (Beyond Always Free)
+
+| Resource | Configuration | Estimated Cost (USD/month) |
+|----------|--------------|---------------------------|
+| **Compute Instances** | | |
+| VM.Standard.E2.1.Micro | 1 instance (beyond Always Free) | ~**$5-7** |
+| VM.Standard.A1.Flex (2 OCPUs, 12 GB) | 1 instance (beyond Always Free) | ~**$15-20** |
+| VM.Standard.A1.Flex (4 OCPUs, 24 GB) | 1 instance (beyond Always Free) | ~**$30-40** |
+| **Block Storage** | | |
+| Boot Volume (50 GB) | Standard performance | ~**$2-3** |
+| Block Volume (50 GB) | Standard performance, 10 VPUs/GB | ~**$2-3** |
+| Block Volume (100 GB) | Standard performance, 10 VPUs/GB | ~**$4-5** |
+| Block Volume Backup | 50 GB backup, 1 backup/month | ~**$1-2** |
+| **Networking** | | |
+| Public IP Address | 1 static public IP | **$0** (Free) |
+| Data Transfer Out | 100 GB/month | ~**$9-10** |
+| **Total (1 E2.1.Micro + 50 GB storage)** | Basic setup beyond Always Free | **~$18-25/month** |
+| **Total (1 A1.Flex 2 OCPUs + 100 GB storage)** | Arm instance setup | **~$30-45/month** |
+
+> **Notes:**
+> - Costs are estimates based on Asia Pacific (Seoul) region pricing
+> - Always Free tier includes 2 E2.1.Micro instances or up to 4 OCPUs A1.Flex
+> - Block storage costs include both boot and data volumes
+> - Data transfer costs apply to outbound internet traffic
+> - Backup costs depend on backup frequency and retention
+> - To minimize costs, use Always Free shapes when possible, and optimize block volume sizes
+
+### Cost Optimization Tips
+
+1. **Use Always Free shapes** (E2.1.Micro or A1.Flex) when possible
+2. **Right-size block volumes** to match actual storage needs
+3. **Use lower VPU settings** for non-performance-critical workloads
+4. **Optimize backup policies** to reduce backup storage costs
+5. **Monitor data transfer** and use Service Gateway for OCI service access (free)
+
 ## Examples
 
 See the [examples](../examples/compute/) directory for complete examples.

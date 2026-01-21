@@ -1,13 +1,3 @@
-terraform {
-  required_version = ">= 1.14.2"
-  required_providers {
-    oci = {
-      source  = "oracle/oci"
-      version = "~> 7.30"
-    }
-  }
-}
-
 resource "oci_ons_notification_topic" "this" {
   for_each = var.topics
 

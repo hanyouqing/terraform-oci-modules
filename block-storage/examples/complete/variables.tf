@@ -10,15 +10,15 @@ variable "tenancy_ocid" {
 
 variable "volumes" {
   type = map(object({
-    display_name        = string
-    availability_domain = string
-    size_in_gbs         = number
-    vpus_per_gb         = optional(string, "10")
+    display_name         = string
+    availability_domain  = string
+    size_in_gbs          = number
+    vpus_per_gb          = optional(string, "10")
     is_auto_tune_enabled = optional(bool, false)
-    backup_policy_id    = optional(string, null)
-    backup_type         = optional(string, "FULL")
-    freeform_tags       = optional(map(string), {})
-    defined_tags        = optional(map(map(string)), {})
+    backup_policy_id     = optional(string, null)
+    backup_type          = optional(string, "FULL")
+    freeform_tags        = optional(map(string), {})
+    defined_tags         = optional(map(map(string)), {})
   }))
   description = "Block volumes"
   default     = {}

@@ -84,7 +84,7 @@ provider_installation {
 # This can be used to set default provider configurations
 # Uncomment and modify as needed
 # provider "oci" {
-#   region = "us-ashburn-1"
+#   region = "ap-seoul-1"
 # }
 
 # -----------------------------------------------------------------------------

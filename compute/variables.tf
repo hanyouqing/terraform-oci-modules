@@ -177,24 +177,24 @@ variable "boot_volume_vpus_per_gb" {
 
 variable "block_volumes" {
   type = map(object({
-    display_name        = string
-    size_in_gbs         = number
-    availability_domain = optional(string, null)
-    instance_index      = number
-    device              = optional(string, null)
-    vpus_per_gb         = optional(string, "10")
+    display_name         = string
+    size_in_gbs          = number
+    availability_domain  = optional(string, null)
+    instance_index       = number
+    device               = optional(string, null)
+    vpus_per_gb          = optional(string, "10")
     is_auto_tune_enabled = optional(bool, false)
   }))
   description = "Map of block volumes to create and attach"
   default     = {}
-  
+
   validation {
-    condition = alltrue([
+    condition = var.instance_count == 0 ? length(var.block_volumes) == 0 : alltrue([
       for v in var.block_volumes : v.instance_index >= 0 && v.instance_index < var.instance_count
     ])
-    error_message = "instance_index must be between 0 and instance_count - 1"
+    error_message = "instance_index must be between 0 and instance_count - 1. If instance_count is 0, block_volumes must be empty."
   }
-  
+
   validation {
     condition = alltrue([
       for v in var.block_volumes : v.size_in_gbs >= 50 && v.size_in_gbs <= 200

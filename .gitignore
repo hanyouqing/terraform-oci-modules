@@ -40,3 +40,8 @@ terraform.rc
 .env.sh
 .env
 *.env
+
+# Ignore tool configuration files (user-specific)
+.tflint.hcl.local
+.tfsec.yml.local
+.terraform-docs.yml.local
