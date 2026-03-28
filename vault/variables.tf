@@ -1,6 +1,11 @@
 variable "compartment_id" {
   type        = string
   description = "OCID of the compartment where the vault will be created"
+
+  validation {
+    condition     = can(regex("^ocid1\\.compartment\\.oc1\\.", var.compartment_id)) || can(regex("^ocid1\\.tenancy\\.oc1\\.", var.compartment_id))
+    error_message = "compartment_id must be a valid OCI compartment or tenancy OCID."
+  }
 }
 
 variable "vault_display_name" {
@@ -34,12 +39,12 @@ variable "keys" {
 
 variable "secrets" {
   type = map(object({
-    display_name   = string
+    secret_name    = string
     secret_content = string
     content_type   = string
     key_id         = string
   }))
-  description = "Map of secrets to create"
+  description = "Map of secrets to create (secret_name maps to oci_vault_secret.secret_name)"
   default     = {}
 }
 
@@ -62,7 +67,7 @@ variable "freeform_tags" {
 }
 
 variable "defined_tags" {
-  type        = map(map(string))
-  description = "Defined tags to apply to all resources"
+  type        = map(string)
+  description = "Defined tags to apply to all resources (KMS/vault resources expect map(string))"
   default     = {}
 }

@@ -30,7 +30,6 @@ module "autonomous_database" {
       nsg_ids                                        = []
       private_endpoint_label                         = null
       subnet_id                                      = null
-      vcn_id                                         = null
       whitelisted_ips                                = ["0.0.0.0/0"]
       freeform_tags                                  = {}
       defined_tags                                   = {}

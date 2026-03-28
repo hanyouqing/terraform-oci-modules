@@ -1,6 +1,6 @@
 # Configuration Files Guide
 
-This document describes the configuration files for development tools used in this project.
+This document describes the configuration files for development tools used in this project. For secrets, credentials, and state handling, see [SECURITY.md](SECURITY.md).
 
 ## Table of Contents
 

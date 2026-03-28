@@ -1,6 +1,11 @@
 variable "compartment_id" {
   type        = string
   description = "OCID of the compartment where the load balancer will be created"
+
+  validation {
+    condition     = can(regex("^ocid1\\.compartment\\.oc1\\.", var.compartment_id)) || can(regex("^ocid1\\.tenancy\\.oc1\\.", var.compartment_id))
+    error_message = "compartment_id must be a valid OCI compartment or tenancy OCID."
+  }
 }
 
 variable "display_name" {
@@ -22,8 +27,8 @@ variable "shape" {
 
 variable "is_private" {
   type        = bool
-  description = "Whether the load balancer is private"
-  default     = false
+  description = "Whether the load balancer is private. Recommended to keep private for internal services."
+  default     = true
 }
 
 variable "shape_details" {
@@ -31,20 +36,15 @@ variable "shape_details" {
     minimum_bandwidth_in_mbps = number
     maximum_bandwidth_in_mbps = number
   })
-  description = "Shape details for flexible load balancer"
+  description = "Shape details for flexible load balancer. Always Free limit is 10 Mbps."
   default = {
     minimum_bandwidth_in_mbps = 10
     maximum_bandwidth_in_mbps = 10
   }
 
   validation {
-    condition     = var.shape_details.minimum_bandwidth_in_mbps <= var.shape_details.maximum_bandwidth_in_mbps
-    error_message = "minimum_bandwidth_in_mbps must be less than or equal to maximum_bandwidth_in_mbps"
-  }
-
-  validation {
-    condition     = var.shape_details.minimum_bandwidth_in_mbps >= 10 && var.shape_details.maximum_bandwidth_in_mbps <= 10000
-    error_message = "bandwidth must be between 10 and 10000 Mbps for flexible load balancer"
+    condition     = var.shape_details.minimum_bandwidth_in_mbps >= 10 && var.shape_details.maximum_bandwidth_in_mbps <= 8000
+    error_message = "Bandwidth must be between 10 and 8000 Mbps for flexible load balancer."
   }
 }
 
@@ -136,11 +136,11 @@ variable "listeners" {
       server_order_preference           = optional(string, "")
       trusted_certificate_authority_ids = optional(list(string), [])
     }))
-    connection_configuration = object({
+    connection_configuration = optional(object({
       idle_timeout_in_seconds = number
-    })
+    }), { idle_timeout_in_seconds = 60 })
   }))
-  description = "Map of listeners to create"
+  description = "Map of listeners to create. connection_configuration.idle_timeout_in_seconds defaults to 60 (1-300)"
   default     = {}
 
   validation {
@@ -166,7 +166,10 @@ variable "listeners" {
 
   validation {
     condition = alltrue([
-      for listener in var.listeners : listener.connection_configuration.idle_timeout_in_seconds >= 1 && listener.connection_configuration.idle_timeout_in_seconds <= 300
+      for listener in var.listeners : (
+        listener.connection_configuration.idle_timeout_in_seconds >= 1 &&
+        listener.connection_configuration.idle_timeout_in_seconds <= 300
+      )
     ])
     error_message = "idle_timeout_in_seconds must be between 1 and 300 seconds"
   }
@@ -191,7 +194,7 @@ variable "freeform_tags" {
 }
 
 variable "defined_tags" {
-  type        = map(map(string))
-  description = "Defined tags to apply to all resources"
+  type        = map(string)
+  description = "Defined tags to apply to all resources (load balancer expects map(string))"
   default     = {}
 }

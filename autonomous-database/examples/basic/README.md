@@ -11,13 +11,17 @@ This example creates a minimal Always Free Autonomous Database.
 
 ## Usage
 
+Set the admin password only via environment or a secret store—never commit it. For example:
+
 ```bash
+export TF_VAR_admin_password="$(openssl rand -base64 32)"   # or inject from CI / 1Password / Vault
 terraform init
 terraform plan \
-  -var="compartment_id=ocid1.compartment.oc1..xxxxx" \
-  -var="admin_password=YourSecurePassword123!"
+  -var="compartment_id=ocid1.compartment.oc1..xxxxx"
 terraform apply
 ```
+
+When `TF_VAR_admin_password` is set, you do not need `-var="admin_password=..."`.
 
 ## Always Free Considerations
 

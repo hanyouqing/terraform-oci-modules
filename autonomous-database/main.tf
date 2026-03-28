@@ -17,17 +17,16 @@ resource "oci_database_autonomous_database" "this" {
   nsg_ids                                        = length(each.value.nsg_ids) > 0 ? each.value.nsg_ids : null
   private_endpoint_label                         = each.value.private_endpoint_label
   subnet_id                                      = each.value.subnet_id
-  vcn_id                                         = each.value.vcn_id
   whitelisted_ips                                = length(each.value.whitelisted_ips) > 0 ? each.value.whitelisted_ips : null
 
   freeform_tags = merge(
-    var.freeform_tags,
-    each.value.freeform_tags,
     {
-      "Module"      = "terraform-oci-modules/autonomous-database"
-      "Project"     = var.project
-      "Environment" = var.environment
-    }
+      "ManagedBy"  = "terraform"
+      "Module"     = "github.com/hanyouqing/terraform-oci-modules/autonomous-database"
+      "AlwaysFree" = tostring(each.value.is_free_tier)
+    },
+    var.freeform_tags,
+    each.value.freeform_tags
   )
 
   defined_tags = merge(

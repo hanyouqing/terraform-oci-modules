@@ -15,6 +15,8 @@ This module creates and manages MySQL HeatWave Database Service systems in Oracl
 - **Data Storage**: 50 GB
 - **Backup Storage**: 50 GB
 
+Use shape **`MySQL.Free`** for Always Free. Paid shapes (for example `MySQL.HeatWave.VM.Standard.E3.*`) appear in `examples/complete` and are not covered by Always Free.
+
 ## Usage
 
 ```hcl
@@ -27,7 +29,7 @@ module "mysql" {
     mysql-1 = {
       display_name        = "mysql-1"
       availability_domain = data.oci_identity_availability_domains.ads.availability_domains[0].name
-      shape_name          = "MySQL.HeatWave.VM.Standard.E3.1.8GB"
+      shape_name          = "MySQL.Free"
       subnet_id           = module.vcn.private_subnet_ids["private-subnet-1"]
       admin_username      = "admin"
       admin_password      = var.mysql_password
@@ -52,7 +54,7 @@ module "mysql" {
 | Name | Version |
 |------|---------|
 | terraform | >= 1.14.2 |
-| oci | ~> 6.0 |
+| oci | ~> 7.30 |
 
 ## Cost Estimate
 

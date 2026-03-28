@@ -7,7 +7,8 @@ resource "oci_core_drg" "this" {
   freeform_tags = merge(
     var.freeform_tags,
     {
-      "Module" = "terraform-oci-modules/vcn/drg"
+      "ManagedBy" = "terraform"
+      "Module"    = "github.com/hanyouqing/terraform-oci-modules/vcn/drg"
     }
   )
 
@@ -27,7 +28,8 @@ resource "oci_core_drg_attachment" "vcn" {
   freeform_tags = merge(
     var.freeform_tags,
     {
-      "Module" = "terraform-oci-modules/vcn/drg-attachment"
+      "ManagedBy" = "terraform"
+      "Module"    = "github.com/hanyouqing/terraform-oci-modules/vcn/drg-attachment"
     }
   )
 }
@@ -41,7 +43,8 @@ resource "oci_core_drg_route_table" "this" {
   freeform_tags = merge(
     var.freeform_tags,
     {
-      "Module" = "terraform-oci-modules/vcn/drg-route-table"
+      "ManagedBy" = "terraform"
+      "Module"    = "github.com/hanyouqing/terraform-oci-modules/vcn/drg-route-table"
     }
   )
 }
@@ -56,7 +59,8 @@ resource "oci_core_drg_route_distribution" "this" {
   freeform_tags = merge(
     var.freeform_tags,
     {
-      "Module" = "terraform-oci-modules/vcn/drg-route-distribution"
+      "ManagedBy" = "terraform"
+      "Module"    = "github.com/hanyouqing/terraform-oci-modules/vcn/drg-route-distribution"
     }
   )
 }
@@ -73,7 +77,8 @@ resource "oci_core_local_peering_gateway" "this" {
   freeform_tags = merge(
     var.freeform_tags,
     {
-      "Module" = "terraform-oci-modules/vcn/lpg"
+      "ManagedBy" = "terraform"
+      "Module"    = "github.com/hanyouqing/terraform-oci-modules/vcn/lpg"
     }
   )
 

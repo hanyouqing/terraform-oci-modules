@@ -8,11 +8,14 @@ resource "oci_ons_notification_topic" "this" {
   freeform_tags = merge(
     var.freeform_tags,
     {
-      "Module"      = "terraform-oci-modules/notifications"
+      "ManagedBy"   = "terraform"
+      "Module"      = "github.com/hanyouqing/terraform-oci-modules/notifications"
       "Project"     = var.project
       "Environment" = var.environment
     }
   )
+
+  defined_tags = var.defined_tags
 }
 
 resource "oci_ons_subscription" "this" {
@@ -26,7 +29,10 @@ resource "oci_ons_subscription" "this" {
   freeform_tags = merge(
     var.freeform_tags,
     {
-      "Module" = "terraform-oci-modules/notifications/subscription"
+      "ManagedBy" = "terraform"
+      "Module"    = "github.com/hanyouqing/terraform-oci-modules/notifications/subscription"
     }
   )
+
+  defined_tags = var.defined_tags
 }

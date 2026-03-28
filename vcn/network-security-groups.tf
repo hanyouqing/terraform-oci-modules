@@ -9,7 +9,8 @@ resource "oci_core_network_security_group" "this" {
     var.freeform_tags,
     each.value.freeform_tags,
     {
-      "Module" = "terraform-oci-modules/vcn/nsg"
+      "ManagedBy" = "terraform"
+      "Module"    = "github.com/hanyouqing/terraform-oci-modules/vcn/nsg"
     }
   )
 
@@ -66,7 +67,7 @@ resource "oci_core_network_security_group_security_rule" "ingress" {
     }
   }
 
-  is_stateless = each.value.is_stateless
+  stateless = each.value.is_stateless
 }
 
 resource "oci_core_network_security_group_security_rule" "egress" {
@@ -116,5 +117,5 @@ resource "oci_core_network_security_group_security_rule" "egress" {
     }
   }
 
-  is_stateless = each.value.is_stateless
+  stateless = each.value.is_stateless
 }

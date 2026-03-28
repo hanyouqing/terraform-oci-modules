@@ -1,6 +1,11 @@
 variable "compartment_id" {
   type        = string
   description = "OCID of the compartment where the compute instance will be created"
+
+  validation {
+    condition     = can(regex("^ocid1\\.compartment\\.oc1\\.", var.compartment_id)) || can(regex("^ocid1\\.tenancy\\.oc1\\.", var.compartment_id))
+    error_message = "compartment_id must be a valid OCI compartment or tenancy OCID."
+  }
 }
 
 variable "tenancy_ocid" {
@@ -14,41 +19,41 @@ variable "instance_count" {
   default     = 1
 
   validation {
-    condition     = var.instance_count > 0 && var.instance_count <= 2
-    error_message = "For Always Free, instance_count must be between 1 and 2 for VM.Standard.E2.1.Micro, or up to 4 OCPUs for VM.Standard.A1.Flex"
+    condition     = var.instance_count > 0
+    error_message = "instance_count must be greater than 0"
   }
 }
 
 variable "shape" {
   type        = string
-  description = "Shape of the compute instance. Always Free shapes: VM.Standard.E2.1.Micro or VM.Standard.A1.Flex"
+  description = "Shape of the compute instance (e.g. VM.Standard.E2.1.Micro, VM.Standard.A1.Flex, VM.Standard.E4.Flex)"
   default     = "VM.Standard.E2.1.Micro"
 
   validation {
-    condition     = contains(["VM.Standard.E2.1.Micro", "VM.Standard.A1.Flex"], var.shape)
-    error_message = "shape must be one of the Always Free shapes: VM.Standard.E2.1.Micro or VM.Standard.A1.Flex"
+    condition     = can(regex("^VM\\..*", var.shape))
+    error_message = "Shape must be a valid OCI VM shape starting with 'VM.'."
   }
 }
 
 variable "ocpus" {
   type        = number
-  description = "Number of OCPUs for VM.Standard.A1.Flex shape (1-4 for Always Free)"
+  description = "Number of OCPUs for flexible shapes (e.g. VM.Standard.A1.Flex)"
   default     = 1
 
   validation {
-    condition     = var.ocpus >= 1 && var.ocpus <= 4
-    error_message = "ocpus must be between 1 and 4 for Always Free VM.Standard.A1.Flex"
+    condition     = var.ocpus >= 1 && var.ocpus <= 114
+    error_message = "ocpus must be between 1 and 114."
   }
 }
 
 variable "memory_in_gbs" {
   type        = number
-  description = "Memory in GBs for VM.Standard.A1.Flex shape"
+  description = "Memory in GBs for flexible shapes (e.g. VM.Standard.A1.Flex)"
   default     = 6
 
   validation {
-    condition     = var.memory_in_gbs >= 6 && var.memory_in_gbs <= 24
-    error_message = "memory_in_gbs must be between 6 and 24 GB for Always Free VM.Standard.A1.Flex"
+    condition     = var.memory_in_gbs >= 1 && var.memory_in_gbs <= 1760
+    error_message = "memory_in_gbs must be between 1 and 1760."
   }
 }
 
@@ -85,6 +90,24 @@ variable "image_operating_system_version" {
   type        = string
   description = "Operating system version for the image"
   default     = null
+}
+
+variable "image_sort_by" {
+  type        = string
+  description = "Sort order for image selection (TIMECREATED, DISPLAYNAME)"
+  default     = "TIMECREATED"
+}
+
+variable "image_sort_order" {
+  type        = string
+  description = "Sort direction for image selection (ASC, DESC)"
+  default     = "DESC"
+}
+
+variable "flexible_shapes" {
+  type        = list(string)
+  description = "List of shapes that require ocpus/memory_in_gbs (e.g. VM.Standard.A1.Flex, VM.Standard.E3.Flex)"
+  default     = ["VM.Standard.A1.Flex", "VM.Standard.E3.Flex", "VM.Standard.E4.Flex"]
 }
 
 variable "assign_public_ip" {
@@ -125,7 +148,12 @@ variable "private_ip" {
 
 variable "ssh_public_keys" {
   type        = string
-  description = "SSH public key(s) for the instance"
+  description = "SSH public key(s) for the instance. Multiple keys should be newline separated."
+
+  validation {
+    condition     = length(var.ssh_public_keys) > 0
+    error_message = "ssh_public_keys cannot be empty."
+  }
 }
 
 variable "user_data" {
@@ -160,12 +188,12 @@ variable "create_boot_volume" {
 
 variable "boot_volume_size_in_gbs" {
   type        = number
-  description = "Size of the boot volume in GBs (50-200 for Always Free)"
+  description = "Size of the boot volume in GBs"
   default     = 50
 
   validation {
-    condition     = var.boot_volume_size_in_gbs >= 50 && var.boot_volume_size_in_gbs <= 200
-    error_message = "boot_volume_size_in_gbs must be between 50 and 200 GB for Always Free (total limit 200 GB)"
+    condition     = var.boot_volume_size_in_gbs >= 50
+    error_message = "boot_volume_size_in_gbs must be at least 50 GB"
   }
 }
 
@@ -197,9 +225,9 @@ variable "block_volumes" {
 
   validation {
     condition = alltrue([
-      for v in var.block_volumes : v.size_in_gbs >= 50 && v.size_in_gbs <= 200
+      for v in var.block_volumes : v.size_in_gbs >= 50
     ])
-    error_message = "Each block volume size must be between 50 and 200 GB for Always Free (total limit 200 GB)"
+    error_message = "Each block volume size must be at least 50 GB"
   }
 }
 
@@ -222,7 +250,7 @@ variable "freeform_tags" {
 }
 
 variable "defined_tags" {
-  type        = map(map(string))
-  description = "Defined tags to apply to all resources"
+  type        = map(string)
+  description = "Defined tags to apply to all resources (oci_core_instance expects map(string))"
   default     = {}
 }

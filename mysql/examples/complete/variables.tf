@@ -27,6 +27,7 @@ variable "mysql_systems" {
   }))
   description = "MySQL systems"
   default     = {}
+  sensitive   = true
 }
 
 variable "project" {
@@ -48,7 +49,7 @@ variable "freeform_tags" {
 }
 
 variable "defined_tags" {
-  type        = map(map(string))
+  type        = map(string)
   description = "Defined tags"
   default     = {}
 }

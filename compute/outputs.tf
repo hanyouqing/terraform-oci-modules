@@ -25,7 +25,7 @@ output "instance_availability_domains" {
 
 output "boot_volume_ids" {
   description = "OCIDs of the boot volumes"
-  value       = var.create_boot_volume ? oci_core_volume.boot[*].id : []
+  value       = { for k, v in oci_core_instance.this : k => v.boot_volume_id }
 }
 
 output "block_volume_ids" {

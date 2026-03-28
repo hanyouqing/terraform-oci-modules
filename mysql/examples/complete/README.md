@@ -1,6 +1,6 @@
 # MySQL HeatWave Complete Example
 
-This example demonstrates a production-ready MySQL HeatWave setup.
+This example demonstrates a production-ready MySQL HeatWave setup. It may use **paid** shapes and options—**not** the same as Always Free. For Always Free, use `examples/basic` with shape **`MySQL.Free`** and 50 GB storage.
 
 ## Features
 

@@ -3,16 +3,18 @@ resource "oci_email_sender" "this" {
 
   compartment_id = var.compartment_id
   email_address  = each.value.email_address
-  is_verified    = false
 
   freeform_tags = merge(
     var.freeform_tags,
     {
-      "Module"      = "terraform-oci-modules/email-delivery"
+      "ManagedBy"   = "terraform"
+      "Module"      = "github.com/hanyouqing/terraform-oci-modules/email-delivery"
       "Project"     = var.project
       "Environment" = var.environment
     }
   )
+
+  defined_tags = var.defined_tags
 }
 
 resource "oci_email_suppression" "this" {
@@ -20,11 +22,4 @@ resource "oci_email_suppression" "this" {
 
   compartment_id = var.compartment_id
   email_address  = each.value.email_address
-
-  freeform_tags = merge(
-    var.freeform_tags,
-    {
-      "Module" = "terraform-oci-modules/email-delivery/suppression"
-    }
-  )
 }

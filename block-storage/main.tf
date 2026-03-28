@@ -17,7 +17,8 @@ resource "oci_core_volume" "this" {
     var.freeform_tags,
     each.value.freeform_tags,
     {
-      "Module"      = "terraform-oci-modules/block-storage"
+      "ManagedBy"   = "terraform"
+      "Module"      = "github.com/hanyouqing/terraform-oci-modules/block-storage"
       "Project"     = var.project
       "Environment" = var.environment
     }
@@ -39,7 +40,8 @@ resource "oci_core_volume_backup" "this" {
   freeform_tags = merge(
     var.freeform_tags,
     {
-      "Module" = "terraform-oci-modules/block-storage/backup"
+      "ManagedBy" = "terraform"
+      "Module"    = "github.com/hanyouqing/terraform-oci-modules/block-storage/backup"
     }
   )
 }
@@ -67,7 +69,8 @@ resource "oci_core_volume_backup_policy" "this" {
   freeform_tags = merge(
     var.freeform_tags,
     {
-      "Module" = "terraform-oci-modules/block-storage/backup-policy"
+      "ManagedBy" = "terraform"
+      "Module"    = "github.com/hanyouqing/terraform-oci-modules/block-storage/backup-policy"
     }
   )
 }
@@ -82,11 +85,4 @@ resource "oci_core_volume_attachment" "this" {
   device          = each.value.device
   is_read_only    = each.value.is_read_only
   is_shareable    = each.value.is_shareable
-
-  freeform_tags = merge(
-    var.freeform_tags,
-    {
-      "Module" = "terraform-oci-modules/block-storage/attachment"
-    }
-  )
 }

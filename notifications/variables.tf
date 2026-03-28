@@ -1,6 +1,11 @@
 variable "compartment_id" {
   type        = string
   description = "OCID of the compartment where the notification resources will be created"
+
+  validation {
+    condition     = can(regex("^ocid1\\.compartment\\.oc1\\.", var.compartment_id)) || can(regex("^ocid1\\.tenancy\\.oc1\\.", var.compartment_id))
+    error_message = "compartment_id must be a valid OCI compartment or tenancy OCID."
+  }
 }
 
 variable "topics" {
@@ -20,6 +25,13 @@ variable "subscriptions" {
   }))
   description = "Map of subscriptions to create"
   default     = {}
+
+  validation {
+    condition = alltrue([
+      for sub in var.subscriptions : contains(["CUSTOM_HTTPS", "EMAIL", "FAAS", "OSS", "PAGERDUTY", "SLACK", "SMS"], sub.protocol)
+    ])
+    error_message = "protocol must be one of: CUSTOM_HTTPS, EMAIL, FAAS, OSS, PAGERDUTY, SLACK, SMS"
+  }
 }
 
 variable "project" {
@@ -37,5 +49,11 @@ variable "environment" {
 variable "freeform_tags" {
   type        = map(string)
   description = "Freeform tags to apply to all resources"
+  default     = {}
+}
+
+variable "defined_tags" {
+  type        = map(string)
+  description = "Defined tags to apply to all resources"
   default     = {}
 }

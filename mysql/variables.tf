@@ -1,6 +1,11 @@
 variable "compartment_id" {
   type        = string
   description = "OCID of the compartment where the MySQL system will be created"
+
+  validation {
+    condition     = can(regex("^ocid1\\.compartment\\.oc1\\.", var.compartment_id)) || can(regex("^ocid1\\.tenancy\\.oc1\\.", var.compartment_id))
+    error_message = "compartment_id must be a valid OCI compartment or tenancy OCID."
+  }
 }
 
 variable "mysql_systems" {
@@ -20,14 +25,14 @@ variable "mysql_systems" {
       window_start_time = optional(string, "02:00")
     })
   }))
-  description = "Map of MySQL systems to create"
+  description = "Map of MySQL systems to create. For Always Free, use shape_name='MySQL.Free' and data_storage_size_in_gb=50."
   default     = {}
 
   validation {
     condition = alltrue([
-      for mysql in var.mysql_systems : mysql.data_storage_size_in_gb == 50
+      for mysql in var.mysql_systems : mysql.shape_name == "MySQL.Free" ? mysql.data_storage_size_in_gb == 50 : true
     ])
-    error_message = "For Always Free, data_storage_size_in_gb must be 50 GB"
+    error_message = "For Always Free Tier (shape_name='MySQL.Free'), data_storage_size_in_gb must be 50 GB."
   }
 
   validation {
@@ -57,7 +62,7 @@ variable "freeform_tags" {
 }
 
 variable "defined_tags" {
-  type        = map(map(string))
-  description = "Defined tags to apply to all resources"
+  type        = map(string)
+  description = "Defined tags to apply to all resources (oci_mysql_mysql_db_system expects map(string))"
   default     = {}
 }

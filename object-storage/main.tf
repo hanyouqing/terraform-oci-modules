@@ -11,15 +11,15 @@ resource "oci_objectstorage_bucket" "this" {
   access_type    = each.value.access_type
   storage_tier   = each.value.storage_tier
   versioning     = each.value.versioning
+  kms_key_id     = each.value.kms_key_id
 
   freeform_tags = merge(
-    var.freeform_tags,
-    each.value.freeform_tags,
     {
-      "Module"      = "terraform-oci-modules/object-storage"
-      "Project"     = var.project
-      "Environment" = var.environment
-    }
+      "ManagedBy" = "terraform"
+      "Module"    = "github.com/hanyouqing/terraform-oci-modules/object-storage"
+    },
+    var.freeform_tags,
+    each.value.freeform_tags
   )
 
   defined_tags = merge(

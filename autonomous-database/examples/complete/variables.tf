@@ -20,7 +20,6 @@ variable "databases" {
     nsg_ids                                        = optional(list(string), [])
     private_endpoint_label                         = optional(string, null)
     subnet_id                                      = optional(string, null)
-    vcn_id                                         = optional(string, null)
     whitelisted_ips                                = optional(list(string), [])
     freeform_tags                                  = optional(map(string), {})
     defined_tags                                   = optional(map(map(string)), {})

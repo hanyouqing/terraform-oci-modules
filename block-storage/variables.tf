@@ -1,6 +1,11 @@
 variable "compartment_id" {
   type        = string
   description = "OCID of the compartment where the block volumes will be created"
+
+  validation {
+    condition     = can(regex("^ocid1\\.compartment\\.oc1\\.", var.compartment_id)) || can(regex("^ocid1\\.tenancy\\.oc1\\.", var.compartment_id))
+    error_message = "compartment_id must be a valid OCI compartment or tenancy OCID."
+  }
 }
 
 variable "tenancy_ocid" {
@@ -18,7 +23,7 @@ variable "volumes" {
     backup_policy_id     = optional(string, null)
     backup_type          = optional(string, "FULL")
     freeform_tags        = optional(map(string), {})
-    defined_tags         = optional(map(map(string)), {})
+    defined_tags         = optional(map(string), {})
   }))
   description = "Map of block volumes to create"
   default     = {}
@@ -88,7 +93,7 @@ variable "freeform_tags" {
 }
 
 variable "defined_tags" {
-  type        = map(map(string))
+  type        = map(string)
   description = "Defined tags to apply to all resources"
   default     = {}
 }

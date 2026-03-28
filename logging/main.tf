@@ -8,11 +8,14 @@ resource "oci_logging_log_group" "this" {
   freeform_tags = merge(
     var.freeform_tags,
     {
-      "Module"      = "terraform-oci-modules/logging"
+      "ManagedBy"   = "terraform"
+      "Module"      = "github.com/hanyouqing/terraform-oci-modules/logging"
       "Project"     = var.project
       "Environment" = var.environment
     }
   )
+
+  defined_tags = var.defined_tags
 }
 
 resource "oci_logging_log" "this" {
@@ -27,7 +30,10 @@ resource "oci_logging_log" "this" {
   freeform_tags = merge(
     var.freeform_tags,
     {
-      "Module" = "terraform-oci-modules/logging/log"
+      "ManagedBy" = "terraform"
+      "Module"    = "github.com/hanyouqing/terraform-oci-modules/logging/log"
     }
   )
+
+  defined_tags = var.defined_tags
 }

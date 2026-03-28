@@ -5,7 +5,8 @@ resource "oci_kms_vault" "this" {
   freeform_tags = merge(
     var.freeform_tags,
     {
-      "Module"      = "terraform-oci-modules/vault"
+      "ManagedBy"   = "terraform"
+      "Module"      = "github.com/hanyouqing/terraform-oci-modules/vault"
       "Project"     = var.project
       "Environment" = var.environment
     }
@@ -29,7 +30,8 @@ resource "oci_kms_key" "this" {
   freeform_tags = merge(
     var.freeform_tags,
     {
-      "Module" = "terraform-oci-modules/vault/key"
+      "ManagedBy" = "terraform"
+      "Module"    = "github.com/hanyouqing/terraform-oci-modules/vault/key"
     }
   )
 }
@@ -42,14 +44,15 @@ resource "oci_vault_secret" "this" {
     content      = each.value.secret_content
     content_type = each.value.content_type
   }
-  vault_id     = oci_kms_vault.this.id
-  display_name = each.value.display_name
-  key_id       = each.value.key_id
+  vault_id    = oci_kms_vault.this.id
+  secret_name = each.value.secret_name
+  key_id      = each.value.key_id
 
   freeform_tags = merge(
     var.freeform_tags,
     {
-      "Module" = "terraform-oci-modules/vault/secret"
+      "ManagedBy" = "terraform"
+      "Module"    = "github.com/hanyouqing/terraform-oci-modules/vault/secret"
     }
   )
 }

@@ -1,3 +1,7 @@
+locals {
+  is_always_free = var.shape == "flexible" && var.shape_details.maximum_bandwidth_in_mbps <= 10
+}
+
 resource "oci_load_balancer_load_balancer" "this" {
   compartment_id = var.compartment_id
   display_name   = var.display_name
@@ -9,16 +13,16 @@ resource "oci_load_balancer_load_balancer" "this" {
     maximum_bandwidth_in_mbps = var.shape_details.maximum_bandwidth_in_mbps
   }
 
-  subnet_ids = var.subnet_ids
-  nsg_ids    = var.nsg_ids
+  subnet_ids                 = var.subnet_ids
+  network_security_group_ids = var.nsg_ids
 
   freeform_tags = merge(
-    var.freeform_tags,
     {
-      "Module"      = "terraform-oci-modules/load-balancer"
-      "Project"     = var.project
-      "Environment" = var.environment
-    }
+      "ManagedBy"  = "terraform"
+      "Module"     = "github.com/hanyouqing/terraform-oci-modules/load-balancer"
+      "AlwaysFree" = tostring(local.is_always_free)
+    },
+    var.freeform_tags
   )
 
   defined_tags = var.defined_tags
@@ -96,3 +100,4 @@ resource "oci_load_balancer_listener" "this" {
     idle_timeout_in_seconds = each.value.connection_configuration.idle_timeout_in_seconds
   }
 }
+

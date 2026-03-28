@@ -94,8 +94,8 @@ output "local_peering_gateway_ids" {
 }
 
 output "vcn_flow_log_id" {
-  description = "OCID of the VCN Flow Log"
-  value       = var.enable_vcn_flow_logs ? oci_core_vcn_flow_log.this[0].id : null
+  description = "OCID of the Logging service log for VCN flow logs"
+  value       = var.enable_vcn_flow_logs ? oci_logging_log.vcn_flow_log[0].id : null
 }
 
 output "zzz_reminders" {

@@ -10,7 +10,7 @@ This module creates a Virtual Cloud Network (VCN) in Oracle Cloud Infrastructure
 - NAT Gateway for private subnets (optional)
 - Service Gateway for OCI services (optional)
 - Route tables for public and private subnets
-- Security lists with default rules
+- Security lists (Locked down by default for security)
 - Support for IPv6 (optional)
 - Comprehensive tagging support
 

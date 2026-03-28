@@ -1,6 +1,11 @@
 variable "compartment_id" {
   type        = string
   description = "OCID of the compartment where the VCN will be created"
+
+  validation {
+    condition     = can(regex("^ocid1\\.compartment\\.oc1\\.", var.compartment_id)) || can(regex("^ocid1\\.tenancy\\.oc1\\.", var.compartment_id))
+    error_message = "compartment_id must be a valid OCI compartment or tenancy OCID."
+  }
 }
 
 variable "tenancy_ocid" {
@@ -18,12 +23,22 @@ variable "vcn_cidr_blocks" {
   type        = list(string)
   description = "List of CIDR blocks for the VCN"
   default     = ["10.0.0.0/16"]
+
+  validation {
+    condition     = alltrue([for c in var.vcn_cidr_blocks : can(cidrnetmask(c))])
+    error_message = "All elements in vcn_cidr_blocks must be valid IPv4 CIDR notation."
+  }
 }
 
 variable "vcn_dns_label" {
   type        = string
   description = "DNS label for the VCN"
   default     = null
+
+  validation {
+    condition     = var.vcn_dns_label == null ? true : can(regex("^[a-zA-Z][a-zA-Z0-9]{0,14}$", var.vcn_dns_label))
+    error_message = "VCN DNS label must begin with a letter, be alphanumeric, and max 15 characters."
+  }
 }
 
 variable "enable_ipv6" {
@@ -133,8 +148,8 @@ variable "freeform_tags" {
 }
 
 variable "defined_tags" {
-  type        = map(map(string))
-  description = "Defined tags to apply to all resources"
+  type        = map(string)
+  description = "Defined tags to apply to all resources (core networking resources expect map(string))"
   default     = {}
 }
 
@@ -142,7 +157,7 @@ variable "network_security_groups" {
   type = map(object({
     display_name  = string
     freeform_tags = optional(map(string), {})
-    defined_tags  = optional(map(map(string)), {})
+    defined_tags  = optional(map(string), {})
   }))
   description = "Map of Network Security Groups to create"
   default     = {}
@@ -271,6 +286,104 @@ variable "local_peering_gateways" {
   }))
   description = "Map of Local Peering Gateways to create"
   default     = {}
+}
+
+variable "public_subnet_ingress_rules" {
+  type = list(object({
+    protocol    = string
+    source      = string
+    source_type = optional(string, "CIDR_BLOCK")
+    description = optional(string, "")
+    tcp_options = optional(object({
+      min = number
+      max = number
+    }), null)
+    udp_options = optional(object({
+      min = number
+      max = number
+    }), null)
+    icmp_options = optional(object({
+      type = number
+      code = optional(number, null)
+    }), null)
+  }))
+  description = "Ingress rules for default public subnet security lists. Default is empty (locked down). User must provide rules to allow traffic."
+  default     = []
+}
+
+variable "public_subnet_egress_rules" {
+  type = list(object({
+    protocol         = string
+    destination      = string
+    destination_type = optional(string, "CIDR_BLOCK")
+    description      = optional(string, "")
+    tcp_options = optional(object({
+      min = number
+      max = number
+    }), null)
+    udp_options = optional(object({
+      min = number
+      max = number
+    }), null)
+    icmp_options = optional(object({
+      type = number
+      code = optional(number, null)
+    }), null)
+  }))
+  description = "Egress rules for default public subnet security lists. Set to null to use default (allow all outbound)"
+  default     = null
+}
+
+variable "private_subnet_ingress_rules" {
+  type = list(object({
+    protocol    = string
+    source      = optional(string, null)
+    source_type = optional(string, "CIDR_BLOCK")
+    description = optional(string, "")
+    tcp_options = optional(object({
+      min = number
+      max = number
+    }), null)
+    udp_options = optional(object({
+      min = number
+      max = number
+    }), null)
+    icmp_options = optional(object({
+      type = number
+      code = optional(number, null)
+    }), null)
+  }))
+  description = "Ingress rules for default private subnet security lists. source=null uses first VCN CIDR. Default is empty (locked down). User must provide rules to allow traffic."
+  default     = []
+}
+
+variable "private_subnet_egress_rules" {
+  type = list(object({
+    protocol         = string
+    destination      = string
+    destination_type = optional(string, "CIDR_BLOCK")
+    description      = optional(string, "")
+    tcp_options = optional(object({
+      min = number
+      max = number
+    }), null)
+    udp_options = optional(object({
+      min = number
+      max = number
+    }), null)
+    icmp_options = optional(object({
+      type = number
+      code = optional(number, null)
+    }), null)
+  }))
+  description = "Egress rules for default private subnet security lists. Set to null to use default (allow all outbound)"
+  default     = null
+}
+
+variable "vcn_flow_log_enabled" {
+  type        = bool
+  description = "Whether the VCN flow log is enabled (when enable_vcn_flow_logs is true)"
+  default     = true
 }
 
 variable "enable_vcn_flow_logs" {

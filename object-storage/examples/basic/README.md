@@ -18,6 +18,8 @@ terraform plan \
 terraform apply
 ```
 
+Change the bucket `name` in `main.tf` if it already exists in your namespace (names must be unique per Object Storage namespace).
+
 ## Always Free Considerations
 
 - Standard storage tier (within 20 GB free limit)

@@ -37,7 +37,8 @@ module "vault" {
 
   secrets = {
     my-secret = {
-      display_name   = "my-secret"
+      secret_name    = "my-secret"
+      # Use a placeholder in docs; load real secret_content from Vault/CI, not plaintext in repo
       secret_content = base64encode("my-secret-value")
       content_type   = "BASE64"
       key_id         = module.vault.key_ids["master-key"]

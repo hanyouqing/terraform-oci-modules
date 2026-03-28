@@ -7,12 +7,11 @@ resource "oci_bastion_bastion" "this" {
   max_session_ttl_in_seconds   = var.max_session_ttl_in_seconds
 
   freeform_tags = merge(
-    var.freeform_tags,
     {
-      "Module"      = "terraform-oci-modules/bastion"
-      "Project"     = var.project
-      "Environment" = var.environment
-    }
+      "ManagedBy" = "terraform"
+      "Module"    = "github.com/hanyouqing/terraform-oci-modules/bastion"
+    },
+    var.freeform_tags
   )
 
   defined_tags = var.defined_tags

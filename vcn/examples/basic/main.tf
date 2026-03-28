@@ -37,6 +37,12 @@ module "vcn" {
     }
   }
 
+  public_subnet_ingress_rules = [
+    { protocol = "6", source = "0.0.0.0/0", source_type = "CIDR_BLOCK", description = "Allow SSH from anywhere", tcp_options = { min = 22, max = 22 }, udp_options = null, icmp_options = null },
+    { protocol = "6", source = "0.0.0.0/0", source_type = "CIDR_BLOCK", description = "Allow HTTP from anywhere", tcp_options = { min = 80, max = 80 }, udp_options = null, icmp_options = null },
+    { protocol = "6", source = "0.0.0.0/0", source_type = "CIDR_BLOCK", description = "Allow HTTPS from anywhere", tcp_options = { min = 443, max = 443 }, udp_options = null, icmp_options = null },
+  ]
+
   private_subnets = {}
 
   project     = "always-free"

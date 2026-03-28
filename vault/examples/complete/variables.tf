@@ -29,14 +29,13 @@ variable "keys" {
 
 variable "secrets" {
   type = map(object({
-    display_name   = string
+    secret_name    = string
     secret_content = string
     content_type   = string
     key_id         = string
   }))
   description = "Secrets"
   default     = {}
-  sensitive   = true
 }
 
 variable "project" {
@@ -58,7 +57,7 @@ variable "freeform_tags" {
 }
 
 variable "defined_tags" {
-  type        = map(map(string))
+  type        = map(string)
   description = "Defined tags"
   default     = {}
 }

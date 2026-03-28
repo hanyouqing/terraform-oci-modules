@@ -16,9 +16,17 @@ module "bastion" {
   bastion_type     = "STANDARD"
   name             = "always-free-bastion"
 
-  client_cidr_block_allow_list = ["0.0.0.0/0"]
+  # Recommended to restrict to your own public IP
+  client_cidr_block_allow_list = var.bastion_client_cidr_block_allow_list
 
-  sessions = {}
+  sessions = {
+    "test-session" = {
+      display_name       = "test-session"
+      public_key_content = var.ssh_public_key
+      session_type       = "PORT_FORWARDING"
+      # Other fields optional
+    }
+  }
 
   project     = "always-free"
   environment = "development"

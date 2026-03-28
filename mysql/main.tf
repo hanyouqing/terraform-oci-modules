@@ -21,12 +21,12 @@ resource "oci_mysql_mysql_db_system" "this" {
   }
 
   freeform_tags = merge(
-    var.freeform_tags,
     {
-      "Module"      = "terraform-oci-modules/mysql"
-      "Project"     = var.project
-      "Environment" = var.environment
-    }
+      "ManagedBy"  = "terraform"
+      "Module"     = "github.com/hanyouqing/terraform-oci-modules/mysql"
+      "AlwaysFree" = tostring(each.value.shape_name == "MySQL.Free")
+    },
+    var.freeform_tags
   )
 
   defined_tags = var.defined_tags

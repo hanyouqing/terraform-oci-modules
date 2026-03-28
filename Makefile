@@ -1,4 +1,4 @@
-.PHONY: help fmt fmt-check validate lint security docs clean init plan apply list-modules list-examples install-tools
+.PHONY: help fmt fmt-check validate validate-prep validate-modules validate-examples lint security docs clean init plan apply list-modules list-examples install-tools oci-credentials-list
 
 # Default target
 .DEFAULT_GOAL := help
@@ -13,46 +13,57 @@ help: ## Show this help message
 	@echo 'Available targets:'
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "  %-20s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
-fmt: ## Format all Terraform files
+oci-credentials-list: ## List account names under credentials/; switch with eval and scripts/oci-use.sh (see README)
+	@bash -c 'source scripts/oci-use.sh && oci_use_list'
+
+fmt: ## Format all Terraform and Terragrunt HCL files
 	@echo "Formatting all Terraform files..."
 	@find . -type f -name "*.tf" -not -path "*/.terraform/*" -exec terraform fmt -recursive {} \;
+	@if command -v terragrunt >/dev/null 2>&1; then \
+		echo "Formatting Terragrunt HCL files..."; \
+		terragrunt hclfmt --working-dir terragrunt; \
+	else \
+		echo "terragrunt not found; skipping terragrunt hclfmt."; \
+	fi
 
-fmt-check: ## Check if files are formatted
+fmt-check: ## Check if Terraform and Terragrunt HCL files are formatted
 	@echo "Checking Terraform formatting..."
 	@terraform fmt -check -recursive
 	@if [ $$? -ne 0 ]; then \
 		echo "Error: Some files are not formatted. Run 'make fmt' to fix."; \
 		exit 1; \
 	fi
+	@if command -v terragrunt >/dev/null 2>&1; then \
+		echo "Checking Terragrunt HCL formatting..."; \
+		terragrunt hclfmt --check --working-dir terragrunt; \
+	else \
+		echo "terragrunt not found; skipping terragrunt hclfmt --check."; \
+	fi
 
-validate: ## Validate all modules and examples
-	@echo "Validating all modules and examples..."
-	@for dir in $$(find modules -type d -name "*.tf" -o -type d | grep -E "(modules|examples)" | sort -u); do \
-		if [ -f "$$dir/main.tf" ] || [ -f "$$dir/*.tf" ]; then \
-			echo "Validating $$dir..."; \
-			cd $$dir && terraform init -backend=false > /dev/null 2>&1 && terraform validate || exit 1; \
-			cd - > /dev/null; \
-		fi; \
-	done
+validate: validate-modules validate-examples ## Validate all modules and examples
 
-validate-modules: ## Validate all modules
+validate-prep: ## Ensure plugin cache dir exists (matches .terraformrc plugin_cache_dir)
+	@mkdir -p "$$HOME/.terraform.d/plugin-cache"
+
+validate-modules: validate-prep ## Validate all modules (top-level directories with main.tf)
 	@echo "Validating all modules..."
-	@for dir in */; do \
-		if [ -d "$$dir" ] && [ -f "$$dir/main.tf" ]; then \
-			echo "Validating $$dir..."; \
-			cd $$dir && terraform init -backend=false > /dev/null 2>&1 && terraform validate || exit 1; \
-			cd - > /dev/null; \
-		fi; \
+	@set -e; \
+	for dir in */; do \
+		dir=$${dir%/}; \
+		[ -f "$$dir/main.tf" ] || continue; \
+		echo "Validating $$dir..."; \
+		(cd "$$dir" && terraform init -backend=false -input=false >/dev/null && terraform validate); \
 	done
 
-validate-examples: ## Validate all examples
+validate-examples: validate-prep ## Validate all Terraform configs under */examples/*
 	@echo "Validating all examples..."
-	@for dir in $$(find . -type d -path "*/examples/*" -o -path "*/example/*"); do \
-		if [ -f "$$dir/*.tf" ]; then \
-			echo "Validating $$dir..."; \
-			cd $$dir && terraform init -backend=false > /dev/null 2>&1 && terraform validate || exit 1; \
-			cd - > /dev/null; \
-		fi; \
+	@set -e; \
+	for dir in $$(find . -type f -name '*.tf' -path '*/examples/*' \
+		-not -path '*/.terraform/*' -not -path '*/.terragrunt-cache/*' 2>/dev/null | \
+		sed 's|/[^/]*$$||' | sort -u); do \
+		[ -n "$$dir" ] || continue; \
+		echo "Validating $$dir..."; \
+		(cd "$$dir" && terraform init -backend=false -input=false >/dev/null && terraform validate); \
 	done
 
 lint: ## Run tflint on all modules
@@ -170,19 +181,59 @@ docs-module: ## Generate docs for a specific module (usage: make docs-module MOD
 init: ## Initialize Terraform in current directory
 	terraform init
 
+workspace: ## Switch to or create a workspace (usage: make workspace ENV=production)
+	@if [ -z "$(ENV)" ]; then \
+		echo "Error: ENV variable is required. Usage: make workspace ENV=production"; \
+		echo "Valid environments: development, testing, staging, production"; \
+		exit 1; \
+	fi
+	@./scripts/terraform-workspace.sh -e $(ENV)
+
+workspace-list: ## List all workspaces
+	@terraform workspace list
+
+workspace-show: ## Show current workspace
+	@terraform workspace show
+
 plan: ## Run terraform plan
 	terraform plan
 
+terraform: ## Run terraform with project and environment (usage: make terraform -- plan -p demo/vpc -e production)
+	@./scripts/terraform-plan.sh $(filter-out terraform,$(MAKECMDGOALS))
+
+plan-workspace: ## Run terraform plan with workspace (usage: make plan-workspace ENV=production)
+	@if [ -z "$(ENV)" ]; then \
+		echo "Error: ENV variable is required. Usage: make plan-workspace ENV=production"; \
+		exit 1; \
+	fi
+	@./scripts/terraform-workspace.sh -e $(ENV) && terraform plan
+
+plan-project: ## Run terraform plan with project and environment (usage: make plan-project P=demo/vpc E=production)
+	@if [ -z "$(P)" ] || [ -z "$(E)" ]; then \
+		echo "Error: P and E variables are required"; \
+		echo "Usage: make plan-project P=<project/path> E=<environment>"; \
+		echo "Example: make plan-project P=demo/vpc E=production"; \
+		exit 1; \
+	fi
+	@./scripts/terraform-plan.sh -p $(P) -e $(E)
+
 apply: ## Run terraform apply (with confirmation)
 	terraform apply
+
+apply-workspace: ## Run terraform apply with workspace (usage: make apply-workspace ENV=production)
+	@if [ -z "$(ENV)" ]; then \
+		echo "Error: ENV variable is required. Usage: make apply-workspace ENV=production"; \
+		exit 1; \
+	fi
+	@./scripts/terraform-workspace.sh -e $(ENV) && terraform apply
 
 list-modules: ## List all modules
 	@echo "Available modules:"
 	@ls -d */ 2>/dev/null | grep -v "^\.terraform" | sed 's|/||' | while read dir; do [ -f "$$dir/main.tf" ] && echo "$$dir"; done || echo "No modules found"
 
-list-examples: ## List all examples
+list-examples: ## List all examples (Terraform root dirs under */examples/*)
 	@echo "Available examples:"
-	@find . -type d -path "*/examples/*" -o -path "*/example/*" | sort || echo "No examples found"
+	@find . -type f -name '*.tf' -path '*/examples/*' -not -path '*/.terraform/*' 2>/dev/null | sed 's|/[^/]*$$||' | sort -u || echo "No examples found"
 
 clean: ## Clean all Terraform files (.terraform, .tfstate, etc.)
 	@echo "Cleaning Terraform files..."
@@ -252,6 +303,16 @@ check-versions: ## Check tool versions
 	@checkov --version 2>/dev/null || echo "checkov: not installed"
 	@terraform-docs --version 2>/dev/null || echo "terraform-docs: not installed"
 
-pre-commit: fmt-check validate-modules lint ## Run pre-commit checks
+info: ## Show project information
+	@echo "Terraform OCI Modules"
+	@echo "====================="
+	@echo "Modules: $$(make list-modules 2>/dev/null | tail -n +2 | wc -l | tr -d ' ')"
+	@echo "Examples: $$(make list-examples 2>/dev/null | tail -n +2 | wc -l | tr -d ' ')"
+	@echo "Current workspace: $$(terraform workspace show 2>/dev/null || echo 'default')"
+	@echo ""
+	@echo "Available workspaces:"
+	@terraform workspace list 2>/dev/null || echo "  (no workspaces yet)"
+
+pre-commit: fmt-check validate lint ## Run pre-commit checks
 
 ci: fmt-check validate lint security ## Run full CI checks

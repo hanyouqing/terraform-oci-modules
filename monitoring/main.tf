@@ -16,9 +16,12 @@ resource "oci_monitoring_alarm" "this" {
   freeform_tags = merge(
     var.freeform_tags,
     {
-      "Module"      = "terraform-oci-modules/monitoring"
+      "ManagedBy"   = "terraform"
+      "Module"      = "github.com/hanyouqing/terraform-oci-modules/monitoring"
       "Project"     = var.project
       "Environment" = var.environment
     }
   )
+
+  defined_tags = var.defined_tags
 }

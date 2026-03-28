@@ -1,6 +1,11 @@
 variable "compartment_id" {
   type        = string
   description = "OCID of the compartment where the buckets will be created"
+
+  validation {
+    condition     = can(regex("^ocid1\\.compartment\\.oc1\\.", var.compartment_id)) || can(regex("^ocid1\\.tenancy\\.oc1\\.", var.compartment_id))
+    error_message = "compartment_id must be a valid OCI compartment or tenancy OCID."
+  }
 }
 
 variable "region" {
@@ -15,12 +20,34 @@ variable "buckets" {
     namespace     = optional(string, null)
     access_type   = optional(string, "NoPublicAccess")
     storage_tier  = optional(string, "Standard")
-    versioning    = optional(string, "Disabled")
+    versioning    = optional(string, "Enabled")
+    kms_key_id    = optional(string, null)
     freeform_tags = optional(map(string), {})
-    defined_tags  = optional(map(map(string)), {})
+    defined_tags  = optional(map(string), {})
   }))
-  description = "Map of buckets to create"
+  description = "Map of buckets to create. name must be alphanumeric with no spaces, max 256 characters. storage_tier can be Standard or Archive."
   default     = {}
+
+  validation {
+    condition = alltrue([
+      for b in var.buckets : can(regex("^[a-zA-Z0-9_-]{1,256}$", b.name))
+    ])
+    error_message = "Each bucket name must be alphanumeric with underscores or dashes, max 256 characters."
+  }
+
+  validation {
+    condition = alltrue([
+      for b in var.buckets : contains(["Standard", "Archive"], b.storage_tier)
+    ])
+    error_message = "storage_tier must be Standard or Archive."
+  }
+
+  validation {
+    condition = alltrue([
+      for b in var.buckets : contains(["Enabled", "Disabled"], b.versioning)
+    ])
+    error_message = "versioning must be Enabled or Disabled."
+  }
 }
 
 variable "lifecycle_policies" {
@@ -105,7 +132,7 @@ variable "freeform_tags" {
 }
 
 variable "defined_tags" {
-  type        = map(map(string))
+  type        = map(string)
   description = "Defined tags to apply to all resources"
   default     = {}
 }

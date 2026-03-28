@@ -12,7 +12,8 @@ resource "oci_core_vcn" "this" {
   freeform_tags = merge(
     var.freeform_tags,
     {
-      "Module"      = "terraform-oci-modules/vcn"
+      "ManagedBy"   = "terraform"
+      "Module"      = "github.com/hanyouqing/terraform-oci-modules/vcn"
       "Project"     = var.project
       "Environment" = var.environment
     }
@@ -32,7 +33,8 @@ resource "oci_core_internet_gateway" "this" {
   freeform_tags = merge(
     var.freeform_tags,
     {
-      "Module" = "terraform-oci-modules/vcn/internet-gateway"
+      "ManagedBy" = "terraform"
+      "Module"    = "github.com/hanyouqing/terraform-oci-modules/vcn/internet-gateway"
     }
   )
 }
@@ -48,7 +50,8 @@ resource "oci_core_nat_gateway" "this" {
   freeform_tags = merge(
     var.freeform_tags,
     {
-      "Module" = "terraform-oci-modules/vcn/nat-gateway"
+      "ManagedBy" = "terraform"
+      "Module"    = "github.com/hanyouqing/terraform-oci-modules/vcn/nat-gateway"
     }
   )
 }
@@ -70,7 +73,8 @@ resource "oci_core_service_gateway" "this" {
   freeform_tags = merge(
     var.freeform_tags,
     {
-      "Module" = "terraform-oci-modules/vcn/service-gateway"
+      "ManagedBy" = "terraform"
+      "Module"    = "github.com/hanyouqing/terraform-oci-modules/vcn/service-gateway"
     }
   )
 }
@@ -90,8 +94,9 @@ resource "oci_core_subnet" "public" {
   freeform_tags = merge(
     var.freeform_tags,
     {
-      "Module" = "terraform-oci-modules/vcn/subnet/public"
-      "Type"   = "public"
+      "ManagedBy" = "terraform"
+      "Module"    = "github.com/hanyouqing/terraform-oci-modules/vcn/subnet/public"
+      "Type"      = "public"
     }
   )
 
@@ -113,8 +118,9 @@ resource "oci_core_subnet" "private" {
   freeform_tags = merge(
     var.freeform_tags,
     {
-      "Module" = "terraform-oci-modules/vcn/subnet/private"
-      "Type"   = "private"
+      "ManagedBy" = "terraform"
+      "Module"    = "github.com/hanyouqing/terraform-oci-modules/vcn/subnet/private"
+      "Type"      = "private"
     }
   )
 
@@ -140,7 +146,8 @@ resource "oci_core_route_table" "public" {
   freeform_tags = merge(
     var.freeform_tags,
     {
-      "Module" = "terraform-oci-modules/vcn/route-table/public"
+      "ManagedBy" = "terraform"
+      "Module"    = "github.com/hanyouqing/terraform-oci-modules/vcn/route-table/public"
     }
   )
 }
@@ -173,7 +180,8 @@ resource "oci_core_route_table" "private" {
   freeform_tags = merge(
     var.freeform_tags,
     {
-      "Module" = "terraform-oci-modules/vcn/route-table/private"
+      "ManagedBy" = "terraform"
+      "Module"    = "github.com/hanyouqing/terraform-oci-modules/vcn/route-table/private"
     }
   )
 }
@@ -192,6 +200,19 @@ resource "oci_core_route_table_attachment" "private" {
   route_table_id = oci_core_route_table.private[each.key].id
 }
 
+locals {
+  public_ingress_rules = var.public_subnet_ingress_rules
+  public_egress_rules = var.public_subnet_egress_rules != null ? var.public_subnet_egress_rules : [
+    { protocol = "all", destination = "0.0.0.0/0", destination_type = "CIDR_BLOCK", description = "Allow all outbound traffic", tcp_options = null, udp_options = null, icmp_options = null },
+  ]
+  private_ingress_rules = [
+    for r in var.private_subnet_ingress_rules : merge(r, { source = coalesce(r.source, var.vcn_cidr_blocks[0]) })
+  ]
+  private_egress_rules = var.private_subnet_egress_rules != null ? var.private_subnet_egress_rules : [
+    { protocol = "all", destination = "0.0.0.0/0", destination_type = "CIDR_BLOCK", description = "Allow all outbound traffic", tcp_options = null, udp_options = null, icmp_options = null },
+  ]
+}
+
 resource "oci_core_security_list" "public" {
   for_each = var.public_subnets
 
@@ -199,50 +220,75 @@ resource "oci_core_security_list" "public" {
   vcn_id         = oci_core_vcn.this.id
   display_name   = "${each.value.display_name}-security-list"
 
-  ingress_security_rules {
-    protocol    = "6"
-    source      = "0.0.0.0/0"
-    source_type = "CIDR_BLOCK"
-    tcp_options {
-      min = 22
-      max = 22
+  dynamic "ingress_security_rules" {
+    for_each = local.public_ingress_rules
+    content {
+      protocol    = ingress_security_rules.value.protocol
+      source      = ingress_security_rules.value.source
+      source_type = ingress_security_rules.value.source_type
+      description = ingress_security_rules.value.description
+
+      dynamic "tcp_options" {
+        for_each = ingress_security_rules.value.tcp_options != null ? [ingress_security_rules.value.tcp_options] : []
+        content {
+          min = tcp_options.value.min
+          max = tcp_options.value.max
+        }
+      }
+      dynamic "udp_options" {
+        for_each = ingress_security_rules.value.udp_options != null ? [ingress_security_rules.value.udp_options] : []
+        content {
+          min = udp_options.value.min
+          max = udp_options.value.max
+        }
+      }
+      dynamic "icmp_options" {
+        for_each = ingress_security_rules.value.icmp_options != null ? [ingress_security_rules.value.icmp_options] : []
+        content {
+          type = icmp_options.value.type
+          code = try(icmp_options.value.code, 0)
+        }
+      }
     }
-    description = "Allow SSH from anywhere"
   }
 
-  ingress_security_rules {
-    protocol    = "6"
-    source      = "0.0.0.0/0"
-    source_type = "CIDR_BLOCK"
-    tcp_options {
-      min = 80
-      max = 80
-    }
-    description = "Allow HTTP from anywhere"
-  }
+  dynamic "egress_security_rules" {
+    for_each = local.public_egress_rules
+    content {
+      protocol         = egress_security_rules.value.protocol
+      destination      = egress_security_rules.value.destination
+      destination_type = egress_security_rules.value.destination_type
+      description      = egress_security_rules.value.description
 
-  ingress_security_rules {
-    protocol    = "6"
-    source      = "0.0.0.0/0"
-    source_type = "CIDR_BLOCK"
-    tcp_options {
-      min = 443
-      max = 443
+      dynamic "tcp_options" {
+        for_each = egress_security_rules.value.tcp_options != null ? [egress_security_rules.value.tcp_options] : []
+        content {
+          min = tcp_options.value.min
+          max = tcp_options.value.max
+        }
+      }
+      dynamic "udp_options" {
+        for_each = egress_security_rules.value.udp_options != null ? [egress_security_rules.value.udp_options] : []
+        content {
+          min = udp_options.value.min
+          max = udp_options.value.max
+        }
+      }
+      dynamic "icmp_options" {
+        for_each = egress_security_rules.value.icmp_options != null ? [egress_security_rules.value.icmp_options] : []
+        content {
+          type = icmp_options.value.type
+          code = try(icmp_options.value.code, 0)
+        }
+      }
     }
-    description = "Allow HTTPS from anywhere"
-  }
-
-  egress_security_rules {
-    protocol         = "all"
-    destination      = "0.0.0.0/0"
-    destination_type = "CIDR_BLOCK"
-    description      = "Allow all outbound traffic"
   }
 
   freeform_tags = merge(
     var.freeform_tags,
     {
-      "Module" = "terraform-oci-modules/vcn/security-list/public"
+      "ManagedBy" = "terraform"
+      "Module"    = "github.com/hanyouqing/terraform-oci-modules/vcn/security-list/public"
     }
   )
 }
@@ -254,50 +300,75 @@ resource "oci_core_security_list" "private" {
   vcn_id         = oci_core_vcn.this.id
   display_name   = "${each.value.display_name}-security-list"
 
-  ingress_security_rules {
-    protocol    = "6"
-    source      = var.vcn_cidr_blocks[0]
-    source_type = "CIDR_BLOCK"
-    tcp_options {
-      min = 22
-      max = 22
+  dynamic "ingress_security_rules" {
+    for_each = local.private_ingress_rules
+    content {
+      protocol    = ingress_security_rules.value.protocol
+      source      = ingress_security_rules.value.source
+      source_type = ingress_security_rules.value.source_type
+      description = ingress_security_rules.value.description
+
+      dynamic "tcp_options" {
+        for_each = ingress_security_rules.value.tcp_options != null ? [ingress_security_rules.value.tcp_options] : []
+        content {
+          min = tcp_options.value.min
+          max = tcp_options.value.max
+        }
+      }
+      dynamic "udp_options" {
+        for_each = ingress_security_rules.value.udp_options != null ? [ingress_security_rules.value.udp_options] : []
+        content {
+          min = udp_options.value.min
+          max = udp_options.value.max
+        }
+      }
+      dynamic "icmp_options" {
+        for_each = ingress_security_rules.value.icmp_options != null ? [ingress_security_rules.value.icmp_options] : []
+        content {
+          type = icmp_options.value.type
+          code = try(icmp_options.value.code, 0)
+        }
+      }
     }
-    description = "Allow SSH from VCN"
   }
 
-  ingress_security_rules {
-    protocol    = "6"
-    source      = var.vcn_cidr_blocks[0]
-    source_type = "CIDR_BLOCK"
-    tcp_options {
-      min = 80
-      max = 80
-    }
-    description = "Allow HTTP from VCN"
-  }
+  dynamic "egress_security_rules" {
+    for_each = local.private_egress_rules
+    content {
+      protocol         = egress_security_rules.value.protocol
+      destination      = egress_security_rules.value.destination
+      destination_type = egress_security_rules.value.destination_type
+      description      = egress_security_rules.value.description
 
-  ingress_security_rules {
-    protocol    = "6"
-    source      = var.vcn_cidr_blocks[0]
-    source_type = "CIDR_BLOCK"
-    tcp_options {
-      min = 443
-      max = 443
+      dynamic "tcp_options" {
+        for_each = egress_security_rules.value.tcp_options != null ? [egress_security_rules.value.tcp_options] : []
+        content {
+          min = tcp_options.value.min
+          max = tcp_options.value.max
+        }
+      }
+      dynamic "udp_options" {
+        for_each = egress_security_rules.value.udp_options != null ? [egress_security_rules.value.udp_options] : []
+        content {
+          min = udp_options.value.min
+          max = udp_options.value.max
+        }
+      }
+      dynamic "icmp_options" {
+        for_each = egress_security_rules.value.icmp_options != null ? [egress_security_rules.value.icmp_options] : []
+        content {
+          type = icmp_options.value.type
+          code = try(icmp_options.value.code, 0)
+        }
+      }
     }
-    description = "Allow HTTPS from VCN"
-  }
-
-  egress_security_rules {
-    protocol         = "all"
-    destination      = "0.0.0.0/0"
-    destination_type = "CIDR_BLOCK"
-    description      = "Allow all outbound traffic"
   }
 
   freeform_tags = merge(
     var.freeform_tags,
     {
-      "Module" = "terraform-oci-modules/vcn/security-list/private"
+      "ManagedBy" = "terraform"
+      "Module"    = "github.com/hanyouqing/terraform-oci-modules/vcn/security-list/private"
     }
   )
 }
