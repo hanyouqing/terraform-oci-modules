@@ -150,11 +150,7 @@ docs: ## Generate documentation for all modules
 		for dir in */; do \
 			if [ -d "$$dir" ] && [ -f "$$dir/main.tf" ]; then \
 				echo "Generating docs for $$dir..."; \
-				if [ -f .terraform-docs.yml ]; then \
-					terraform-docs --config .terraform-docs.yml $$dir || true; \
-				else \
-					terraform-docs markdown table $$dir > $$dir/README.md || true; \
-				fi; \
+				(cd "$$dir" && terraform-docs markdown --output-file README.md --output-mode inject --sort-by name .) || true; \
 			fi; \
 		done; \
 	else \
@@ -168,11 +164,7 @@ docs-module: ## Generate docs for a specific module (usage: make docs-module MOD
 		exit 1; \
 	fi
 	@if command -v terraform-docs > /dev/null; then \
-		if [ -f .terraform-docs.yml ]; then \
-			terraform-docs --config .terraform-docs.yml $(MODULE); \
-		else \
-			terraform-docs markdown table $(MODULE) > $(MODULE)/README.md; \
-		fi; \
+		(cd $(MODULE) && terraform-docs markdown --output-file README.md --output-mode inject --sort-by name .); \
 	else \
 		echo "terraform-docs not installed. Run 'make install-terraform-docs' to install."; \
 		exit 1; \

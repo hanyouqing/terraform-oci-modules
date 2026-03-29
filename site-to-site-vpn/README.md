@@ -169,3 +169,54 @@ The following Site-to-Site VPN resources are **free** within Always Free tier li
 
 - [Basic](examples/basic/) — Single CPE + IPSec connection with static routing
 - [Complete](examples/complete/) — Multiple CPEs + IPSec connections for multi-site VPN
+
+<!-- BEGIN_TF_DOCS -->
+## Requirements
+
+| Name | Version |
+|------|---------|
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.14.2 |
+| <a name="requirement_oci"></a> [oci](#requirement\_oci) | ~> 7.30 |
+
+## Providers
+
+| Name | Version |
+|------|---------|
+| <a name="provider_oci"></a> [oci](#provider\_oci) | 7.32.0 |
+
+## Modules
+
+No modules.
+
+## Resources
+
+| Name | Type |
+|------|------|
+| [oci_core_cpe.this](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/core_cpe) | resource |
+| [oci_core_ipsec.this](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/core_ipsec) | resource |
+| [oci_core_ipsec_connection_tunnels.this](https://registry.terraform.io/providers/oracle/oci/latest/docs/data-sources/core_ipsec_connection_tunnels) | data source |
+
+## Inputs
+
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| <a name="input_compartment_id"></a> [compartment\_id](#input\_compartment\_id) | OCID of the compartment where VPN resources will be created | `string` | n/a | yes |
+| <a name="input_cpes"></a> [cpes](#input\_cpes) | Map of Customer-Premises Equipment (CPE) objects representing on-premises VPN devices. | <pre>map(object({<br/>    display_name        = string<br/>    ip_address          = string<br/>    cpe_device_shape_id = optional(string, null)<br/>    is_private          = optional(bool, false)<br/>    freeform_tags       = optional(map(string), {})<br/>    defined_tags        = optional(map(string), {})<br/>  }))</pre> | `{}` | no |
+| <a name="input_defined_tags"></a> [defined\_tags](#input\_defined\_tags) | Defined tags to apply to all resources | `map(string)` | `{}` | no |
+| <a name="input_environment"></a> [environment](#input\_environment) | Environment name for tagging | `string` | `"development"` | no |
+| <a name="input_freeform_tags"></a> [freeform\_tags](#input\_freeform\_tags) | Freeform tags to apply to all resources | `map(string)` | `{}` | no |
+| <a name="input_ipsec_connections"></a> [ipsec\_connections](#input\_ipsec\_connections) | Map of IPSec connections. Each connection creates 2 redundant tunnels. Always Free: 50 connections per tenancy. Use cpe\_key to reference a CPE in the cpes variable, or cpe\_id for an external CPE OCID. | <pre>map(object({<br/>    display_name  = string<br/>    drg_id        = string<br/>    static_routes = list(string)<br/><br/>    # Reference to a CPE — either a key in cpes variable or a direct OCID<br/>    cpe_key = optional(string, null)<br/>    cpe_id  = optional(string, null)<br/><br/>    cpe_local_identifier      = optional(string, null)<br/>    cpe_local_identifier_type = optional(string, null)<br/><br/>    freeform_tags = optional(map(string), {})<br/>    defined_tags  = optional(map(string), {})<br/>  }))</pre> | `{}` | no |
+| <a name="input_project"></a> [project](#input\_project) | Project name for tagging | `string` | `"oci-modules"` | no |
+
+## Outputs
+
+| Name | Description |
+|------|-------------|
+| <a name="output_cpe_ids"></a> [cpe\_ids](#output\_cpe\_ids) | OCIDs of the Customer-Premises Equipment objects |
+| <a name="output_cpe_ip_addresses"></a> [cpe\_ip\_addresses](#output\_cpe\_ip\_addresses) | IP addresses of the CPE objects |
+| <a name="output_ipsec_connection_ids"></a> [ipsec\_connection\_ids](#output\_ipsec\_connection\_ids) | OCIDs of the IPSec connections |
+| <a name="output_ipsec_connection_states"></a> [ipsec\_connection\_states](#output\_ipsec\_connection\_states) | States of the IPSec connections |
+| <a name="output_tunnel_details"></a> [tunnel\_details](#output\_tunnel\_details) | Tunnel details for each IPSec connection (2 tunnels per connection) |
+| <a name="output_tunnel_vpn_ips"></a> [tunnel\_vpn\_ips](#output\_tunnel\_vpn\_ips) | Oracle VPN endpoint IPs for each IPSec connection (for on-premises CPE configuration) |
+| <a name="output_zzz_reminders"></a> [zzz\_reminders](#output\_zzz\_reminders) | Important reminders and next steps for Site-to-Site VPN module |
+<!-- END_TF_DOCS -->

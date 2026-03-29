@@ -145,3 +145,60 @@ The following block storage resources are **free** within Always Free tier limit
 ## Examples
 
 See the [examples](../examples/block-storage/) directory for complete examples.
+
+<!-- BEGIN_TF_DOCS -->
+## Requirements
+
+| Name | Version |
+|------|---------|
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.14.2 |
+| <a name="requirement_oci"></a> [oci](#requirement\_oci) | ~> 7.30 |
+
+## Providers
+
+| Name | Version |
+|------|---------|
+| <a name="provider_oci"></a> [oci](#provider\_oci) | ~> 7.30 |
+
+## Modules
+
+No modules.
+
+## Resources
+
+| Name | Type |
+|------|------|
+| [oci_core_volume.this](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/core_volume) | resource |
+| [oci_core_volume_attachment.this](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/core_volume_attachment) | resource |
+| [oci_core_volume_backup.this](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/core_volume_backup) | resource |
+| [oci_core_volume_backup_policy.this](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/core_volume_backup_policy) | resource |
+| [oci_identity_availability_domains.ads](https://registry.terraform.io/providers/oracle/oci/latest/docs/data-sources/identity_availability_domains) | data source |
+
+## Inputs
+
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| <a name="input_backup_policies"></a> [backup\_policies](#input\_backup\_policies) | Map of backup policies to create | <pre>map(object({<br/>    display_name = string<br/>    schedules = list(object({<br/>      backup_type       = string<br/>      period            = string<br/>      retention_seconds = number<br/>      hour_of_day       = number<br/>      day_of_month      = number<br/>      day_of_week       = string<br/>      month             = string<br/>      time_zone         = string<br/>    }))<br/>  }))</pre> | `{}` | no |
+| <a name="input_compartment_id"></a> [compartment\_id](#input\_compartment\_id) | OCID of the compartment where the block volumes will be created | `string` | n/a | yes |
+| <a name="input_create_backups"></a> [create\_backups](#input\_create\_backups) | Whether to create backups for volumes | `bool` | `false` | no |
+| <a name="input_defined_tags"></a> [defined\_tags](#input\_defined\_tags) | Defined tags to apply to all resources | `map(string)` | `{}` | no |
+| <a name="input_environment"></a> [environment](#input\_environment) | Environment name for tagging | `string` | `"development"` | no |
+| <a name="input_freeform_tags"></a> [freeform\_tags](#input\_freeform\_tags) | Freeform tags to apply to all resources | `map(string)` | `{}` | no |
+| <a name="input_project"></a> [project](#input\_project) | Project name for tagging | `string` | `"oci-modules"` | no |
+| <a name="input_tenancy_ocid"></a> [tenancy\_ocid](#input\_tenancy\_ocid) | OCID of the tenancy | `string` | n/a | yes |
+| <a name="input_volume_attachments"></a> [volume\_attachments](#input\_volume\_attachments) | Map of volume attachments | <pre>map(object({<br/>    volume_key      = string<br/>    instance_id     = string<br/>    attachment_type = string<br/>    display_name    = string<br/>    device          = string<br/>    is_read_only    = bool<br/>    is_shareable    = bool<br/>  }))</pre> | `{}` | no |
+| <a name="input_volumes"></a> [volumes](#input\_volumes) | Map of block volumes to create | <pre>map(object({<br/>    display_name         = string<br/>    availability_domain  = string<br/>    size_in_gbs          = number<br/>    vpus_per_gb          = optional(string, "10")<br/>    is_auto_tune_enabled = optional(bool, false)<br/>    backup_policy_id     = optional(string, null)<br/>    backup_type          = optional(string, "FULL")<br/>    freeform_tags        = optional(map(string), {})<br/>    defined_tags         = optional(map(string), {})<br/>  }))</pre> | `{}` | no |
+
+## Outputs
+
+| Name | Description |
+|------|-------------|
+| <a name="output_attachment_ids"></a> [attachment\_ids](#output\_attachment\_ids) | OCIDs of the volume attachments |
+| <a name="output_backup_ids"></a> [backup\_ids](#output\_backup\_ids) | OCIDs of the volume backups |
+| <a name="output_backup_policy_ids"></a> [backup\_policy\_ids](#output\_backup\_policy\_ids) | OCIDs of the backup policies |
+| <a name="output_total_storage_gb"></a> [total\_storage\_gb](#output\_total\_storage\_gb) | Total storage size in GBs |
+| <a name="output_volume_display_names"></a> [volume\_display\_names](#output\_volume\_display\_names) | Display names of the block volumes |
+| <a name="output_volume_ids"></a> [volume\_ids](#output\_volume\_ids) | OCIDs of the block volumes |
+| <a name="output_volume_sizes"></a> [volume\_sizes](#output\_volume\_sizes) | Sizes of the block volumes in GBs |
+| <a name="output_zzz_reminders"></a> [zzz\_reminders](#output\_zzz\_reminders) | Important reminders and next steps for Block Storage module |
+<!-- END_TF_DOCS -->

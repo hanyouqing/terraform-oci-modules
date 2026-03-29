@@ -89,3 +89,54 @@ The following Bastion resources are **free** for both free and paid accounts:
 ## Examples
 
 See the [examples](../examples/bastion/) directory for complete examples.
+
+<!-- BEGIN_TF_DOCS -->
+## Requirements
+
+| Name | Version |
+|------|---------|
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.14.2 |
+| <a name="requirement_oci"></a> [oci](#requirement\_oci) | ~> 7.30 |
+
+## Providers
+
+| Name | Version |
+|------|---------|
+| <a name="provider_oci"></a> [oci](#provider\_oci) | 7.32.0 |
+
+## Modules
+
+No modules.
+
+## Resources
+
+| Name | Type |
+|------|------|
+| [oci_bastion_bastion.this](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/bastion_bastion) | resource |
+| [oci_bastion_session.this](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/bastion_session) | resource |
+
+## Inputs
+
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| <a name="input_bastion_type"></a> [bastion\_type](#input\_bastion\_type) | Type of bastion: STANDARD or SESSION | `string` | `"STANDARD"` | no |
+| <a name="input_client_cidr_block_allow_list"></a> [client\_cidr\_block\_allow\_list](#input\_client\_cidr\_block\_allow\_list) | List of CIDR blocks allowed to connect to the bastion. Recommended to restrict to your own public IP (e.g., ['1.2.3.4/32']). | `list(string)` | `[]` | no |
+| <a name="input_compartment_id"></a> [compartment\_id](#input\_compartment\_id) | OCID of the compartment where the bastion will be created | `string` | n/a | yes |
+| <a name="input_defined_tags"></a> [defined\_tags](#input\_defined\_tags) | Defined tags to apply to all resources (OCI provider expects map(string) for this resource) | `map(string)` | `{}` | no |
+| <a name="input_environment"></a> [environment](#input\_environment) | Environment name for tagging | `string` | `"development"` | no |
+| <a name="input_freeform_tags"></a> [freeform\_tags](#input\_freeform\_tags) | Freeform tags to apply to all resources | `map(string)` | `{}` | no |
+| <a name="input_max_session_ttl_in_seconds"></a> [max\_session\_ttl\_in\_seconds](#input\_max\_session\_ttl\_in\_seconds) | Maximum session TTL in seconds | `number` | `10800` | no |
+| <a name="input_name"></a> [name](#input\_name) | Name of the bastion | `string` | `"bastion"` | no |
+| <a name="input_project"></a> [project](#input\_project) | Project name for tagging | `string` | `"oci-modules"` | no |
+| <a name="input_sessions"></a> [sessions](#input\_sessions) | Map of bastion sessions to create | <pre>map(object({<br/>    display_name                               = string<br/>    public_key_content                         = string<br/>    session_type                               = string<br/>    target_resource_id                         = optional(string, null)<br/>    target_resource_operating_system_user_name = optional(string, null)<br/>    target_resource_port                       = optional(number, 22)<br/>    target_resource_private_ip_address         = optional(string, null)<br/>    session_ttl_in_seconds                     = optional(number, 3600)<br/>  }))</pre> | `{}` | no |
+| <a name="input_target_subnet_id"></a> [target\_subnet\_id](#input\_target\_subnet\_id) | OCID of the target subnet for the bastion | `string` | n/a | yes |
+
+## Outputs
+
+| Name | Description |
+|------|-------------|
+| <a name="output_bastion_id"></a> [bastion\_id](#output\_bastion\_id) | OCID of the bastion |
+| <a name="output_bastion_name"></a> [bastion\_name](#output\_bastion\_name) | Name of the bastion |
+| <a name="output_session_ids"></a> [session\_ids](#output\_session\_ids) | OCIDs of the bastion sessions |
+| <a name="output_zzz_reminders"></a> [zzz\_reminders](#output\_zzz\_reminders) | Important reminders and next steps for Bastion module |
+<!-- END_TF_DOCS -->

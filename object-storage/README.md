@@ -126,3 +126,56 @@ The following Object Storage resources are **free** within Always Free tier limi
 ## Examples
 
 See the [examples](../examples/object-storage/) directory for complete examples.
+
+<!-- BEGIN_TF_DOCS -->
+## Requirements
+
+| Name | Version |
+|------|---------|
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.14.2 |
+| <a name="requirement_oci"></a> [oci](#requirement\_oci) | ~> 7.30 |
+
+## Providers
+
+| Name | Version |
+|------|---------|
+| <a name="provider_oci"></a> [oci](#provider\_oci) | 7.32.0 |
+
+## Modules
+
+No modules.
+
+## Resources
+
+| Name | Type |
+|------|------|
+| [oci_objectstorage_bucket.this](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/objectstorage_bucket) | resource |
+| [oci_objectstorage_object_lifecycle_policy.this](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/objectstorage_object_lifecycle_policy) | resource |
+| [oci_objectstorage_preauthrequest.this](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/objectstorage_preauthrequest) | resource |
+| [oci_objectstorage_namespace.this](https://registry.terraform.io/providers/oracle/oci/latest/docs/data-sources/objectstorage_namespace) | data source |
+
+## Inputs
+
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| <a name="input_buckets"></a> [buckets](#input\_buckets) | Map of buckets to create. name must be alphanumeric with no spaces, max 256 characters. storage\_tier can be Standard or Archive. | <pre>map(object({<br/>    name          = string<br/>    namespace     = optional(string, null)<br/>    access_type   = optional(string, "NoPublicAccess")<br/>    storage_tier  = optional(string, "Standard")<br/>    versioning    = optional(string, "Enabled")<br/>    kms_key_id    = optional(string, null)<br/>    freeform_tags = optional(map(string), {})<br/>    defined_tags  = optional(map(string), {})<br/>  }))</pre> | `{}` | no |
+| <a name="input_compartment_id"></a> [compartment\_id](#input\_compartment\_id) | OCID of the compartment where the buckets will be created | `string` | n/a | yes |
+| <a name="input_defined_tags"></a> [defined\_tags](#input\_defined\_tags) | Defined tags to apply to all resources | `map(string)` | `{}` | no |
+| <a name="input_environment"></a> [environment](#input\_environment) | Environment name for tagging | `string` | `"development"` | no |
+| <a name="input_freeform_tags"></a> [freeform\_tags](#input\_freeform\_tags) | Freeform tags to apply to all resources | `map(string)` | `{}` | no |
+| <a name="input_lifecycle_policies"></a> [lifecycle\_policies](#input\_lifecycle\_policies) | Map of lifecycle policies to create | <pre>map(object({<br/>    bucket_key         = string<br/>    rule_name          = string<br/>    is_enabled         = optional(bool, true)<br/>    action             = string<br/>    inclusion_prefixes = optional(list(string), [])<br/>    inclusion_patterns = optional(list(string), [])<br/>    target             = string<br/>    time_amount        = number<br/>    time_unit          = string<br/>  }))</pre> | `{}` | no |
+| <a name="input_preauth_requests"></a> [preauth\_requests](#input\_preauth\_requests) | Map of pre-authenticated requests to create | <pre>map(object({<br/>    bucket_key   = string<br/>    name         = string<br/>    object       = string<br/>    access_type  = string<br/>    time_expires = string<br/>  }))</pre> | `{}` | no |
+| <a name="input_project"></a> [project](#input\_project) | Project name for tagging | `string` | `"oci-modules"` | no |
+| <a name="input_region"></a> [region](#input\_region) | OCI region for bucket URIs | `string` | `""` | no |
+
+## Outputs
+
+| Name | Description |
+|------|-------------|
+| <a name="output_bucket_names"></a> [bucket\_names](#output\_bucket\_names) | Names of the buckets |
+| <a name="output_bucket_namespaces"></a> [bucket\_namespaces](#output\_bucket\_namespaces) | Namespaces of the buckets |
+| <a name="output_bucket_uris"></a> [bucket\_uris](#output\_bucket\_uris) | URIs of the buckets (format: https://objectstorage.<region>.oraclecloud.com/n/<namespace>/b/<name>/o) |
+| <a name="output_namespace"></a> [namespace](#output\_namespace) | Object Storage namespace |
+| <a name="output_preauth_request_uris"></a> [preauth\_request\_uris](#output\_preauth\_request\_uris) | URIs of the pre-authenticated requests |
+| <a name="output_zzz_reminders"></a> [zzz\_reminders](#output\_zzz\_reminders) | Important reminders and next steps for Object Storage module |
+<!-- END_TF_DOCS -->

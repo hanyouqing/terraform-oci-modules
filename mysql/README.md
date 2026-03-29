@@ -106,3 +106,47 @@ The following MySQL HeatWave resources are **free** within Always Free tier limi
 ## Examples
 
 See the [examples](../examples/mysql/) directory for complete examples.
+
+<!-- BEGIN_TF_DOCS -->
+## Requirements
+
+| Name | Version |
+|------|---------|
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.14.2 |
+| <a name="requirement_oci"></a> [oci](#requirement\_oci) | ~> 7.30 |
+
+## Providers
+
+| Name | Version |
+|------|---------|
+| <a name="provider_oci"></a> [oci](#provider\_oci) | 7.32.0 |
+
+## Modules
+
+No modules.
+
+## Resources
+
+| Name | Type |
+|------|------|
+| [oci_mysql_mysql_db_system.this](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/mysql_mysql_db_system) | resource |
+
+## Inputs
+
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| <a name="input_compartment_id"></a> [compartment\_id](#input\_compartment\_id) | OCID of the compartment where the MySQL system will be created | `string` | n/a | yes |
+| <a name="input_defined_tags"></a> [defined\_tags](#input\_defined\_tags) | Defined tags to apply to all resources (oci\_mysql\_mysql\_db\_system expects map(string)) | `map(string)` | `{}` | no |
+| <a name="input_environment"></a> [environment](#input\_environment) | Environment name for tagging | `string` | `"development"` | no |
+| <a name="input_freeform_tags"></a> [freeform\_tags](#input\_freeform\_tags) | Freeform tags to apply to all resources | `map(string)` | `{}` | no |
+| <a name="input_mysql_systems"></a> [mysql\_systems](#input\_mysql\_systems) | Map of MySQL systems to create. For Always Free, use shape\_name='MySQL.Free' and data\_storage\_size\_in\_gb=50. | <pre>map(object({<br/>    display_name            = string<br/>    availability_domain     = string<br/>    shape_name              = string<br/>    subnet_id               = string<br/>    admin_username          = string<br/>    admin_password          = string<br/>    mysql_version           = optional(string, "8.0.35")<br/>    configuration_id        = optional(string, null)<br/>    data_storage_size_in_gb = number<br/>    backup_policy = object({<br/>      is_enabled        = optional(bool, true)<br/>      retention_in_days = optional(number, 7)<br/>      window_start_time = optional(string, "02:00")<br/>    })<br/>  }))</pre> | `{}` | no |
+| <a name="input_project"></a> [project](#input\_project) | Project name for tagging | `string` | `"oci-modules"` | no |
+
+## Outputs
+
+| Name | Description |
+|------|-------------|
+| <a name="output_mysql_endpoints"></a> [mysql\_endpoints](#output\_mysql\_endpoints) | Endpoints of the MySQL systems |
+| <a name="output_mysql_system_ids"></a> [mysql\_system\_ids](#output\_mysql\_system\_ids) | OCIDs of the MySQL systems |
+| <a name="output_zzz_reminders"></a> [zzz\_reminders](#output\_zzz\_reminders) | Important reminders and next steps for MySQL module |
+<!-- END_TF_DOCS -->

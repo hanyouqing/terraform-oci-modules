@@ -79,4 +79,58 @@ module "credentials" {
 - [Complete](examples/complete/) — All credential types with multiple entries
 
 <!-- BEGIN_TF_DOCS -->
+## Requirements
+
+| Name | Version |
+|------|---------|
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.14.2 |
+| <a name="requirement_oci"></a> [oci](#requirement\_oci) | ~> 7.30 |
+
+## Providers
+
+| Name | Version |
+|------|---------|
+| <a name="provider_oci"></a> [oci](#provider\_oci) | 7.32.0 |
+
+## Modules
+
+No modules.
+
+## Resources
+
+| Name | Type |
+|------|------|
+| [oci_identity_api_key.this](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/identity_api_key) | resource |
+| [oci_identity_auth_token.this](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/identity_auth_token) | resource |
+| [oci_identity_customer_secret_key.this](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/identity_customer_secret_key) | resource |
+| [oci_identity_smtp_credential.this](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/identity_smtp_credential) | resource |
+
+## Inputs
+
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| <a name="input_api_keys"></a> [api\_keys](#input\_api\_keys) | Map of API signing keys to create. Each key requires a PEM-encoded RSA public key. | <pre>map(object({<br/>    key_value = string<br/>  }))</pre> | `{}` | no |
+| <a name="input_auth_tokens"></a> [auth\_tokens](#input\_auth\_tokens) | Map of auth tokens to create. Auth tokens are Oracle-compatible authentication tokens for services like Swift and HDFS. | <pre>map(object({<br/>    description = string<br/>  }))</pre> | `{}` | no |
+| <a name="input_customer_secret_keys"></a> [customer\_secret\_keys](#input\_customer\_secret\_keys) | Map of customer secret keys to create. Used for Amazon S3-compatible API access to Object Storage. | <pre>map(object({<br/>    display_name = string<br/>  }))</pre> | `{}` | no |
+| <a name="input_defined_tags"></a> [defined\_tags](#input\_defined\_tags) | Defined tags to apply to all resources (where supported) | `map(string)` | `{}` | no |
+| <a name="input_environment"></a> [environment](#input\_environment) | Environment name (e.g., development, staging, production). | `string` | `"development"` | no |
+| <a name="input_freeform_tags"></a> [freeform\_tags](#input\_freeform\_tags) | Freeform tags to apply to all resources (where supported) | `map(string)` | `{}` | no |
+| <a name="input_project"></a> [project](#input\_project) | Project name used for tagging and naming. | `string` | `"oci-modules"` | no |
+| <a name="input_smtp_credentials"></a> [smtp\_credentials](#input\_smtp\_credentials) | Map of SMTP credentials to create. Used for sending email via OCI Email Delivery SMTP interface. | <pre>map(object({<br/>    description = string<br/>  }))</pre> | `{}` | no |
+| <a name="input_user_id"></a> [user\_id](#input\_user\_id) | The OCID of the user to manage credentials for. | `string` | n/a | yes |
+
+## Outputs
+
+| Name | Description |
+|------|-------------|
+| <a name="output_api_key_fingerprints"></a> [api\_key\_fingerprints](#output\_api\_key\_fingerprints) | Map of API key fingerprints. |
+| <a name="output_api_key_ids"></a> [api\_key\_ids](#output\_api\_key\_ids) | Map of API key identifiers. |
+| <a name="output_auth_token_ids"></a> [auth\_token\_ids](#output\_auth\_token\_ids) | Map of auth token identifiers. |
+| <a name="output_auth_token_values"></a> [auth\_token\_values](#output\_auth\_token\_values) | Map of auth token values. Only available at creation time. |
+| <a name="output_customer_secret_key_ids"></a> [customer\_secret\_key\_ids](#output\_customer\_secret\_key\_ids) | Map of customer secret key identifiers (access key IDs). |
+| <a name="output_customer_secret_key_keys"></a> [customer\_secret\_key\_keys](#output\_customer\_secret\_key\_keys) | Map of customer secret key values. Only available at creation time. |
+| <a name="output_smtp_credential_ids"></a> [smtp\_credential\_ids](#output\_smtp\_credential\_ids) | Map of SMTP credential identifiers. |
+| <a name="output_smtp_credential_passwords"></a> [smtp\_credential\_passwords](#output\_smtp\_credential\_passwords) | Map of SMTP passwords. Only available at creation time. |
+| <a name="output_smtp_credential_usernames"></a> [smtp\_credential\_usernames](#output\_smtp\_credential\_usernames) | Map of SMTP usernames. |
+| <a name="output_zzz_reminders"></a> [zzz\_reminders](#output\_zzz\_reminders) | Helpful reminders and next steps for credential management. |
 <!-- END_TF_DOCS -->

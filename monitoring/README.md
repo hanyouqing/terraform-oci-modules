@@ -94,3 +94,46 @@ The following Monitoring resources are **free** within Always Free tier limits:
 ## Examples
 
 See the [examples](../examples/monitoring/) directory for complete examples.
+
+<!-- BEGIN_TF_DOCS -->
+## Requirements
+
+| Name | Version |
+|------|---------|
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.14.2 |
+| <a name="requirement_oci"></a> [oci](#requirement\_oci) | ~> 7.30 |
+
+## Providers
+
+| Name | Version |
+|------|---------|
+| <a name="provider_oci"></a> [oci](#provider\_oci) | 7.32.0 |
+
+## Modules
+
+No modules.
+
+## Resources
+
+| Name | Type |
+|------|------|
+| [oci_monitoring_alarm.this](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/monitoring_alarm) | resource |
+
+## Inputs
+
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| <a name="input_alarms"></a> [alarms](#input\_alarms) | Map of monitoring alarms to create | <pre>map(object({<br/>    display_name          = string<br/>    is_enabled            = optional(bool, true)<br/>    metric_compartment_id = string<br/>    namespace             = string<br/>    query                 = string<br/>    severity              = string<br/>    message_format        = optional(string, "ONS_OPTIMIZED")<br/>    body                  = optional(string, "")<br/>    destinations          = optional(list(string), [])<br/>  }))</pre> | `{}` | no |
+| <a name="input_compartment_id"></a> [compartment\_id](#input\_compartment\_id) | OCID of the compartment where the monitoring alarms will be created | `string` | n/a | yes |
+| <a name="input_defined_tags"></a> [defined\_tags](#input\_defined\_tags) | Defined tags to apply to all resources | `map(string)` | `{}` | no |
+| <a name="input_environment"></a> [environment](#input\_environment) | Environment name for tagging | `string` | `"development"` | no |
+| <a name="input_freeform_tags"></a> [freeform\_tags](#input\_freeform\_tags) | Freeform tags to apply to all resources | `map(string)` | `{}` | no |
+| <a name="input_project"></a> [project](#input\_project) | Project name for tagging | `string` | `"oci-modules"` | no |
+
+## Outputs
+
+| Name | Description |
+|------|-------------|
+| <a name="output_alarm_ids"></a> [alarm\_ids](#output\_alarm\_ids) | OCIDs of the monitoring alarms |
+| <a name="output_zzz_reminders"></a> [zzz\_reminders](#output\_zzz\_reminders) | Important reminders and next steps for Monitoring module |
+<!-- END_TF_DOCS -->

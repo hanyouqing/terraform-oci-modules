@@ -161,3 +161,118 @@ The following resources are **free** within Always Free tier limits:
 ## Examples
 
 See the [examples](../examples/vcn/) directory for complete examples.
+
+<!-- BEGIN_TF_DOCS -->
+## Requirements
+
+| Name | Version |
+|------|---------|
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.14.2 |
+| <a name="requirement_oci"></a> [oci](#requirement\_oci) | ~> 7.30 |
+
+## Providers
+
+| Name | Version |
+|------|---------|
+| <a name="provider_oci"></a> [oci](#provider\_oci) | 7.32.0 |
+
+## Modules
+
+No modules.
+
+## Resources
+
+| Name | Type |
+|------|------|
+| [oci_core_drg.this](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/core_drg) | resource |
+| [oci_core_drg_attachment.vcn](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/core_drg_attachment) | resource |
+| [oci_core_drg_route_distribution.this](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/core_drg_route_distribution) | resource |
+| [oci_core_drg_route_table.this](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/core_drg_route_table) | resource |
+| [oci_core_internet_gateway.this](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/core_internet_gateway) | resource |
+| [oci_core_local_peering_gateway.this](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/core_local_peering_gateway) | resource |
+| [oci_core_nat_gateway.this](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/core_nat_gateway) | resource |
+| [oci_core_network_security_group.this](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/core_network_security_group) | resource |
+| [oci_core_network_security_group_security_rule.egress](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/core_network_security_group_security_rule) | resource |
+| [oci_core_network_security_group_security_rule.ingress](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/core_network_security_group_security_rule) | resource |
+| [oci_core_route_table.private](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/core_route_table) | resource |
+| [oci_core_route_table.public](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/core_route_table) | resource |
+| [oci_core_route_table_attachment.private](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/core_route_table_attachment) | resource |
+| [oci_core_route_table_attachment.public](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/core_route_table_attachment) | resource |
+| [oci_core_security_list.private](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/core_security_list) | resource |
+| [oci_core_security_list.public](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/core_security_list) | resource |
+| [oci_core_service_gateway.this](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/core_service_gateway) | resource |
+| [oci_core_subnet.private](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/core_subnet) | resource |
+| [oci_core_subnet.public](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/core_subnet) | resource |
+| [oci_core_vcn.this](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/core_vcn) | resource |
+| [oci_logging_log.vcn_flow_log](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/logging_log) | resource |
+| [oci_logging_log_group.vcn_flow_logs](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/logging_log_group) | resource |
+| [oci_identity_availability_domains.ads](https://registry.terraform.io/providers/oracle/oci/latest/docs/data-sources/identity_availability_domains) | data source |
+
+## Inputs
+
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| <a name="input_attach_drg_to_vcn"></a> [attach\_drg\_to\_vcn](#input\_attach\_drg\_to\_vcn) | Whether to attach DRG to VCN | `bool` | `false` | no |
+| <a name="input_compartment_id"></a> [compartment\_id](#input\_compartment\_id) | OCID of the compartment where the VCN will be created | `string` | n/a | yes |
+| <a name="input_create_drg"></a> [create\_drg](#input\_create\_drg) | Whether to create a Dynamic Routing Gateway | `bool` | `false` | no |
+| <a name="input_create_internet_gateway"></a> [create\_internet\_gateway](#input\_create\_internet\_gateway) | Whether to create an Internet Gateway | `bool` | `true` | no |
+| <a name="input_create_nat_gateway"></a> [create\_nat\_gateway](#input\_create\_nat\_gateway) | Whether to create a NAT Gateway | `bool` | `false` | no |
+| <a name="input_create_service_gateway"></a> [create\_service\_gateway](#input\_create\_service\_gateway) | Whether to create a Service Gateway | `bool` | `false` | no |
+| <a name="input_defined_tags"></a> [defined\_tags](#input\_defined\_tags) | Defined tags to apply to all resources (core networking resources expect map(string)) | `map(string)` | `{}` | no |
+| <a name="input_drg_display_name"></a> [drg\_display\_name](#input\_drg\_display\_name) | Display name for the DRG | `string` | `"drg"` | no |
+| <a name="input_drg_route_distributions"></a> [drg\_route\_distributions](#input\_drg\_route\_distributions) | Map of DRG route distributions to create | <pre>map(object({<br/>    display_name      = string<br/>    distribution_type = string<br/>  }))</pre> | `{}` | no |
+| <a name="input_drg_route_tables"></a> [drg\_route\_tables](#input\_drg\_route\_tables) | Map of DRG route tables to create | <pre>map(object({<br/>    display_name = string<br/>  }))</pre> | `{}` | no |
+| <a name="input_enable_ipv6"></a> [enable\_ipv6](#input\_enable\_ipv6) | Enable IPv6 for the VCN | `bool` | `false` | no |
+| <a name="input_enable_vcn_flow_logs"></a> [enable\_vcn\_flow\_logs](#input\_enable\_vcn\_flow\_logs) | Whether to enable VCN Flow Logs | `bool` | `false` | no |
+| <a name="input_environment"></a> [environment](#input\_environment) | Environment name for tagging | `string` | `"development"` | no |
+| <a name="input_freeform_tags"></a> [freeform\_tags](#input\_freeform\_tags) | Freeform tags to apply to all resources | `map(string)` | `{}` | no |
+| <a name="input_internet_gateway_display_name"></a> [internet\_gateway\_display\_name](#input\_internet\_gateway\_display\_name) | Display name for the Internet Gateway | `string` | `"internet-gateway"` | no |
+| <a name="input_internet_gateway_enabled"></a> [internet\_gateway\_enabled](#input\_internet\_gateway\_enabled) | Whether the Internet Gateway is enabled | `bool` | `true` | no |
+| <a name="input_local_peering_gateways"></a> [local\_peering\_gateways](#input\_local\_peering\_gateways) | Map of Local Peering Gateways to create | <pre>map(object({<br/>    display_name   = string<br/>    route_table_id = optional(string, null)<br/>    peer_id        = optional(string, null)<br/>  }))</pre> | `{}` | no |
+| <a name="input_nat_gateway_block_traffic"></a> [nat\_gateway\_block\_traffic](#input\_nat\_gateway\_block\_traffic) | Whether to block traffic on the NAT Gateway | `bool` | `false` | no |
+| <a name="input_nat_gateway_display_name"></a> [nat\_gateway\_display\_name](#input\_nat\_gateway\_display\_name) | Display name for the NAT Gateway | `string` | `"nat-gateway"` | no |
+| <a name="input_network_security_groups"></a> [network\_security\_groups](#input\_network\_security\_groups) | Map of Network Security Groups to create | <pre>map(object({<br/>    display_name  = string<br/>    freeform_tags = optional(map(string), {})<br/>    defined_tags  = optional(map(string), {})<br/>  }))</pre> | `{}` | no |
+| <a name="input_nsg_egress_rules"></a> [nsg\_egress\_rules](#input\_nsg\_egress\_rules) | Map of NSG egress rules to create | <pre>map(object({<br/>    nsg_key          = string<br/>    protocol         = string<br/>    description      = optional(string, "")<br/>    destination      = string<br/>    destination_type = string<br/>    is_stateless     = optional(bool, false)<br/>    tcp_options = optional(object({<br/>      destination_port_min = number<br/>      destination_port_max = number<br/>      source_port_min      = optional(number, null)<br/>      source_port_max      = optional(number, null)<br/>    }), null)<br/>    udp_options = optional(object({<br/>      destination_port_min = number<br/>      destination_port_max = number<br/>      source_port_min      = optional(number, null)<br/>      source_port_max      = optional(number, null)<br/>    }), null)<br/>    icmp_options = optional(object({<br/>      type = number<br/>      code = optional(number, null)<br/>    }), null)<br/>  }))</pre> | `{}` | no |
+| <a name="input_nsg_ingress_rules"></a> [nsg\_ingress\_rules](#input\_nsg\_ingress\_rules) | Map of NSG ingress rules to create | <pre>map(object({<br/>    nsg_key      = string<br/>    protocol     = string<br/>    description  = optional(string, "")<br/>    source       = string<br/>    source_type  = string<br/>    is_stateless = optional(bool, false)<br/>    tcp_options = optional(object({<br/>      destination_port_min = number<br/>      destination_port_max = number<br/>      source_port_min      = optional(number, null)<br/>      source_port_max      = optional(number, null)<br/>    }), null)<br/>    udp_options = optional(object({<br/>      destination_port_min = number<br/>      destination_port_max = number<br/>      source_port_min      = optional(number, null)<br/>      source_port_max      = optional(number, null)<br/>    }), null)<br/>    icmp_options = optional(object({<br/>      type = number<br/>      code = optional(number, null)<br/>    }), null)<br/>  }))</pre> | `{}` | no |
+| <a name="input_private_subnet_egress_rules"></a> [private\_subnet\_egress\_rules](#input\_private\_subnet\_egress\_rules) | Egress rules for default private subnet security lists. Set to null to use default (allow all outbound) | <pre>list(object({<br/>    protocol         = string<br/>    destination      = string<br/>    destination_type = optional(string, "CIDR_BLOCK")<br/>    description      = optional(string, "")<br/>    tcp_options = optional(object({<br/>      min = number<br/>      max = number<br/>    }), null)<br/>    udp_options = optional(object({<br/>      min = number<br/>      max = number<br/>    }), null)<br/>    icmp_options = optional(object({<br/>      type = number<br/>      code = optional(number, null)<br/>    }), null)<br/>  }))</pre> | `null` | no |
+| <a name="input_private_subnet_ingress_rules"></a> [private\_subnet\_ingress\_rules](#input\_private\_subnet\_ingress\_rules) | Ingress rules for default private subnet security lists. source=null uses first VCN CIDR. Default is empty (locked down). User must provide rules to allow traffic. | <pre>list(object({<br/>    protocol    = string<br/>    source      = optional(string, null)<br/>    source_type = optional(string, "CIDR_BLOCK")<br/>    description = optional(string, "")<br/>    tcp_options = optional(object({<br/>      min = number<br/>      max = number<br/>    }), null)<br/>    udp_options = optional(object({<br/>      min = number<br/>      max = number<br/>    }), null)<br/>    icmp_options = optional(object({<br/>      type = number<br/>      code = optional(number, null)<br/>    }), null)<br/>  }))</pre> | `[]` | no |
+| <a name="input_private_subnets"></a> [private\_subnets](#input\_private\_subnets) | Map of private subnets to create | <pre>map(object({<br/>    cidr_block          = string<br/>    display_name        = string<br/>    dns_label           = optional(string, "")<br/>    availability_domain = string<br/>    security_list_ids   = optional(list(string), null)<br/>  }))</pre> | `{}` | no |
+| <a name="input_project"></a> [project](#input\_project) | Project name for tagging | `string` | `"oci-modules"` | no |
+| <a name="input_public_subnet_egress_rules"></a> [public\_subnet\_egress\_rules](#input\_public\_subnet\_egress\_rules) | Egress rules for default public subnet security lists. Set to null to use default (allow all outbound) | <pre>list(object({<br/>    protocol         = string<br/>    destination      = string<br/>    destination_type = optional(string, "CIDR_BLOCK")<br/>    description      = optional(string, "")<br/>    tcp_options = optional(object({<br/>      min = number<br/>      max = number<br/>    }), null)<br/>    udp_options = optional(object({<br/>      min = number<br/>      max = number<br/>    }), null)<br/>    icmp_options = optional(object({<br/>      type = number<br/>      code = optional(number, null)<br/>    }), null)<br/>  }))</pre> | `null` | no |
+| <a name="input_public_subnet_ingress_rules"></a> [public\_subnet\_ingress\_rules](#input\_public\_subnet\_ingress\_rules) | Ingress rules for default public subnet security lists. Default is empty (locked down). User must provide rules to allow traffic. | <pre>list(object({<br/>    protocol    = string<br/>    source      = string<br/>    source_type = optional(string, "CIDR_BLOCK")<br/>    description = optional(string, "")<br/>    tcp_options = optional(object({<br/>      min = number<br/>      max = number<br/>    }), null)<br/>    udp_options = optional(object({<br/>      min = number<br/>      max = number<br/>    }), null)<br/>    icmp_options = optional(object({<br/>      type = number<br/>      code = optional(number, null)<br/>    }), null)<br/>  }))</pre> | `[]` | no |
+| <a name="input_public_subnets"></a> [public\_subnets](#input\_public\_subnets) | Map of public subnets to create | <pre>map(object({<br/>    cidr_block          = string<br/>    display_name        = string<br/>    dns_label           = optional(string, "")<br/>    availability_domain = string<br/>    security_list_ids   = optional(list(string), null)<br/>  }))</pre> | `{}` | no |
+| <a name="input_service_gateway_display_name"></a> [service\_gateway\_display\_name](#input\_service\_gateway\_display\_name) | Display name for the Service Gateway | `string` | `"service-gateway"` | no |
+| <a name="input_service_gateway_services"></a> [service\_gateway\_services](#input\_service\_gateway\_services) | List of services for the Service Gateway | <pre>list(object({<br/>    service_id   = string<br/>    service_name = string<br/>    cidr_block   = string<br/>  }))</pre> | `[]` | no |
+| <a name="input_tenancy_ocid"></a> [tenancy\_ocid](#input\_tenancy\_ocid) | OCID of the tenancy | `string` | n/a | yes |
+| <a name="input_vcn_cidr_blocks"></a> [vcn\_cidr\_blocks](#input\_vcn\_cidr\_blocks) | List of CIDR blocks for the VCN | `list(string)` | <pre>[<br/>  "10.0.0.0/16"<br/>]</pre> | no |
+| <a name="input_vcn_display_name"></a> [vcn\_display\_name](#input\_vcn\_display\_name) | Display name for the VCN | `string` | `"vcn"` | no |
+| <a name="input_vcn_dns_label"></a> [vcn\_dns\_label](#input\_vcn\_dns\_label) | DNS label for the VCN | `string` | `null` | no |
+| <a name="input_vcn_flow_log_enabled"></a> [vcn\_flow\_log\_enabled](#input\_vcn\_flow\_log\_enabled) | Whether the VCN flow log is enabled (when enable\_vcn\_flow\_logs is true) | `bool` | `true` | no |
+| <a name="input_vcn_flow_log_retention_duration"></a> [vcn\_flow\_log\_retention\_duration](#input\_vcn\_flow\_log\_retention\_duration) | Retention duration in days for VCN Flow Logs | `number` | `30` | no |
+
+## Outputs
+
+| Name | Description |
+|------|-------------|
+| <a name="output_availability_domains"></a> [availability\_domains](#output\_availability\_domains) | List of availability domain names |
+| <a name="output_drg_attachment_id"></a> [drg\_attachment\_id](#output\_drg\_attachment\_id) | OCID of the DRG attachment to VCN |
+| <a name="output_drg_id"></a> [drg\_id](#output\_drg\_id) | OCID of the Dynamic Routing Gateway |
+| <a name="output_internet_gateway_id"></a> [internet\_gateway\_id](#output\_internet\_gateway\_id) | OCID of the Internet Gateway |
+| <a name="output_local_peering_gateway_ids"></a> [local\_peering\_gateway\_ids](#output\_local\_peering\_gateway\_ids) | Map of Local Peering Gateway IDs |
+| <a name="output_nat_gateway_id"></a> [nat\_gateway\_id](#output\_nat\_gateway\_id) | OCID of the NAT Gateway |
+| <a name="output_network_security_group_ids"></a> [network\_security\_group\_ids](#output\_network\_security\_group\_ids) | Map of Network Security Group IDs |
+| <a name="output_private_route_table_ids"></a> [private\_route\_table\_ids](#output\_private\_route\_table\_ids) | Map of private route table IDs |
+| <a name="output_private_security_list_ids"></a> [private\_security\_list\_ids](#output\_private\_security\_list\_ids) | Map of private security list IDs |
+| <a name="output_private_subnet_cidrs"></a> [private\_subnet\_cidrs](#output\_private\_subnet\_cidrs) | Map of private subnet CIDR blocks |
+| <a name="output_private_subnet_ids"></a> [private\_subnet\_ids](#output\_private\_subnet\_ids) | Map of private subnet IDs |
+| <a name="output_public_route_table_ids"></a> [public\_route\_table\_ids](#output\_public\_route\_table\_ids) | Map of public route table IDs |
+| <a name="output_public_security_list_ids"></a> [public\_security\_list\_ids](#output\_public\_security\_list\_ids) | Map of public security list IDs |
+| <a name="output_public_subnet_cidrs"></a> [public\_subnet\_cidrs](#output\_public\_subnet\_cidrs) | Map of public subnet CIDR blocks |
+| <a name="output_public_subnet_ids"></a> [public\_subnet\_ids](#output\_public\_subnet\_ids) | Map of public subnet IDs |
+| <a name="output_service_gateway_id"></a> [service\_gateway\_id](#output\_service\_gateway\_id) | OCID of the Service Gateway |
+| <a name="output_vcn_cidr_blocks"></a> [vcn\_cidr\_blocks](#output\_vcn\_cidr\_blocks) | CIDR blocks of the VCN |
+| <a name="output_vcn_display_name"></a> [vcn\_display\_name](#output\_vcn\_display\_name) | Display name of the VCN |
+| <a name="output_vcn_flow_log_id"></a> [vcn\_flow\_log\_id](#output\_vcn\_flow\_log\_id) | OCID of the Logging service log for VCN flow logs |
+| <a name="output_vcn_id"></a> [vcn\_id](#output\_vcn\_id) | OCID of the VCN |
+| <a name="output_zzz_reminders"></a> [zzz\_reminders](#output\_zzz\_reminders) | Important reminders and next steps for VCN module |
+<!-- END_TF_DOCS -->

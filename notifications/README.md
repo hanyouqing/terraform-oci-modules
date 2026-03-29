@@ -96,3 +96,50 @@ The following Notification Service resources are **free** within Always Free tie
 ## Examples
 
 See the [examples](../examples/notifications/) directory for complete examples.
+
+<!-- BEGIN_TF_DOCS -->
+## Requirements
+
+| Name | Version |
+|------|---------|
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.14.2 |
+| <a name="requirement_oci"></a> [oci](#requirement\_oci) | ~> 7.30 |
+
+## Providers
+
+| Name | Version |
+|------|---------|
+| <a name="provider_oci"></a> [oci](#provider\_oci) | ~> 7.30 |
+
+## Modules
+
+No modules.
+
+## Resources
+
+| Name | Type |
+|------|------|
+| [oci_ons_notification_topic.this](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/ons_notification_topic) | resource |
+| [oci_ons_subscription.this](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/ons_subscription) | resource |
+
+## Inputs
+
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| <a name="input_compartment_id"></a> [compartment\_id](#input\_compartment\_id) | OCID of the compartment where the notification resources will be created | `string` | n/a | yes |
+| <a name="input_defined_tags"></a> [defined\_tags](#input\_defined\_tags) | Defined tags to apply to all resources | `map(string)` | `{}` | no |
+| <a name="input_environment"></a> [environment](#input\_environment) | Environment name for tagging | `string` | `"development"` | no |
+| <a name="input_freeform_tags"></a> [freeform\_tags](#input\_freeform\_tags) | Freeform tags to apply to all resources | `map(string)` | `{}` | no |
+| <a name="input_project"></a> [project](#input\_project) | Project name for tagging | `string` | `"oci-modules"` | no |
+| <a name="input_subscriptions"></a> [subscriptions](#input\_subscriptions) | Map of subscriptions to create | <pre>map(object({<br/>    topic_key = string<br/>    protocol  = string<br/>    endpoint  = string<br/>  }))</pre> | `{}` | no |
+| <a name="input_topics"></a> [topics](#input\_topics) | Map of notification topics to create | <pre>map(object({<br/>    name        = string<br/>    description = string<br/>  }))</pre> | `{}` | no |
+
+## Outputs
+
+| Name | Description |
+|------|-------------|
+| <a name="output_subscription_ids"></a> [subscription\_ids](#output\_subscription\_ids) | OCIDs of the subscriptions |
+| <a name="output_topic_endpoints"></a> [topic\_endpoints](#output\_topic\_endpoints) | Endpoints of the notification topics |
+| <a name="output_topic_ids"></a> [topic\_ids](#output\_topic\_ids) | OCIDs of the notification topics |
+| <a name="output_zzz_reminders"></a> [zzz\_reminders](#output\_zzz\_reminders) | Important reminders and next steps for Notifications module |
+<!-- END_TF_DOCS -->

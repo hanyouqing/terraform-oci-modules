@@ -136,3 +136,50 @@ The following Autonomous Database resources are **free** within Always Free tier
 ## Examples
 
 See the [examples](../examples/autonomous-database/) directory for complete examples.
+
+<!-- BEGIN_TF_DOCS -->
+## Requirements
+
+| Name | Version |
+|------|---------|
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.14.2 |
+| <a name="requirement_oci"></a> [oci](#requirement\_oci) | ~> 7.30 |
+
+## Providers
+
+| Name | Version |
+|------|---------|
+| <a name="provider_oci"></a> [oci](#provider\_oci) | 7.32.0 |
+
+## Modules
+
+No modules.
+
+## Resources
+
+| Name | Type |
+|------|------|
+| [oci_database_autonomous_database.this](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/database_autonomous_database) | resource |
+
+## Inputs
+
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| <a name="input_compartment_id"></a> [compartment\_id](#input\_compartment\_id) | OCID of the compartment where the Autonomous Database will be created | `string` | n/a | yes |
+| <a name="input_databases"></a> [databases](#input\_databases) | Map of Autonomous Databases to create. For Always Free, is\_free\_tier=true, cpu\_core\_count=1, data\_storage\_size\_in\_tbs=1. | <pre>map(object({<br/>    db_name                                        = string<br/>    display_name                                   = string<br/>    admin_password                                 = string<br/>    db_workload                                    = string<br/>    is_free_tier                                   = bool<br/>    license_model                                  = string<br/>    cpu_core_count                                 = number<br/>    data_storage_size_in_tbs                       = number<br/>    is_auto_scaling_enabled                        = optional(bool, false)<br/>    is_dedicated                                   = optional(bool, false)<br/>    is_mtls_connection_required                    = optional(bool, true)<br/>    is_preview_version_with_service_terms_accepted = optional(bool, false)<br/>    nsg_ids                                        = optional(list(string), [])<br/>    private_endpoint_label                         = optional(string, null)<br/>    subnet_id                                      = optional(string, null)<br/>    whitelisted_ips                                = optional(list(string), [])<br/>    freeform_tags                                  = optional(map(string), {})<br/>    defined_tags                                   = optional(map(string), {})<br/>  }))</pre> | `{}` | no |
+| <a name="input_defined_tags"></a> [defined\_tags](#input\_defined\_tags) | Defined tags to apply to all resources | `map(string)` | `{}` | no |
+| <a name="input_environment"></a> [environment](#input\_environment) | Environment name for tagging | `string` | `"development"` | no |
+| <a name="input_freeform_tags"></a> [freeform\_tags](#input\_freeform\_tags) | Freeform tags to apply to all resources | `map(string)` | `{}` | no |
+| <a name="input_project"></a> [project](#input\_project) | Project name for tagging | `string` | `"oci-modules"` | no |
+
+## Outputs
+
+| Name | Description |
+|------|-------------|
+| <a name="output_database_connection_strings"></a> [database\_connection\_strings](#output\_database\_connection\_strings) | Connection strings for the Autonomous Databases |
+| <a name="output_database_connection_urls"></a> [database\_connection\_urls](#output\_database\_connection\_urls) | Connection URLs for the Autonomous Databases |
+| <a name="output_database_ids"></a> [database\_ids](#output\_database\_ids) | OCIDs of the Autonomous Databases |
+| <a name="output_database_private_endpoints"></a> [database\_private\_endpoints](#output\_database\_private\_endpoints) | Private endpoints for the Autonomous Databases |
+| <a name="output_database_public_endpoints"></a> [database\_public\_endpoints](#output\_database\_public\_endpoints) | Public endpoints for the Autonomous Databases |
+| <a name="output_zzz_reminders"></a> [zzz\_reminders](#output\_zzz\_reminders) | Important reminders and next steps for Autonomous Database module |
+<!-- END_TF_DOCS -->

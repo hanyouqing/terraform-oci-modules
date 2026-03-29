@@ -107,3 +107,55 @@ The following Vault resources are **free** within Always Free tier limits:
 ## Examples
 
 See the [examples](../examples/vault/) directory for complete examples.
+
+<!-- BEGIN_TF_DOCS -->
+## Requirements
+
+| Name | Version |
+|------|---------|
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.14.2 |
+| <a name="requirement_oci"></a> [oci](#requirement\_oci) | ~> 7.30 |
+
+## Providers
+
+| Name | Version |
+|------|---------|
+| <a name="provider_oci"></a> [oci](#provider\_oci) | ~> 7.30 |
+
+## Modules
+
+No modules.
+
+## Resources
+
+| Name | Type |
+|------|------|
+| [oci_kms_key.this](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/kms_key) | resource |
+| [oci_kms_vault.this](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/kms_vault) | resource |
+| [oci_vault_secret.this](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/vault_secret) | resource |
+
+## Inputs
+
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| <a name="input_compartment_id"></a> [compartment\_id](#input\_compartment\_id) | OCID of the compartment where the vault will be created | `string` | n/a | yes |
+| <a name="input_defined_tags"></a> [defined\_tags](#input\_defined\_tags) | Defined tags to apply to all resources (KMS/vault resources expect map(string)) | `map(string)` | `{}` | no |
+| <a name="input_environment"></a> [environment](#input\_environment) | Environment name for tagging | `string` | `"development"` | no |
+| <a name="input_freeform_tags"></a> [freeform\_tags](#input\_freeform\_tags) | Freeform tags to apply to all resources | `map(string)` | `{}` | no |
+| <a name="input_keys"></a> [keys](#input\_keys) | Map of keys to create | <pre>map(object({<br/>    display_name    = string<br/>    algorithm       = string<br/>    length          = optional(number, null)<br/>    curve_id        = optional(string, null)<br/>    protection_mode = string<br/>  }))</pre> | `{}` | no |
+| <a name="input_project"></a> [project](#input\_project) | Project name for tagging | `string` | `"oci-modules"` | no |
+| <a name="input_secrets"></a> [secrets](#input\_secrets) | Map of secrets to create (secret\_name maps to oci\_vault\_secret.secret\_name) | <pre>map(object({<br/>    secret_name    = string<br/>    secret_content = string<br/>    content_type   = string<br/>    key_id         = string<br/>  }))</pre> | `{}` | no |
+| <a name="input_vault_display_name"></a> [vault\_display\_name](#input\_vault\_display\_name) | Display name for the vault | `string` | `"vault"` | no |
+| <a name="input_vault_type"></a> [vault\_type](#input\_vault\_type) | Type of vault: VIRTUAL\_PRIVATE or DEFAULT | `string` | `"DEFAULT"` | no |
+
+## Outputs
+
+| Name | Description |
+|------|-------------|
+| <a name="output_key_ids"></a> [key\_ids](#output\_key\_ids) | OCIDs of the keys |
+| <a name="output_secret_ids"></a> [secret\_ids](#output\_secret\_ids) | OCIDs of the secrets |
+| <a name="output_vault_crypto_endpoint"></a> [vault\_crypto\_endpoint](#output\_vault\_crypto\_endpoint) | Crypto endpoint of the vault |
+| <a name="output_vault_id"></a> [vault\_id](#output\_vault\_id) | OCID of the vault |
+| <a name="output_vault_management_endpoint"></a> [vault\_management\_endpoint](#output\_vault\_management\_endpoint) | Management endpoint of the vault |
+| <a name="output_zzz_reminders"></a> [zzz\_reminders](#output\_zzz\_reminders) | Important reminders and next steps for Vault module |
+<!-- END_TF_DOCS -->

@@ -125,3 +125,61 @@ The following Load Balancer resources are **free** within Always Free tier limit
 ## Examples
 
 See the [examples](../examples/load-balancer/) directory for complete examples.
+
+<!-- BEGIN_TF_DOCS -->
+## Requirements
+
+| Name | Version |
+|------|---------|
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.14.2 |
+| <a name="requirement_oci"></a> [oci](#requirement\_oci) | ~> 7.30 |
+
+## Providers
+
+| Name | Version |
+|------|---------|
+| <a name="provider_oci"></a> [oci](#provider\_oci) | 7.32.0 |
+
+## Modules
+
+No modules.
+
+## Resources
+
+| Name | Type |
+|------|------|
+| [oci_load_balancer_backend.this](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/load_balancer_backend) | resource |
+| [oci_load_balancer_backend_set.this](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/load_balancer_backend_set) | resource |
+| [oci_load_balancer_listener.this](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/load_balancer_listener) | resource |
+| [oci_load_balancer_load_balancer.this](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/load_balancer_load_balancer) | resource |
+
+## Inputs
+
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| <a name="input_backend_sets"></a> [backend\_sets](#input\_backend\_sets) | Map of backend sets to create | <pre>map(object({<br/>    policy = string<br/>    health_checker = object({<br/>      protocol            = string<br/>      port                = number<br/>      url_path            = string<br/>      interval_ms         = number<br/>      timeout_in_millis   = number<br/>      retries             = number<br/>      response_body_regex = string<br/>    })<br/>    ssl_configuration = optional(object({<br/>      certificate_ids                   = optional(list(string), [])<br/>      certificate_name                  = optional(string, "")<br/>      verify_depth                      = optional(number, 1)<br/>      verify_peer_certificate           = optional(bool, false)<br/>      protocols                         = optional(list(string), [])<br/>      cipher_suite_name                 = optional(string, "")<br/>      server_order_preference           = optional(string, "")<br/>      trusted_certificate_authority_ids = optional(list(string), [])<br/>    }))<br/>  }))</pre> | `{}` | no |
+| <a name="input_backends"></a> [backends](#input\_backends) | Map of backends to create | <pre>map(object({<br/>    backendset_name = string<br/>    ip_address      = string<br/>    port            = number<br/>    backup          = bool<br/>    drain           = bool<br/>    offline         = bool<br/>    weight          = number<br/>  }))</pre> | `{}` | no |
+| <a name="input_compartment_id"></a> [compartment\_id](#input\_compartment\_id) | OCID of the compartment where the load balancer will be created | `string` | n/a | yes |
+| <a name="input_defined_tags"></a> [defined\_tags](#input\_defined\_tags) | Defined tags to apply to all resources (load balancer expects map(string)) | `map(string)` | `{}` | no |
+| <a name="input_display_name"></a> [display\_name](#input\_display\_name) | Display name for the load balancer | `string` | `"load-balancer"` | no |
+| <a name="input_environment"></a> [environment](#input\_environment) | Environment name for tagging | `string` | `"development"` | no |
+| <a name="input_freeform_tags"></a> [freeform\_tags](#input\_freeform\_tags) | Freeform tags to apply to all resources | `map(string)` | `{}` | no |
+| <a name="input_is_private"></a> [is\_private](#input\_is\_private) | Whether the load balancer is private. Recommended to keep private for internal services. | `bool` | `true` | no |
+| <a name="input_listeners"></a> [listeners](#input\_listeners) | Map of listeners to create. connection\_configuration.idle\_timeout\_in\_seconds defaults to 60 (1-300) | <pre>map(object({<br/>    default_backend_set_name = string<br/>    port                     = number<br/>    protocol                 = string<br/>    ssl_configuration = optional(object({<br/>      certificate_ids                   = optional(list(string), [])<br/>      certificate_name                  = optional(string, "")<br/>      verify_depth                      = optional(number, 1)<br/>      verify_peer_certificate           = optional(bool, false)<br/>      protocols                         = optional(list(string), [])<br/>      cipher_suite_name                 = optional(string, "")<br/>      server_order_preference           = optional(string, "")<br/>      trusted_certificate_authority_ids = optional(list(string), [])<br/>    }))<br/>    connection_configuration = optional(object({<br/>      idle_timeout_in_seconds = number<br/>    }), { idle_timeout_in_seconds = 60 })<br/>  }))</pre> | `{}` | no |
+| <a name="input_nsg_ids"></a> [nsg\_ids](#input\_nsg\_ids) | List of Network Security Group OCIDs | `list(string)` | `[]` | no |
+| <a name="input_project"></a> [project](#input\_project) | Project name for tagging | `string` | `"oci-modules"` | no |
+| <a name="input_shape"></a> [shape](#input\_shape) | Shape of the load balancer. For Always Free, use 'flexible' | `string` | `"flexible"` | no |
+| <a name="input_shape_details"></a> [shape\_details](#input\_shape\_details) | Shape details for flexible load balancer. Always Free limit is 10 Mbps. | <pre>object({<br/>    minimum_bandwidth_in_mbps = number<br/>    maximum_bandwidth_in_mbps = number<br/>  })</pre> | <pre>{<br/>  "maximum_bandwidth_in_mbps": 10,<br/>  "minimum_bandwidth_in_mbps": 10<br/>}</pre> | no |
+| <a name="input_subnet_ids"></a> [subnet\_ids](#input\_subnet\_ids) | List of subnet OCIDs for the load balancer | `list(string)` | n/a | yes |
+
+## Outputs
+
+| Name | Description |
+|------|-------------|
+| <a name="output_backend_set_names"></a> [backend\_set\_names](#output\_backend\_set\_names) | Names of the backend sets |
+| <a name="output_listener_names"></a> [listener\_names](#output\_listener\_names) | Names of the listeners |
+| <a name="output_load_balancer_id"></a> [load\_balancer\_id](#output\_load\_balancer\_id) | OCID of the load balancer |
+| <a name="output_load_balancer_ip_address"></a> [load\_balancer\_ip\_address](#output\_load\_balancer\_ip\_address) | Primary IP address of the load balancer |
+| <a name="output_load_balancer_ip_addresses"></a> [load\_balancer\_ip\_addresses](#output\_load\_balancer\_ip\_addresses) | IP addresses of the load balancer |
+| <a name="output_zzz_reminders"></a> [zzz\_reminders](#output\_zzz\_reminders) | Important reminders and next steps for Load Balancer module |
+<!-- END_TF_DOCS -->
