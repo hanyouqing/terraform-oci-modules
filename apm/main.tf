@@ -45,13 +45,13 @@ resource "oci_apm_synthetics_monitor" "this" {
   batch_interval_in_seconds  = each.value.batch_interval_in_seconds
 
   configuration {
-    config_type            = each.value.config_type
-    is_failure_retried     = each.value.is_failure_retried
+    config_type                       = each.value.config_type
+    is_failure_retried                = each.value.is_failure_retried
     is_certificate_validation_enabled = each.value.is_certificate_validation_enabled
-    is_redirection_enabled = each.value.is_redirection_enabled
-    request_method         = each.value.request_method
-    verify_response_content = each.value.verify_response_content
-    verify_response_codes  = each.value.verify_response_codes
+    is_redirection_enabled            = each.value.is_redirection_enabled
+    request_method                    = each.value.request_method
+    verify_response_content           = each.value.verify_response_content
+    verify_response_codes             = each.value.verify_response_codes
   }
 
   dynamic "script_parameters" {

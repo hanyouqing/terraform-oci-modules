@@ -10,9 +10,9 @@ variable "compartment_id" {
 
 variable "apm_domains" {
   type = map(object({
-    display_name = string
-    description  = optional(string, "")
-    is_free_tier = optional(bool, true)
+    display_name  = string
+    description   = optional(string, "")
+    is_free_tier  = optional(bool, true)
     freeform_tags = optional(map(string), {})
     defined_tags  = optional(map(string), {})
   }))
@@ -22,16 +22,16 @@ variable "apm_domains" {
 
 variable "synthetics_monitors" {
   type = map(object({
-    display_name       = string
-    monitor_type       = string
+    display_name               = string
+    monitor_type               = string
     repeat_interval_in_seconds = number
 
     # Reference to APM domain — either a key in apm_domains or a direct OCID
     apm_domain_key = optional(string, null)
     apm_domain_id  = optional(string, null)
 
-    target  = optional(string, null)
-    status  = optional(string, "ENABLED")
+    target      = optional(string, null)
+    status      = optional(string, "ENABLED")
     is_run_once = optional(bool, false)
 
     # Scheduling
@@ -39,7 +39,7 @@ variable "synthetics_monitors" {
     is_run_now        = optional(bool, false)
 
     # Script (for scripted monitors)
-    script_id         = optional(string, null)
+    script_id = optional(string, null)
     script_parameters = optional(list(object({
       param_name  = string
       param_value = string
@@ -49,17 +49,17 @@ variable "synthetics_monitors" {
     vantage_points = optional(list(string), [])
 
     # Timeout and configuration settings
-    timeout_in_seconds     = optional(number, 60)
+    timeout_in_seconds        = optional(number, 60)
     batch_interval_in_seconds = optional(number, null)
 
     # Configuration block
-    config_type            = optional(string, null)
-    is_failure_retried     = optional(bool, true)
+    config_type                       = optional(string, null)
+    is_failure_retried                = optional(bool, true)
     is_certificate_validation_enabled = optional(bool, true)
-    is_redirection_enabled = optional(bool, true)
-    request_method         = optional(string, null)
-    verify_response_content = optional(string, null)
-    verify_response_codes  = optional(list(string), null)
+    is_redirection_enabled            = optional(bool, true)
+    request_method                    = optional(string, null)
+    verify_response_content           = optional(string, null)
+    verify_response_codes             = optional(list(string), null)
 
     freeform_tags = optional(map(string), {})
     defined_tags  = optional(map(string), {})

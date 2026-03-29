@@ -23,12 +23,12 @@ output "tunnel_details" {
   value = {
     for k, v in data.oci_core_ipsec_connection_tunnels.this : k => [
       for tunnel in v.ip_sec_connection_tunnels : {
-        id         = tunnel.id
-        vpn_ip     = tunnel.vpn_ip
-        status     = tunnel.status
+        id          = tunnel.id
+        vpn_ip      = tunnel.vpn_ip
+        status      = tunnel.status
         ike_version = tunnel.ike_version
-        routing    = tunnel.routing
-        state      = tunnel.state
+        routing     = tunnel.routing
+        state       = tunnel.state
       }
     ]
   }
