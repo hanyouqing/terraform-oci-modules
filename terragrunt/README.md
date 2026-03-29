@@ -1,6 +1,6 @@
-# Terragrunt Configuration for OCI Always Free Modules
+# Terragrunt Configuration for OCI Modules
 
-This directory provides a production-ready [Terragrunt](https://terragrunt.gruntwork.io/) wrapper around all 13 OCI Terraform modules. It handles remote state, provider configuration, cross-module dependencies, and environment promotion.
+Production-ready [Terragrunt](https://terragrunt.gruntwork.io/) wrapper for all 19 OCI Terraform modules. Supports **multi-account**, **multi-region**, and **multi-environment** deployments with isolated state, provider configuration, cross-module dependencies, and environment promotion.
 
 ## Prerequisites
 
@@ -12,129 +12,144 @@ This directory provides a production-ready [Terragrunt](https://terragrunt.grunt
 
 ## Directory Structure
 
+The layout follows a **3-layer hierarchy**: Account → Region → Environment.
+
 ```
 terragrunt/
-├── terragrunt.hcl                 # Root: remote state (OCI Object Storage) + provider generation + shared inputs
-├── _envcommon/                    # Per-module shared configs (DRY defaults); see _envcommon/README.md
+├── terragrunt.hcl                 # Root config: remote state, provider gen, shared inputs
+├── _envcommon/                    # Per-module shared defaults (19 modules); see _envcommon/README.md
 │   ├── vcn.hcl
 │   ├── compute.hcl
-│   ├── autonomous-database.hcl
+│   ├── bastion.hcl
 │   ├── block-storage.hcl
 │   ├── object-storage.hcl
 │   ├── load-balancer.hcl
-│   ├── bastion.hcl
+│   ├── network-load-balancer.hcl
+│   ├── autonomous-database.hcl
+│   ├── mysql.hcl
+│   ├── nosql-database.hcl
 │   ├── vault.hcl
+│   ├── certificates.hcl
+│   ├── credentials.hcl
 │   ├── monitoring.hcl
 │   ├── notifications.hcl
 │   ├── logging.hcl
 │   ├── email-delivery.hcl
-│   └── mysql.hcl
-└── environments/
-    ├── development/               # Always Free dev environment (see development/README.md)
-    │   ├── env.hcl                # Region, environment name, project
-    │   ├── vcn/terragrunt.hcl
-    │   ├── compute/terragrunt.hcl
-    │   ├── autonomous-database/terragrunt.hcl
-    │   ├── block-storage/terragrunt.hcl
-    │   ├── object-storage/terragrunt.hcl
-    │   ├── load-balancer/terragrunt.hcl
-    │   ├── bastion/terragrunt.hcl
-    │   ├── vault/terragrunt.hcl
-    │   ├── monitoring/terragrunt.hcl
-    │   ├── notifications/terragrunt.hcl
-    │   ├── logging/terragrunt.hcl
-    │   ├── email-delivery/terragrunt.hcl
-    │   └── mysql/terragrunt.hcl
-    └── production/                # Prod environment (see production/README.md)
-        ├── env.hcl
-        └── ... (same 13 modules)
+│   ├── apm.hcl
+│   └── site-to-site-vpn.hcl
+│
+├── personal/                      # ← Account (OCI tenancy)
+│   ├── account.hcl                # tenancy_ocid, compartment_id, namespace, OCI CLI profile
+│   │
+│   ├── ap-seoul-1/                # ← Region
+│   │   ├── region.hcl             # region = "ap-seoul-1"
+│   │   ├── development/           # ← Environment
+│   │   │   ├── env.hcl            # environment, project, ad_index
+│   │   │   ├── vcn/terragrunt.hcl
+│   │   │   ├── compute/terragrunt.hcl
+│   │   │   └── ... (19 modules)
+│   │   └── production/
+│   │       ├── env.hcl
+│   │       └── ... (19 modules)
+│   │
+│   └── us-ashburn-1/              # ← Second region (same account)
+│       ├── region.hcl
+│       └── development/
+│           ├── env.hcl
+│           └── ... (subset of modules)
+│
+└── company/                       # ← Second account (example)
+    ├── account.hcl
+    └── us-phoenix-1/
+        └── production/
+            └── ...
 ```
+
+### Adding a new account, region, or environment
+
+| Want to add | What to create |
+|-------------|---------------|
+| **Account** | New directory under `terragrunt/`, copy `account.hcl` template |
+| **Region** | New directory under `<account>/`, create `region.hcl` with one local |
+| **Environment** | New directory under `<account>/<region>/`, create `env.hcl`, copy module dirs |
 
 ## Configuration Layers
 
-Each child `terragrunt.hcl` merges three layers (deepest wins):
+Each leaf `terragrunt.hcl` resolves four config layers (deepest wins):
 
 ```
-Root terragrunt.hcl          → provider_tg.tf + backend.tf + project/environment + default freeform_tags
-  └─ _envcommon/<module>.hcl → terraform.source + Always Free defaults + compartment_id
-       └─ environments/<env>/<module>/terragrunt.hcl → env-specific overrides + dependencies
+Root terragrunt.hcl                           → provider_tg.tf + backend.tf + shared inputs
+  └─ <account>/account.hcl                    → tenancy_ocid, compartment_id, namespace, profile
+      └─ <account>/<region>/region.hcl        → region
+          └─ _envcommon/<module>.hcl           → terraform.source + module defaults
+              └─ <account>/<region>/<env>/<module>/terragrunt.hcl → env-specific overrides + dependencies
 ```
 
-The root `inputs` block sets `project`, `environment`, and a baseline `freeform_tags` map (`Project`, `Environment`, `ManagedBy`) so leaf stacks and modules stay consistent without repeating tags in every `_envcommon` file. Override or extend tags in an environment’s `terragrunt.hcl` when needed (deep merge).
+**Root `terragrunt.hcl`** provides:
+- Remote state (OCI Object Storage via S3-compatible API)
+- Provider generation (`provider_tg.tf`) with region and OCI profile from `account.hcl`
+- Shared inputs: `project`, `environment`, `compartment_id`, `tenancy_ocid`, `freeform_tags`
 
-`environments/<env>/env.hcl` supplies `region`, `project`, `environment`, and optional `ad_index`. The object-storage stack uses `local.region` from `_envcommon` so it stays aligned with the provider region.
+**Shared inputs (`freeform_tags`)** include `Project`, `Environment`, `Account`, `Region`, and `ManagedBy` for cost attribution and resource discovery.
 
 ## Quick Start
 
 ### 1. OCI Authentication
 
-**Option A — Config file (recommended):**
-```bash
-oci setup config      # creates ~/.oci/config with [DEFAULT] profile
+Create a profile in `~/.oci/config` for each OCI account:
+
+```ini
+[DEFAULT]
+tenancy=ocid1.tenancy.oc1..xxxx
+user=ocid1.user.oc1..xxxx
+fingerprint=xx:xx:xx:...
+key_file=~/.oci/oci_api_key.pem
+region=ap-seoul-1
+
+[company]
+tenancy=ocid1.tenancy.oc1..yyyy
+user=ocid1.user.oc1..yyyy
+fingerprint=yy:yy:yy:...
+key_file=~/.oci/company_api_key.pem
+region=us-phoenix-1
 ```
 
-**Option B — Environment variables:**
-```bash
-export OCI_CLI_TENANCY=ocid1.tenancy.oc1..xxxx
-export OCI_CLI_USER=ocid1.user.oc1..xxxx
-export OCI_CLI_FINGERPRINT=xx:xx:xx:...
-export OCI_CLI_KEY_FILE=~/.oci/oci_api_key.pem
-```
+The `config_file_profile` in `account.hcl` selects which profile to use.
 
-### 2. Module Source (Copy-Paste Ready)
-
-`_envcommon/*.hcl` sets an explicit remote module source, for example:
+### 2. Configure account.hcl
 
 ```hcl
-terraform {
-  source = "git::https://github.com/hanyouqing/terraform-oci-modules.git//vcn"
+# terragrunt/personal/account.hcl
+locals {
+  account_name        = "personal"
+  tenancy_ocid        = "ocid1.tenancy.oc1..xxxx"
+  compartment_id      = "ocid1.compartment.oc1..xxxx"
+  namespace           = "your-namespace"        # oci os ns get
+  config_file_profile = "DEFAULT"               # matches ~/.oci/config profile
 }
 ```
 
-You can copy stacks into another repo without editing the URL. Pin a branch or tag with a query string if needed, e.g. `...git?ref=v1.0.0//vcn`.
-
-For **local development** (iterate on a clone without pushing), override `terraform.source` in the leaf `environments/<env>/<module>/terragrunt.hcl` (merged after `_envcommon`, so it wins):
+### 3. Configure region.hcl
 
 ```hcl
-terraform {
-  source = "/path/to/terraform-oci-modules//vcn"
+# terragrunt/personal/ap-seoul-1/region.hcl
+locals {
+  region = "ap-seoul-1"
 }
 ```
 
-### 3. Set Required Environment Variables
+### 4. Configure env.hcl
 
-```bash
-# Required for all modules
-export TF_VAR_compartment_id=ocid1.compartment.oc1..xxxx
-export TF_VAR_tenancy_ocid=ocid1.tenancy.oc1..xxxx
-
-# Required for stacks that use subnets or AD-specific resources (VCN, compute, MySQL, load balancer, bastion, block-storage volumes)
-export TF_VAR_availability_domain="oci-yourdomain-ad-1"
-
-# Optional: standalone Terraform examples only; Terragrunt object-storage uses region from env.hcl
-export TF_VAR_region=ap-seoul-1        # should match environments/*/env.hcl
-
-# Compute
-export TF_VAR_ssh_public_keys="$(cat ~/.ssh/id_rsa.pub)"
-
-# Databases — set at runtime from a secret manager or CI (never commit real values):
-#   export TF_VAR_adb_admin_password="..."
-#   export TF_VAR_mysql_admin_password="..."
-# Or: read -s TF_VAR_adb_admin_password; export TF_VAR_adb_admin_password
-
-# Notifications
-export TF_VAR_alert_email="ops@example.com"
-
-# Email delivery sender
-export TF_VAR_sender_email="noreply@yourdomain.com"
-
-# Bastion (restrict to your IP in production)
-export TF_VAR_bastion_allowed_cidr="0.0.0.0/0"
+```hcl
+# terragrunt/personal/ap-seoul-1/development/env.hcl
+locals {
+  environment = "development"
+  project     = "oci-modules"
+  ad_index    = 0                # availability domain index
+}
 ```
 
-**Always Free development (minimal checklist):** set compartment/tenancy, **`TF_VAR_availability_domain`**, remote-state credentials, then SSH and DB passwords before those stacks. See [environments/development/README.md](environments/development/README.md).
-
-### 4. Remote State (OCI Object Storage via S3-compatible API)
+### 5. Remote State (OCI Object Storage via S3-compatible API)
 
 ```bash
 # 1. Create a Customer Secret Key in OCI Console:
@@ -142,43 +157,72 @@ export TF_VAR_bastion_allowed_cidr="0.0.0.0/0"
 export AWS_ACCESS_KEY_ID=<customer-secret-key-id>
 export AWS_SECRET_ACCESS_KEY=<customer-secret-key-secret>
 
-# 2. Set your Object Storage namespace
-export TG_OCI_NAMESPACE=$(oci os ns get --query 'data' --raw-output)
-
-# 3. Create the state bucket (first time only)
+# 2. Create the state bucket (first time only)
+#    Bucket name format: tfstate-<account_name>-<project>
 oci os bucket create \
-  --compartment-id "${TF_VAR_compartment_id}" \
-  --name "terragrunt-state-oci-modules-development" \
+  --compartment-id "ocid1.compartment.oc1..xxxx" \
+  --name "tfstate-personal-oci-modules" \
   --versioning Enabled
 ```
 
-### 5. Edit env.hcl
+State key layout: `<region>/<environment>/<module>/terraform.tfstate` — state is fully isolated across accounts, regions, and environments.
 
-Update `environments/development/env.hcl` (and `production/env.hcl`) with your region:
-
-```hcl
-locals {
-  environment = "development"
-  region      = "ap-seoul-1"   # ← Your OCI home region
-  project     = "oci-modules"
-}
-```
-
-### 6. Deploy
+### 6. Set Runtime Environment Variables
 
 ```bash
-cd environments/development
+# Required for AD-specific resources (compute, block-storage, MySQL, bastion)
+export TF_VAR_availability_domain="oci-yourdomain-ad-1"
+
+# Compute
+export TF_VAR_ssh_public_keys="$(cat ~/.ssh/id_rsa.pub)"
+
+# Databases — set from secret manager or read interactively (never commit values)
+read -s TF_VAR_adb_admin_password && export TF_VAR_adb_admin_password
+read -s TF_VAR_mysql_admin_password && export TF_VAR_mysql_admin_password
+
+# Notifications
+export TF_VAR_alert_email="ops@example.com"
+
+# Email delivery
+export TF_VAR_sender_email="noreply@yourdomain.com"
+
+# Bastion (restrict to your IP in production)
+export TF_VAR_bastion_allowed_cidr="0.0.0.0/0"
+```
+
+### 7. Deploy
+
+```bash
+cd terragrunt/personal/ap-seoul-1/development
 
 # Deploy everything in dependency order
 terragrunt run-all init
 terragrunt run-all plan
 terragrunt run-all apply
 
-# Or deploy a single module
+# Deploy a single module
 cd vcn
-terragrunt init
-terragrunt plan
-terragrunt apply
+terragrunt init && terragrunt plan && terragrunt apply
+```
+
+## Module Source
+
+`_envcommon/*.hcl` uses remote Git module sources:
+
+```hcl
+terraform {
+  source = "git::https://github.com/hanyouqing/terraform-oci-modules.git//vcn"
+}
+```
+
+Pin a version: `...git?ref=v1.0.0//vcn`
+
+For **local development**, override in the leaf `terragrunt.hcl`:
+
+```hcl
+terraform {
+  source = "/path/to/terraform-oci-modules//vcn"
+}
 ```
 
 ## Module Dependency Graph
@@ -186,22 +230,21 @@ terragrunt apply
 ```
 vcn ──────────┬──→ compute ──→ block-storage
               ├──→ load-balancer
+              ├──→ network-load-balancer
               ├──→ bastion
               └──→ mysql
+
+vault ──→ certificates ──→ credentials
 
 notifications ──→ monitoring
 
 # Independent (no dependencies):
-autonomous-database
-object-storage
-vault
-logging
-email-delivery
+autonomous-database    nosql-database     apm
+object-storage         email-delivery     logging
+site-to-site-vpn
 ```
 
 ## Always Free Tier Limits
-
-All modules enforce Always Free constraints via Terraform `validation` blocks:
 
 | Module | Always Free Limit |
 |--------|------------------|
@@ -218,64 +261,95 @@ All modules enforce Always Free constraints via Terraform `validation` blocks:
 | `email-delivery` | 3,000 emails/month |
 | `logging` | Free for Always Free tier |
 
-## Common Terragrunt Commands
+## Multi-Account / Multi-Region Patterns
+
+### Deploy the same environment across regions
 
 ```bash
-# Validate all modules (uses mock outputs, no OCI calls)
+# Seoul — development
+cd terragrunt/personal/ap-seoul-1/development
+terragrunt run-all apply
+
+# Ashburn — development (same account, different region)
+cd terragrunt/personal/us-ashburn-1/development
+terragrunt run-all apply
+```
+
+### Deploy to a different account
+
+```bash
+# 1. Create the account directory
+mkdir -p terragrunt/company/us-phoenix-1/production
+
+# 2. Create account.hcl with the company tenancy
+cat > terragrunt/company/account.hcl <<'EOF'
+locals {
+  account_name        = "company"
+  tenancy_ocid        = "ocid1.tenancy.oc1..yyyy"
+  compartment_id      = "ocid1.compartment.oc1..yyyy"
+  namespace           = "company-namespace"
+  config_file_profile = "company"   # ~/.oci/config profile
+}
+EOF
+
+# 3. Create region.hcl and env.hcl, copy module dirs
+# 4. terragrunt run-all apply
+```
+
+### Switching to ARM (VM.Standard.A1.Flex)
+
+Edit `<account>/<region>/<env>/compute/terragrunt.hcl`:
+
+```hcl
+inputs = {
+  shape          = "VM.Standard.A1.Flex"
+  instance_count = 1
+  ocpus          = 4
+  memory_in_gbs  = 24
+}
+```
+
+## Common Commands
+
+```bash
+# Validate all modules (no OCI calls)
 terragrunt run-all validate --terragrunt-ignore-external-dependencies
 
 # Plan everything
 terragrunt run-all plan
 
-# Apply with auto-approval (CI use)
+# Apply (CI — non-interactive)
 terragrunt run-all apply --terragrunt-non-interactive
 
-# Destroy everything (reverse order)
+# Destroy everything (reverse dependency order)
 terragrunt run-all destroy
 
 # Show dependency graph
 terragrunt graph-dependencies | dot -Tpng > deps.png
 
-# Target a single module
-cd environments/development/compute && terragrunt apply
-
-# Force re-init (after provider version changes)
+# Force re-init (after provider version bumps)
 terragrunt run-all init --upgrade
-```
-
-## Switching to ARM (VM.Standard.A1.Flex)
-
-Edit `environments/<env>/compute/terragrunt.hcl`:
-
-```hcl
-inputs = {
-  shape         = "VM.Standard.A1.Flex"
-  instance_count = 1      # up to 4 OCPUs total across all instances
-  ocpus         = 4
-  memory_in_gbs = 24
-  subnet_id     = dependency.vcn.outputs.public_subnet_ids["public-1"]
-  ssh_public_keys = get_env("TF_VAR_ssh_public_keys", "")
-}
 ```
 
 ## Security Notes
 
-- **Passwords** (`adb_admin_password`, `mysql_admin_password`) are passed via `TF_VAR_*` env vars and never stored in `.hcl` files or state in plain text by the modules.
-- **SSH keys** are passed via env var, not committed to source control.
-- **OCI API key** stays in `~/.oci/` and is never referenced in Terraform code (provider reads it automatically).
+- **Secrets** (`adb_admin_password`, `mysql_admin_password`, SSH keys) are passed via `TF_VAR_*` env vars — never committed to `.hcl` files.
+- **OCI API keys** stay in `~/.oci/` — provider reads them automatically via `config_file_profile`.
 - **State bucket** should have versioning enabled and access restricted to your IAM group.
 - **Bastion** `client_cidr_block_allow_list` should be restricted to known IPs in production.
+- **account.hcl** contains OCIDs (not secrets), but treat it as infrastructure config — don't expose publicly if your tenancy OCID is sensitive.
 
 ## Troubleshooting
 
 | Error | Fix |
 |-------|-----|
-| `Error: No valid credential sources found` | Run `oci setup config` or set `OCI_CLI_*` env vars |
-| `Error: failed to get object storage namespace` | Set `TG_OCI_NAMESPACE` env var |
-| `Error: compartment_id is required` | Set `TF_VAR_compartment_id` env var |
+| `No valid credential sources found` | Run `oci setup config` or check `config_file_profile` in `account.hcl` matches `~/.oci/config` |
+| `failed to get object storage namespace` | Verify `namespace` in `account.hcl` matches `oci os ns get` output |
 | `Error accessing state bucket` | Create the bucket or check `AWS_ACCESS_KEY_ID`/`AWS_SECRET_ACCESS_KEY` |
-| `mock_outputs not matching` | Normal for `plan` — mock outputs are used when dependency hasn't been applied yet |
-| `availability_domain not set` | Set `TF_VAR_availability_domain` to your AD name (e.g., `oci-yourdomain-ad-1`) |
+| `Could not find account.hcl` | Ensure you are running from inside `<account>/<region>/<env>/<module>/` |
+| `Could not find region.hcl` | Ensure `region.hcl` exists in `<account>/<region>/` |
+| `mock_outputs not matching` | Normal for `plan` — mock outputs are used when a dependency hasn't been applied yet |
+| `availability_domain not set` | Set `TF_VAR_availability_domain` (e.g., `oci-yourdomain-ad-1`) |
 
 ## References
 
@@ -283,3 +357,4 @@ inputs = {
 - [OCI Terraform Provider](https://registry.terraform.io/providers/oracle/oci/latest/docs)
 - [OCI Always Free Resources](https://docs.oracle.com/en-us/iaas/Content/FreeTier/freetier_topic-Always_Free_Resources.htm)
 - [OCI Object Storage S3 Compatibility](https://docs.oracle.com/en-us/iaas/Content/Object/Tasks/s3compatibleapi.htm)
+- [Gruntwork Reference Architecture](https://gruntwork.io/reference-architecture/)
