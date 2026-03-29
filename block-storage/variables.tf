@@ -11,6 +11,11 @@ variable "compartment_id" {
 variable "tenancy_ocid" {
   type        = string
   description = "OCID of the tenancy"
+
+  validation {
+    condition     = can(regex("^ocid1\\.tenancy\\.oc1\\.", var.tenancy_ocid))
+    error_message = "tenancy_ocid must be a valid OCI tenancy OCID."
+  }
 }
 
 variable "volumes" {
@@ -33,6 +38,20 @@ variable "volumes" {
       for v in var.volumes : v.size_in_gbs >= 50 && v.size_in_gbs <= 200
     ])
     error_message = "Each volume size must be between 50 and 200 GB for Always Free (total limit 200 GB)"
+  }
+
+  validation {
+    condition = alltrue([
+      for v in var.volumes : contains(["0", "10", "20", "30", "40", "50", "60", "70", "80", "90", "100", "110", "120"], v.vpus_per_gb)
+    ])
+    error_message = "vpus_per_gb must be a value between 0 and 120 in increments of 10."
+  }
+
+  validation {
+    condition = alltrue([
+      for v in var.volumes : contains(["FULL", "INCREMENTAL"], v.backup_type)
+    ])
+    error_message = "backup_type must be FULL or INCREMENTAL."
   }
 }
 
@@ -58,6 +77,33 @@ variable "backup_policies" {
   }))
   description = "Map of backup policies to create"
   default     = {}
+
+  validation {
+    condition = alltrue(flatten([
+      for p in var.backup_policies : [
+        for s in p.schedules : contains(["FULL", "INCREMENTAL"], s.backup_type)
+      ]
+    ]))
+    error_message = "backup_policies schedules backup_type must be FULL or INCREMENTAL."
+  }
+
+  validation {
+    condition = alltrue(flatten([
+      for p in var.backup_policies : [
+        for s in p.schedules : contains(["ONE_DAY", "ONE_WEEK", "ONE_MONTH", "ONE_YEAR"], s.period)
+      ]
+    ]))
+    error_message = "backup_policies schedules period must be one of: ONE_DAY, ONE_WEEK, ONE_MONTH, ONE_YEAR."
+  }
+
+  validation {
+    condition = alltrue(flatten([
+      for p in var.backup_policies : [
+        for s in p.schedules : s.hour_of_day >= 0 && s.hour_of_day <= 23
+      ]
+    ]))
+    error_message = "backup_policies schedules hour_of_day must be between 0 and 23."
+  }
 }
 
 variable "volume_attachments" {
@@ -72,6 +118,20 @@ variable "volume_attachments" {
   }))
   description = "Map of volume attachments"
   default     = {}
+
+  validation {
+    condition = alltrue([
+      for a in var.volume_attachments : contains(["iscsi", "paravirtualized"], a.attachment_type)
+    ])
+    error_message = "attachment_type must be iscsi or paravirtualized."
+  }
+
+  validation {
+    condition = alltrue([
+      for a in var.volume_attachments : can(regex("^ocid1\\.instance\\.oc1\\.", a.instance_id))
+    ])
+    error_message = "instance_id must be a valid OCI instance OCID."
+  }
 }
 
 variable "project" {

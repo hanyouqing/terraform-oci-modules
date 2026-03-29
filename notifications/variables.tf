@@ -15,6 +15,13 @@ variable "topics" {
   }))
   description = "Map of notification topics to create"
   default     = {}
+
+  validation {
+    condition = alltrue([
+      for t in var.topics : length(t.name) >= 1 && length(t.name) <= 255 && can(regex("^[a-zA-Z0-9_-]+$", t.name))
+    ])
+    error_message = "topics name must be 1-255 characters, alphanumeric with hyphens and underscores only."
+  }
 }
 
 variable "subscriptions" {
@@ -31,6 +38,13 @@ variable "subscriptions" {
       for sub in var.subscriptions : contains(["CUSTOM_HTTPS", "EMAIL", "FAAS", "OSS", "PAGERDUTY", "SLACK", "SMS"], sub.protocol)
     ])
     error_message = "protocol must be one of: CUSTOM_HTTPS, EMAIL, FAAS, OSS, PAGERDUTY, SLACK, SMS"
+  }
+
+  validation {
+    condition = alltrue([
+      for sub in var.subscriptions : length(sub.endpoint) > 0
+    ])
+    error_message = "subscriptions endpoint must not be empty."
   }
 }
 

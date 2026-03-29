@@ -12,6 +12,11 @@ variable "vault_display_name" {
   type        = string
   description = "Display name for the vault"
   default     = "vault"
+
+  validation {
+    condition     = length(var.vault_display_name) >= 1 && length(var.vault_display_name) <= 255
+    error_message = "vault_display_name must be between 1 and 255 characters."
+  }
 }
 
 variable "vault_type" {
@@ -35,6 +40,20 @@ variable "keys" {
   }))
   description = "Map of keys to create"
   default     = {}
+
+  validation {
+    condition = alltrue([
+      for k in var.keys : contains(["AES", "RSA", "ECDSA"], k.algorithm)
+    ])
+    error_message = "keys algorithm must be one of: AES, RSA, ECDSA."
+  }
+
+  validation {
+    condition = alltrue([
+      for k in var.keys : contains(["HSM", "SOFTWARE"], k.protection_mode)
+    ])
+    error_message = "keys protection_mode must be HSM or SOFTWARE."
+  }
 }
 
 variable "secrets" {
@@ -46,6 +65,20 @@ variable "secrets" {
   }))
   description = "Map of secrets to create (secret_name maps to oci_vault_secret.secret_name)"
   default     = {}
+
+  validation {
+    condition = alltrue([
+      for s in var.secrets : contains(["BASE64"], s.content_type)
+    ])
+    error_message = "secrets content_type must be BASE64."
+  }
+
+  validation {
+    condition = alltrue([
+      for s in var.secrets : s.key_id == "" || can(regex("^ocid1\\.key\\.oc1\\.", s.key_id))
+    ])
+    error_message = "secrets key_id must be a valid OCI Key OCID."
+  }
 }
 
 variable "project" {
