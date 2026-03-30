@@ -1,0 +1,247 @@
+name: "Terragrunt Apply (Development)"
+
+on:
+  # Manual trigger with plan/apply choice
+  workflow_dispatch:
+    inputs:
+      action:
+        description: "Action to perform"
+        required: true
+        type: choice
+        default: plan
+        options:
+          - plan
+          - apply
+          - destroy
+      modules:
+        description: "Space-separated module list (empty = all)"
+        required: false
+        type: string
+        default: ""
+
+  # Auto-plan on push to main when terragrunt configs change
+  push:
+    branches: [main]
+    paths:
+      - "terragrunt/personal/ap-seoul-1/development/**"
+      - "terragrunt/_envcommon/**"
+      - "terragrunt/terragrunt.hcl"
+      - "terragrunt/personal/account.hcl"
+      - "terragrunt/personal/ap-seoul-1/region.hcl"
+
+  pull_request:
+    branches: [main]
+    paths:
+      - "terragrunt/personal/ap-seoul-1/development/**"
+      - "terragrunt/_envcommon/**"
+      - "terragrunt/terragrunt.hcl"
+      - "terragrunt/personal/account.hcl"
+      - "terragrunt/personal/ap-seoul-1/region.hcl"
+
+permissions:
+  contents: read
+  pull-requests: write
+
+env:
+  TERRAGRUNT_VERSION: "0.77.8"
+  TERRAFORM_VERSION: "~> 1.14"
+  WORKING_DIR: "terragrunt/personal/ap-seoul-1/development"
+
+  # OCI Provider auth (written to ~/.oci/config)
+  OCI_CLI_TENANCY: ${{ secrets.OCI_CLI_TENANCY }}
+  OCI_CLI_USER: ${{ secrets.OCI_CLI_USER }}
+  OCI_CLI_FINGERPRINT: ${{ secrets.OCI_CLI_FINGERPRINT }}
+
+  # Account & module variables
+  TF_VAR_tenancy_ocid: ${{ secrets.OCI_CLI_TENANCY }}
+  TF_VAR_compartment_id: ${{ secrets.OCI_COMPARTMENT_ID }}
+  TG_OCI_NAMESPACE: ${{ secrets.OCI_NAMESPACE }}
+
+  # Remote state backend (OCI S3-compatible)
+  AWS_ACCESS_KEY_ID: ${{ secrets.OCI_S3_ACCESS_KEY }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.OCI_S3_SECRET_KEY }}
+
+  # Module-specific
+  TF_VAR_availability_domain: ${{ secrets.OCI_AVAILABILITY_DOMAIN }}
+  TF_VAR_ssh_public_keys: ${{ secrets.SSH_PUBLIC_KEYS }}
+  TF_VAR_alert_email: ${{ secrets.ALERT_EMAIL }}
+  TF_VAR_sender_email: ${{ secrets.SENDER_EMAIL }}
+  TF_VAR_bastion_allowed_cidr: ${{ secrets.BASTION_ALLOWED_CIDR }}
+  TF_VAR_adb_admin_password: ${{ secrets.ADB_ADMIN_PASSWORD }}
+  TF_VAR_mysql_admin_password: ${{ secrets.MYSQL_ADMIN_PASSWORD }}
+
+  # Disable interactive prompts
+  TF_INPUT: "false"
+  TERRAGRUNT_NON_INTERACTIVE: "true"
+
+jobs:
+  # ── Plan ──────────────────────────────────────────────────────────────────────
+  plan:
+    name: Terragrunt Plan
+    runs-on: ubuntu-latest
+    outputs:
+      plan_exitcode: ${{ steps.plan.outputs.exitcode }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
+          terraform_wrapper: false
+
+      - name: Install Terragrunt
+        run: |
+          curl -sSL "https://github.com/gruntwork-io/terragrunt/releases/download/v${TERRAGRUNT_VERSION}/terragrunt_linux_amd64" \
+            -o /usr/local/bin/terragrunt
+          chmod +x /usr/local/bin/terragrunt
+          terragrunt --version
+
+      - name: Configure OCI credentials
+        run: |
+          mkdir -p ~/.oci
+          echo "${{ secrets.OCI_CLI_KEY_CONTENT }}" | base64 -d > ~/.oci/oci_api_key.pem
+          chmod 600 ~/.oci/oci_api_key.pem
+          cat > ~/.oci/config << EOF
+          [DEFAULT]
+          tenancy=${OCI_CLI_TENANCY}
+          user=${OCI_CLI_USER}
+          fingerprint=${OCI_CLI_FINGERPRINT}
+          key_file=~/.oci/oci_api_key.pem
+          region=ap-seoul-1
+          EOF
+          chmod 600 ~/.oci/config
+
+      - name: Terragrunt Init
+        working-directory: ${{ env.WORKING_DIR }}
+        run: |
+          if [ -n "${{ inputs.modules }}" ]; then
+            for mod in ${{ inputs.modules }}; do
+              echo "::group::Init $mod"
+              (cd "$mod" && terragrunt init)
+              echo "::endgroup::"
+            done
+          else
+            terragrunt run-all init
+          fi
+
+      - name: Terragrunt Plan
+        id: plan
+        working-directory: ${{ env.WORKING_DIR }}
+        run: |
+          set +e
+          if [ -n "${{ inputs.modules }}" ]; then
+            for mod in ${{ inputs.modules }}; do
+              echo "::group::Plan $mod"
+              (cd "$mod" && terragrunt plan -detailed-exitcode -out=tfplan)
+              echo "::endgroup::"
+            done
+          else
+            terragrunt run-all plan --terragrunt-out-dir "${{ github.workspace }}/plans"
+          fi
+          exitcode=$?
+          echo "exitcode=$exitcode" >> "$GITHUB_OUTPUT"
+          # exit code 2 = changes present (not an error)
+          if [ $exitcode -eq 1 ]; then exit 1; fi
+
+      - name: Post plan to PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const output = `### Terragrunt Plan 📋
+            **Trigger:** \`${{ github.event_name }}\`
+            **Working Dir:** \`${{ env.WORKING_DIR }}\`
+            **Plan exit code:** \`${{ steps.plan.outputs.exitcode }}\`
+
+            > Exit code 0 = no changes, 2 = changes present
+
+            *Pushed by @${{ github.actor }}*`;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: output
+            });
+
+  # ── Apply ─────────────────────────────────────────────────────────────────────
+  apply:
+    name: Terragrunt Apply
+    needs: plan
+    runs-on: ubuntu-latest
+    if: |
+      github.event_name == 'workflow_dispatch' &&
+      (github.event.inputs.action == 'apply' || github.event.inputs.action == 'destroy')
+    environment: development
+    concurrency:
+      group: terragrunt-apply-development
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
+          terraform_wrapper: false
+
+      - name: Install Terragrunt
+        run: |
+          curl -sSL "https://github.com/gruntwork-io/terragrunt/releases/download/v${TERRAGRUNT_VERSION}/terragrunt_linux_amd64" \
+            -o /usr/local/bin/terragrunt
+          chmod +x /usr/local/bin/terragrunt
+
+      - name: Configure OCI credentials
+        run: |
+          mkdir -p ~/.oci
+          echo "${{ secrets.OCI_CLI_KEY_CONTENT }}" | base64 -d > ~/.oci/oci_api_key.pem
+          chmod 600 ~/.oci/oci_api_key.pem
+          cat > ~/.oci/config << EOF
+          [DEFAULT]
+          tenancy=${OCI_CLI_TENANCY}
+          user=${OCI_CLI_USER}
+          fingerprint=${OCI_CLI_FINGERPRINT}
+          key_file=~/.oci/oci_api_key.pem
+          region=ap-seoul-1
+          EOF
+          chmod 600 ~/.oci/config
+
+      - name: Terragrunt Init
+        working-directory: ${{ env.WORKING_DIR }}
+        run: |
+          if [ -n "${{ inputs.modules }}" ]; then
+            for mod in ${{ inputs.modules }}; do
+              echo "::group::Init $mod"
+              (cd "$mod" && terragrunt init)
+              echo "::endgroup::"
+            done
+          else
+            terragrunt run-all init
+          fi
+
+      - name: Terragrunt Apply
+        if: github.event.inputs.action == 'apply'
+        working-directory: ${{ env.WORKING_DIR }}
+        run: |
+          if [ -n "${{ inputs.modules }}" ]; then
+            for mod in ${{ inputs.modules }}; do
+              echo "::group::Apply $mod"
+              (cd "$mod" && terragrunt apply -auto-approve)
+              echo "::endgroup::"
+            done
+          else
+            terragrunt run-all apply
+          fi
+
+      - name: Terragrunt Destroy
+        if: github.event.inputs.action == 'destroy'
+        working-directory: ${{ env.WORKING_DIR }}
+        run: |
+          if [ -n "${{ inputs.modules }}" ]; then
+            for mod in ${{ inputs.modules }}; do
+              echo "::group::Destroy $mod"
+              (cd "$mod" && terragrunt destroy -auto-approve)
+              echo "::endgroup::"
+            done
+          else
+            terragrunt run-all destroy
+          fi
