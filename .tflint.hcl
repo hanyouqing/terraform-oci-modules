@@ -126,8 +126,5 @@ rule "terraform_workspace_remote" {
 # Ignore Files/Directories
 # =============================================================================
 
-# Files and directories to ignore
-ignore_module = [
-  ".terraform/**",
-  "**/.terraform/**",
-]
+# TFLint automatically ignores .terraform directories.
+# Use --filter flag or .tflint.hcl plugin config to exclude paths if needed.

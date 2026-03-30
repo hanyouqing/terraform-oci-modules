@@ -22,7 +22,7 @@ variable "databases" {
     subnet_id                                      = optional(string, null)
     whitelisted_ips                                = optional(list(string), [])
     freeform_tags                                  = optional(map(string), {})
-    defined_tags                                   = optional(map(map(string)), {})
+    defined_tags                                   = optional(map(string), {})
   }))
   description = "Autonomous Databases"
   default     = {}
@@ -47,7 +47,7 @@ variable "freeform_tags" {
 }
 
 variable "defined_tags" {
-  type        = map(map(string))
+  type        = map(string)
   description = "Defined tags"
   default     = {}
 }

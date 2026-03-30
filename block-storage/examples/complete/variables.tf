@@ -18,7 +18,7 @@ variable "volumes" {
     backup_policy_id     = optional(string, null)
     backup_type          = optional(string, "FULL")
     freeform_tags        = optional(map(string), {})
-    defined_tags         = optional(map(map(string)), {})
+    defined_tags         = optional(map(string), {})
   }))
   description = "Block volumes"
   default     = {}
@@ -81,7 +81,7 @@ variable "freeform_tags" {
 }
 
 variable "defined_tags" {
-  type        = map(map(string))
+  type        = map(string)
   description = "Defined tags"
   default     = {}
 }
