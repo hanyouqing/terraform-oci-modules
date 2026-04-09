@@ -2,6 +2,29 @@ data "oci_identity_availability_domains" "ads" {
   compartment_id = var.tenancy_ocid
 }
 
+data "oci_core_services" "sgw_osn" {
+  count = var.create_service_gateway && length(var.service_gateway_services) == 0 ? 1 : 0
+
+  filter {
+    name   = "name"
+    values = ["All .* Services In Oracle Services Network"]
+    regex  = true
+  }
+}
+
+locals {
+  service_gateway_services_effective = length(var.service_gateway_services) > 0 ? var.service_gateway_services : (
+    var.create_service_gateway && length(var.service_gateway_services) == 0 && length(data.oci_core_services.sgw_osn) > 0 ? [
+      for s in data.oci_core_services.sgw_osn[0].services : {
+        service_id   = s.id
+        service_name = s.name
+        cidr_block   = s.cidr_block
+      }
+      if can(regex("All .* Services In Oracle Services Network", s.name))
+    ] : []
+  )
+}
+
 resource "oci_core_vcn" "this" {
   compartment_id = var.compartment_id
   display_name   = var.vcn_display_name
@@ -64,9 +87,16 @@ resource "oci_core_service_gateway" "this" {
   display_name   = var.service_gateway_display_name
 
   dynamic "services" {
-    for_each = var.service_gateway_services
+    for_each = local.service_gateway_services_effective
     content {
       service_id = services.value.service_id
+    }
+  }
+
+  lifecycle {
+    precondition {
+      condition     = !var.create_service_gateway || length(local.service_gateway_services_effective) > 0
+      error_message = "Service Gateway requires at least one service. Set service_gateway_services or ensure the tenancy can read oci_core_services (All * Services In Oracle Services Network)."
     }
   }
 
@@ -169,7 +199,7 @@ resource "oci_core_route_table" "private" {
   }
 
   dynamic "route_rules" {
-    for_each = var.create_service_gateway ? var.service_gateway_services : []
+    for_each = var.create_service_gateway ? local.service_gateway_services_effective : []
     content {
       network_entity_id = oci_core_service_gateway.this[0].id
       destination       = route_rules.value.cidr_block

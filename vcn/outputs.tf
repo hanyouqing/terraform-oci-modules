@@ -70,7 +70,7 @@ output "private_security_list_ids" {
 
 output "availability_domains" {
   description = "List of availability domain names"
-  value       = data.oci_identity_availability_domains.ads.availability_domains[*].name
+  value       = [for ad in coalesce(data.oci_identity_availability_domains.ads.availability_domains, []) : ad.name]
 }
 
 output "network_security_group_ids" {

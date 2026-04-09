@@ -101,7 +101,7 @@ variable "service_gateway_services" {
     service_name = string
     cidr_block   = string
   }))
-  description = "List of services for the Service Gateway"
+  description = "Services attached to the Service Gateway. If empty and create_service_gateway is true, the regional All * Services In Oracle Services Network entry is resolved automatically."
   default     = []
 }
 

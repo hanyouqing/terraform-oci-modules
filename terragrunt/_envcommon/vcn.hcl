@@ -9,13 +9,16 @@ locals {
 }
 
 terraform {
-  source = "git::https://github.com/hanyouqing/terraform-oci-modules.git//vcn"
+  # Same repo as Terragrunt: use workspace module so plan/apply pick up changes before git push.
+  # Other stacks still use git:: sources; override there if you need the same behavior.
+  source = "${dirname(find_in_parent_folders("root.hcl"))}/../vcn"
 }
 
 inputs = {
   vcn_display_name = "${local.project}-${local.env}-vcn"
   vcn_cidr_blocks  = ["10.0.0.0/16"]
-  vcn_dns_label    = replace("${local.project}${local.env}", "-", "")
+  # OCI VCN dns_label: must start with a letter, alphanumeric only, max 15 characters.
+  vcn_dns_label = substr("v${replace(lower("${local.project}-${local.env}"), "-", "")}", 0, 15)
 
   create_internet_gateway       = true
   internet_gateway_display_name = "${local.project}-${local.env}-igw"
