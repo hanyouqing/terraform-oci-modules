@@ -25,7 +25,7 @@ on:
     paths:
       - "terragrunt/personal/ap-seoul-1/development/**"
       - "terragrunt/_envcommon/**"
-      - "terragrunt/terragrunt.hcl"
+      - "terragrunt/root.hcl"
       - "terragrunt/personal/account.hcl"
       - "terragrunt/personal/ap-seoul-1/region.hcl"
 
@@ -34,7 +34,7 @@ on:
     paths:
       - "terragrunt/personal/ap-seoul-1/development/**"
       - "terragrunt/_envcommon/**"
-      - "terragrunt/terragrunt.hcl"
+      - "terragrunt/root.hcl"
       - "terragrunt/personal/account.hcl"
       - "terragrunt/personal/ap-seoul-1/region.hcl"
 
@@ -57,9 +57,7 @@ env:
   TF_VAR_compartment_id: ${{ secrets.OCI_COMPARTMENT_ID }}
   TG_OCI_NAMESPACE: ${{ secrets.OCI_NAMESPACE }}
 
-  # Remote state backend (OCI S3-compatible)
-  AWS_ACCESS_KEY_ID: ${{ secrets.OCI_S3_ACCESS_KEY }}
-  AWS_SECRET_ACCESS_KEY: ${{ secrets.OCI_S3_SECRET_KEY }}
+  # Remote state: Terraform backend "oci" uses the same ~/.oci/config as the provider (no Customer Secret Key).
 
   # Module-specific
   TF_VAR_availability_domain: ${{ secrets.OCI_AVAILABILITY_DOMAIN }}

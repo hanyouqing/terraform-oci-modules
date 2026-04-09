@@ -11,7 +11,7 @@ Each file reads two config layers via `find_in_parent_folders()`:
 | `region.hcl` | `region` |
 | `env.hcl` | `environment`, `project`, `ad_index` |
 
-Account-level values (`compartment_id`, `tenancy_ocid`, `freeform_tags`) are injected by the root `terragrunt.hcl` shared inputs — they are NOT repeated here.
+Account-level values (`compartment_id`, `tenancy_ocid`, `freeform_tags`) are injected by the root `root.hcl` shared inputs — they are NOT repeated here.
 
 ## `terraform.source`
 

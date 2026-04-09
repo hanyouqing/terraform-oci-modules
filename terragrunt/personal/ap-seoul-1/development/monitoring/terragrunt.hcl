@@ -1,10 +1,10 @@
 include "root" {
-  path   = find_in_parent_folders()
+  path   = find_in_parent_folders("root.hcl")
   expose = true
 }
 
 include "envcommon" {
-  path           = "${dirname(find_in_parent_folders())}/_envcommon/monitoring.hcl"
+  path           = "${dirname(find_in_parent_folders("root.hcl"))}/_envcommon/monitoring.hcl"
   expose         = true
   merge_strategy = "deep"
 }
@@ -12,7 +12,7 @@ include "envcommon" {
 dependency "notifications" {
   config_path = "../notifications"
 
-  mock_outputs_allowed_terraform_commands = ["validate", "plan"]
+  mock_outputs_allowed_terraform_commands = ["validate", "plan", "init"]
   mock_outputs = {
     topic_ids = { "alerts-topic" = "ocid1.onstopic.oc1..mock" }
   }

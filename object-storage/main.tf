@@ -6,8 +6,11 @@ resource "oci_objectstorage_bucket" "this" {
   for_each = var.buckets
 
   compartment_id = var.compartment_id
-  namespace      = each.value.namespace != null ? each.value.namespace : data.oci_objectstorage_namespace.this.namespace
-  name           = each.value.name
+  # Prefer explicit namespace when set; otherwise tenancy namespace. Trim avoids empty-string edge cases.
+  namespace = length(trimspace(try(each.value.namespace, ""))) > 0 ? trimspace(each.value.namespace) : data.oci_objectstorage_namespace.this.namespace
+  name = each.value.name
+
+  depends_on = [data.oci_objectstorage_namespace.this]
   access_type    = each.value.access_type
   storage_tier   = each.value.storage_tier
   versioning     = each.value.versioning

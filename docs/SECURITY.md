@@ -6,7 +6,7 @@ This document summarizes how this project avoids storing **passwords, API keys, 
 
 | Item | Why | Mitigation |
 |------|-----|------------|
-| **Terraform state** (`.tfstate`) | Often contains secrets and resource identifiers | Listed in `.gitignore`; use a [remote backend](https://developer.hashicorp.com/terraform/language/settings/backends) with encryption and strict IAM |
+| **Terraform state** (`.tfstate`) | Often contains secrets and resource identifiers | Listed in `.gitignore`; use a [remote backend](https://developer.hashicorp.com/terraform/language/settings/backends) with encryption and strict IAM. On OCI, see [Using Object Storage for State Files](https://docs.oracle.com/en-us/iaas/Content/dev/terraform/object-storage-state.htm) and the [README section on the state backend](../README.md#terraform-state-backend-oci-object-storage). |
 | **`.tfvars` / `*.tfvars.json`** | Typical place for passwords and OCIDs | Ignored by `.gitignore`; use `.tfvars` only locally or via CI injection |
 | **`.env.sh`, `.env`, `credentials/*.env`** | OCI keys, compartments, DB passwords | Ignored; use templates (`.env.sh.example`, `credentials/example.env.example`) only |
 | **Private keys** (`*.pem`, SSH keys) | Signing and access | Keep under `~/.oci/` or a secret store; `*.pem` is ignored to reduce accidental adds |
@@ -17,7 +17,7 @@ This document summarizes how this project avoids storing **passwords, API keys, 
 
 - **OCI API keys**: Use `OCI_PRIVATE_KEY_PATH` to a file outside the repo, not `OCI_PRIVATE_KEY` (inline PEM) in shared env files.
 - **Database / app passwords**: Pass via `TF_VAR_*` from CI secret stores, `read -s`, or tools like 1Password CLI—**never** echo them in `show_config` or commit them in `.env.sh`.
-- **Object Storage backend keys** (`AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` for S3-compatible state): Treat like production credentials; rotate Customer Secret Keys regularly.
+- **Terraform `backend "oci"`**: Uses the same OCI API key profile as the provider (`~/.oci/config` or `OCI_CLI_CONFIG_FILE`). Protect that file and rotate API keys per your security policy.
 
 ## Terraform: `sensitive` variables
 

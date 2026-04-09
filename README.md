@@ -8,6 +8,28 @@ This repository provides comprehensive, flexible, and robust Terraform modules f
 
 For **Terragrunt** (remote state, generated provider, DRY stack configs), see [terragrunt/README.md](terragrunt/README.md) and the [Always Free development checklist](terragrunt/environments/development/README.md).
 
+## Project Goals
+
+- **Always-Free Optimization**: Maximize utilization of OCI's always-free tier resources with intelligent resource sizing and lifecycle management
+- **Modular Design**: Create reusable Terraform modules with exposed parameters via variables for maximum flexibility and reusability
+- **Cost-Effective Defaults**: Use always-free resource sizes and counts as default values while allowing easy scaling for production workloads
+- **Production Ready**: Follow enterprise best practices for security, compliance, monitoring, and scalability with comprehensive error handling
+- **Multi-Environment Support**: Support development, staging, and production environments with environment-specific configurations and state management
+- **Support Native Terraform and Resource Manager**: Compatible with both Terraform CLI workflows and OCI Resource Manager for enterprise deployment scenarios
+- **Security First**: Implement least-privilege access, encryption at rest and in transit, and comprehensive audit logging
+- **Monitoring & Observability**: Built-in monitoring, alerting, and logging capabilities for infrastructure health and performance tracking
+- **Cost Management**: Automated cost optimization, resource tagging, and usage analytics for budget control and resource allocation
+- **Compliance Ready**: Pre-configured security policies, backup strategies, and disaster recovery procedures meeting enterprise compliance requirements
+
+## Prerequisites
+
+- [Terraform](https://www.terraform.io/downloads.html) >= 1.14.2
+- [OCI Provider for Terraform](https://registry.terraform.io/providers/oracle/oci/latest/docs) `~> 7.30` (see each module’s `versions.tf`)
+- [OCI CLI](https://docs.oracle.com/en-us/iaas/Content/API/SDKDocs/cliinstall.htm) configured (verify with `oci iam region list --output table`)
+- [OCI credentials](#setting-up-oci-credentials-for-the-terraform-provider) for the Terraform provider — the [OCI CLI](#setting-up-credentials-with-the-oci-cli) (`oci setup config`) is the usual way to create `~/.oci/config`; alternatively use environment variables from `.env.sh` only
+- Oracle Cloud Infrastructure account with appropriate permissions (enable the Always Free tier if you use demo/Always Free defaults)
+- [Git](https://git-scm.com/) for version control
+
 ## Modules
 
 ### Infrastructure
@@ -85,6 +107,41 @@ This project includes configuration files for development tools:
 - **`.terraformrc`** - Terraform CLI configuration (provider install, plugin cache)
 
 See [docs/CONFIG.md](docs/CONFIG.md) for detailed configuration guide.
+
+## Terraform state backend (OCI Object Storage)
+
+Remote state avoids committing `.tfstate` and supports locking and team workflows. Oracle documents storing Terraform state in Object Storage in [Using Object Storage for State Files](https://docs.oracle.com/en-us/iaas/Content/dev/terraform/object-storage-state.htm).
+
+| Approach | Notes |
+| --- | --- |
+| **OCI native backend** | **Recommended** by Oracle. Requires **Terraform v1.12.0 or greater** (this repo’s modules require **>= 1.14.2**). See *Data Source Configuration (OCI Backend)* on the page above. |
+| **S3-compatible `backend "s3"`** | **Deprecated** for new work—use only if you cannot use the native backend. Uses a Customer Secret Key and an endpoint such as `https://<namespace>.compat.objectstorage.<region>.oraclecloud.com`. Full steps are on the same Oracle page. |
+| **HTTP backend** | Uses a pre-authenticated request (PAR) for the state object; Oracle prefers the native backend over HTTP for Object Storage. |
+
+Backend settings live in the root `terraform` block; **variables and locals are not allowed** there—use literal values or partial configuration / `-backend-config` as documented by HashiCorp.
+
+**Terragrunt:** This repository’s [terragrunt/README.md](terragrunt/README.md) stack uses Terraform’s **native `backend "oci"`** (Object Storage, same OCI API key profile as the provider). Use that layout when you adopt Terragrunt here.
+
+### Terragrunt: remote state bucket and the object-storage module (first run)
+
+There is a **bootstrap loop** when the **same** Object Storage bucket is both:
+
+1. The **remote state** target configured in [terragrunt/root.hcl](terragrunt/root.hcl) (`<project>-<account_name>-tfstate`), and  
+2. A bucket managed by the **`object-storage`** Terragrunt stack.
+
+Terraform needs the bucket to **exist** before it can write state into it, but the `object-storage` module cannot create that bucket on a totally empty first run without somewhere to store state—or you would create the bucket and the state object in one apply while state was still local or missing. In practice:
+
+| Step | What to do |
+| --- | --- |
+| 1 | **Create the state bucket once** outside Terraform (OCI Console or `oci os bucket create`). Name must match `local.state_bucket` in `terragrunt/root.hcl` (see [terragrunt/README.md](terragrunt/README.md) § Remote State). |
+| 2 | Set **`TF_VAR_namespace`** to the value from `oci os ns get --query data --raw-output` so the backend and module use the correct Object Storage namespace. |
+| 3 | Run **`terragrunt init`** in any stack; Terraform can now use the backend and write state into that bucket. |
+| 4 | In the **`object-storage`** stack, **import** the existing bucket into Terraform state (one-time), then **`apply`**. Use the **composite** import ID `n/<namespace>/b/<bucket_name>`—not the bucket OCID—or the provider can error on refresh. The stack’s `terragrunt.hcl` can **generate** `import.tf` when **`TG_IMPORT_TFSTATE_BUCKET=true`** (see [terragrunt/README.md § 5a](terragrunt/README.md#5a-object-storage-stack-importing-the-tfstate-bucket-circular-dependency)). |
+| 5 | Later applies are normal; optional other buckets in the same module follow the usual module workflow. |
+
+**Ways to avoid managing the state bucket in Terraform:** omit that bucket from `object-storage` inputs and treat it as operations-only, or use a **different** bucket for remote state than any bucket this module creates.
+
+For secrets and state handling in general, see [docs/SECURITY.md](docs/SECURITY.md).
 
 ## Setting up OCI credentials for the Terraform provider
 
@@ -351,13 +408,6 @@ terraform init
 terraform plan
 terraform apply
 ```
-
-## Prerequisites
-
-- Terraform >= 1.14.2
-- OCI Provider ~> 7.30
-- [OCI credentials](#setting-up-oci-credentials-for-the-terraform-provider) for the Terraform provider — the [OCI CLI](#setting-up-credentials-with-the-oci-cli) (`oci setup config`) is the usual way to create `~/.oci/config`; alternatively use environment variables from `.env.sh` only
-- OCI account with Always Free tier enabled
 
 ## Environment Variables
 

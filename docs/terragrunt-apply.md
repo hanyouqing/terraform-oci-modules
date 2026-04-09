@@ -31,15 +31,13 @@ These secrets are used to generate `~/.oci/config` at runtime so the OCI Terrafo
 | `OCI_CLI_FINGERPRINT` | API key fingerprint | OCI Console → Identity → Users → API Keys |
 | `OCI_CLI_KEY_CONTENT` | API private key (**base64-encoded**) | See [Encoding the API Key](#encoding-the-api-key) |
 
-### Remote State Backend
+### Remote state (Terraform `backend "oci"`)
 
-The Terragrunt remote state uses OCI Object Storage via its S3-compatible API. These credentials are separate from the API key.
+The workflow writes `~/.oci/config` with the API key above. **No separate Customer Secret Key** is required: the same profile is used for the Terraform provider and the native OCI state backend ([HashiCorp `backend "oci"`](https://developer.hashicorp.com/terraform/language/backend/oci)).
 
 | Secret | Description | How to get it |
 |--------|-------------|---------------|
-| `OCI_S3_ACCESS_KEY` | Customer Secret Key ID | OCI Console → Identity → Users → Customer Secret Keys |
-| `OCI_S3_SECRET_KEY` | Customer Secret Key | Shown once when key is created — save immediately |
-| `OCI_NAMESPACE` | Object Storage namespace | Run `oci os ns get --query 'data' --raw-output` |
+| `OCI_NAMESPACE` | Object Storage namespace (for Terragrunt `TG_OCI_NAMESPACE` / namespace resolution) | Run `oci os ns get --query 'data' --raw-output` |
 
 ### Account & Infrastructure
 
@@ -91,35 +89,25 @@ base64 -w 0 ~/.oci/oci_api_key.pem | xclip -selection clipboard
 
 Paste the result as the `OCI_CLI_KEY_CONTENT` secret.
 
-### 3. Create a Customer Secret Key (for state backend)
+### 3. Create the state bucket
 
-```bash
-# Via OCI Console: Identity → Users → your user → Customer Secret Keys → Generate
-# Or via CLI:
-oci iam customer-secret-key create \
-  --user-id "ocid1.user.oc1..xxxx" \
-  --display-name "terragrunt-state-github-actions"
-```
-
-Save the returned `id` as `OCI_S3_ACCESS_KEY` and `key` as `OCI_S3_SECRET_KEY`.
-
-### 4. Create the State Bucket
+Bucket name must match `local.state_bucket` in `terragrunt/root.hcl` (`<project>-<account>-tfstate`). Example for `project=oci-modules` and account name `personal`:
 
 ```bash
 oci os bucket create \
   --compartment-id "ocid1.compartment.oc1..xxxx" \
-  --name "tfstate-personal-oci-modules" \
+  --name "oci-modules-personal-tfstate" \
   --versioning Enabled
 ```
 
-### 5. Create the GitHub Environment
+### 4. Create the GitHub Environment
 
 1. Go to **Settings → Environments → New environment**
 2. Name: `development`
 3. (Recommended) Add **Required reviewers** — this gates `apply` and `destroy` actions
 4. (Optional) Add **Wait timer** or restrict to specific branches
 
-### 6. Add All Secrets
+### 5. Add All Secrets
 
 Go to **Settings → Secrets and variables → Actions** and add each secret listed above.
 
@@ -130,8 +118,6 @@ Go to **Settings → Secrets and variables → Actions** and add each secret lis
 ✅ OCI_CLI_USER             = ocid1.user.oc1..xxxx
 ✅ OCI_CLI_FINGERPRINT      = aa:bb:cc:dd:...
 ✅ OCI_CLI_KEY_CONTENT      = <base64 of ~/.oci/oci_api_key.pem>
-✅ OCI_S3_ACCESS_KEY        = <customer secret key id>
-✅ OCI_S3_SECRET_KEY        = <customer secret key>
 ✅ OCI_NAMESPACE            = <object storage namespace>
 ✅ OCI_COMPARTMENT_ID       = ocid1.compartment.oc1..xxxx
 ✅ OCI_AVAILABILITY_DOMAIN  = xxxx:AP-SEOUL-1-AD-1
@@ -185,7 +171,7 @@ Actions → Run workflow → action: destroy → modules: (leave empty or specif
 - **Concurrency lock**: Only one apply/destroy can run at a time (`concurrency.group`).
 - **State encryption**: Enable server-side encryption on the state bucket in OCI Console.
 - **Least privilege**: Create a dedicated OCI user with only the policies needed for the deployed resources. See [OCI IAM Policies](https://docs.oracle.com/en-us/iaas/Content/Identity/Concepts/policygetstarted.htm).
-- **Key rotation**: Rotate the API key and Customer Secret Key periodically. Update the GitHub secrets after rotation.
+- **Key rotation**: Rotate the OCI API key periodically and update the GitHub secrets after rotation.
 
 ## Troubleshooting
 
@@ -193,7 +179,7 @@ Actions → Run workflow → action: destroy → modules: (leave empty or specif
 |-------|-----|
 | `No valid credential sources found` | Check `OCI_CLI_TENANCY`, `OCI_CLI_USER`, `OCI_CLI_FINGERPRINT`, `OCI_CLI_KEY_CONTENT` secrets |
 | `Error: invalid base64 data` | Re-encode the PEM file: `base64 -w 0 ~/.oci/oci_api_key.pem` (use `-i` on macOS) |
-| `Error accessing state bucket` | Verify `OCI_S3_ACCESS_KEY`, `OCI_S3_SECRET_KEY`, and `OCI_NAMESPACE` secrets |
-| `Bucket does not exist` | Create the bucket: `oci os bucket create --name tfstate-personal-oci-modules ...` |
+| `Error accessing state bucket` | Verify `OCI_NAMESPACE`, API key secrets, and IAM access to the state bucket; bucket name must match `<project>-<account>-tfstate` in `root.hcl` |
+| `Bucket does not exist` | Create the bucket: `oci os bucket create --name oci-modules-personal-tfstate ...` (adjust for your project/account) |
 | `Environment 'development' not found` | Create the environment in Settings → Environments |
 | `Resource already exists` | State may be out of sync — run `terragrunt import` or check for manual changes |

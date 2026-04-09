@@ -1,10 +1,10 @@
 include "root" {
-  path   = find_in_parent_folders()
+  path   = find_in_parent_folders("root.hcl")
   expose = true
 }
 
 include "envcommon" {
-  path           = "${dirname(find_in_parent_folders())}/_envcommon/block-storage.hcl"
+  path           = "${dirname(find_in_parent_folders("root.hcl"))}/_envcommon/block-storage.hcl"
   expose         = true
   merge_strategy = "deep"
 }
@@ -12,7 +12,7 @@ include "envcommon" {
 dependency "compute" {
   config_path = "../compute"
 
-  mock_outputs_allowed_terraform_commands = ["validate", "plan"]
+  mock_outputs_allowed_terraform_commands = ["validate", "plan", "init"]
   mock_outputs = {
     instance_ids = ["ocid1.instance.oc1..mock"]
   }
