@@ -27,11 +27,28 @@ resource "oci_logging_log" "this" {
   is_enabled         = each.value.is_enabled
   retention_duration = each.value.retention_duration
 
+  dynamic "configuration" {
+    for_each = each.value.configuration != null ? [each.value.configuration] : []
+    content {
+      compartment_id = configuration.value.compartment_id != null ? configuration.value.compartment_id : var.compartment_id
+
+      source {
+        category    = configuration.value.source.category
+        resource    = configuration.value.source.resource
+        service     = configuration.value.source.service
+        source_type = configuration.value.source.source_type
+        parameters  = length(configuration.value.source.parameters) > 0 ? configuration.value.source.parameters : null
+      }
+    }
+  }
+
   freeform_tags = merge(
     var.freeform_tags,
     {
-      "ManagedBy" = "terraform"
-      "Module"    = "github.com/hanyouqing/terraform-oci-modules/logging/log"
+      "ManagedBy"   = "terraform"
+      "Module"      = "github.com/hanyouqing/terraform-oci-modules/logging/log"
+      "Project"     = var.project
+      "Environment" = var.environment
     }
   )
 

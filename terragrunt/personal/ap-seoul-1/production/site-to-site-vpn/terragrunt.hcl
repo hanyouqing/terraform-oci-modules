@@ -18,21 +18,25 @@ dependency "vcn" {
   }
 }
 
-# Production: configure CPE and IPSec connections
+locals {
+  cpe_ip = trimspace(get_env("TF_VAR_cpe_ip_address", ""))
+}
+
+# Production: no VPN by default. Set TF_VAR_cpe_ip_address and enable DRG on the VCN stack first.
 inputs = {
-  cpes = {
+  cpes = local.cpe_ip != "" ? {
     on-prem = {
       display_name = "on-premises-router"
-      ip_address   = "203.0.113.1" # Replace with actual CPE IP
+      ip_address   = local.cpe_ip
     }
-  }
+  } : {}
 
-  ipsec_connections = {
+  ipsec_connections = local.cpe_ip != "" ? {
     main-vpn = {
       display_name  = "production-vpn"
       drg_id        = dependency.vcn.outputs.drg_id
       cpe_key       = "on-prem"
       static_routes = ["10.0.0.0/16"]
     }
-  }
+  } : {}
 }

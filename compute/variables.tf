@@ -112,8 +112,8 @@ variable "flexible_shapes" {
 
 variable "assign_public_ip" {
   type        = bool
-  description = "Whether to assign a public IP address"
-  default     = true
+  description = "Whether to assign a public IP address. Default false for least privilege; set true for public-edge instances."
+  default     = false
 }
 
 variable "hostname_label" {
@@ -158,7 +158,55 @@ variable "ssh_public_keys" {
 
 variable "user_data" {
   type        = string
-  description = "User data script to run on instance launch"
+  description = "Base64-encoded cloud-init / user_data supplied by the caller. This module does not embed application bootstrap scripts. Changes to user_data are ignored after create (see lifecycle) to avoid unintended recreation; taint/replace the instance to re-apply."
+  default     = null
+}
+
+variable "extended_metadata" {
+  type        = map(string)
+  description = "Extended metadata key/value pairs for the instance"
+  default     = {}
+}
+
+variable "fault_domain" {
+  type        = string
+  description = "Fault domain for the instance. Null lets OCI choose."
+  default     = null
+}
+
+variable "preserve_boot_volume" {
+  type        = bool
+  description = "Whether to preserve the boot volume when the instance is terminated"
+  default     = false
+}
+
+variable "launch_options" {
+  type = object({
+    boot_volume_type                    = optional(string, null)
+    firmware                            = optional(string, null)
+    network_type                        = optional(string, null)
+    remote_data_volume_type             = optional(string, null)
+    is_pv_encryption_in_transit_enabled = optional(bool, null)
+    is_consistent_volume_naming_enabled = optional(bool, null)
+  })
+  description = "Optional launch_options block for oci_core_instance"
+  default     = null
+}
+
+variable "instance_options" {
+  type = object({
+    are_legacy_imds_endpoints_disabled = optional(bool, null)
+  })
+  description = "Optional instance_options block for oci_core_instance"
+  default     = null
+}
+
+variable "availability_config" {
+  type = object({
+    is_live_migration_preferred = optional(bool, null)
+    recovery_action             = optional(string, null)
+  })
+  description = "Optional availability_config block for oci_core_instance"
   default     = null
 }
 

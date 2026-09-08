@@ -20,6 +20,7 @@ resource "oci_email_sender" "this" {
 resource "oci_email_suppression" "this" {
   for_each = var.suppressions
 
+  # oci_email_suppression does not support freeform_tags/defined_tags
   compartment_id = var.compartment_id
   email_address  = each.value.email_address
 }

@@ -12,7 +12,8 @@ This module creates Always Free compute instances in Oracle Cloud Infrastructure
 - Block volume attachment
 - Public/private IP assignment
 - Network Security Group support
-- User data scripts
+- Caller-supplied base64 `user_data` (no embedded application scripts)
+- Optional `fault_domain`, `launch_options`, `instance_options`, `availability_config`, `extended_metadata`
 - Monitoring and management agent configuration
 - Comprehensive tagging support
 
@@ -22,6 +23,14 @@ This module creates Always Free compute instances in Oracle Cloud Infrastructure
 - **VM.Standard.A1.Flex**: Up to 4 OCPUs and 24 GB memory total
 - **Total Block Storage**: 200 GB (boot + block volumes)
 - **Backups**: 5 volume backups
+
+## Examples
+
+| Example | Description |
+|---------|-------------|
+| `examples/basic` | E2.1.Micro Always Free |
+| `examples/complete` | Flexible options including block volumes |
+| `examples/edge-arm` | A1.Flex 2 OCPU / 12 GB / 50 GB boot profile |
 
 ## Usage
 
@@ -76,47 +85,6 @@ module "compute_a1" {
   environment = "production"
 }
 ```
-
-## Requirements
-
-| Name | Version |
-|------|---------|
-| terraform | >= 1.14.2 |
-| oci | ~> 6.0 |
-
-## Providers
-
-| Name | Version |
-|------|---------|
-| oci | ~> 6.0 |
-
-## Inputs
-
-| Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
-| compartment_id | OCID of the compartment where the compute instance will be created | `string` | n/a | yes |
-| tenancy_ocid | OCID of the tenancy | `string` | n/a | yes |
-| subnet_id | OCID of the subnet where the instance will be created | `string` | n/a | yes |
-| ssh_public_keys | SSH public key(s) for the instance | `string` | n/a | yes |
-| instance_count | Number of compute instances to create | `number` | `1` | no |
-| shape | Shape of the compute instance | `string` | `"VM.Standard.E2.1.Micro"` | no |
-| ocpus | Number of OCPUs for VM.Standard.A1.Flex shape | `number` | `1` | no |
-| memory_in_gbs | Memory in GBs for VM.Standard.A1.Flex shape | `number` | `6` | no |
-| availability_domain | Availability domain for the instance | `string` | `null` | no |
-| display_name | Display name for the compute instance(s) | `string` | `"compute-instance"` | no |
-| image_id | OCID of the image to use | `string` | `null` | no |
-| image_operating_system | Operating system for the image | `string` | `"Oracle Linux"` | no |
-| assign_public_ip | Whether to assign a public IP address | `bool` | `true` | no |
-| block_volumes | Map of block volumes to create and attach | `map(object)` | `{}` | no |
-
-## Outputs
-
-| Name | Description |
-|------|-------------|
-| instance_ids | OCIDs of the compute instances |
-| instance_private_ips | Private IP addresses of the compute instances |
-| instance_public_ips | Public IP addresses of the compute instances |
-| block_volume_ids | OCIDs of the block volumes |
 
 ## Cost Estimate
 
@@ -173,15 +141,15 @@ See the [examples](../examples/compute/) directory for complete examples.
 ## Requirements
 
 | Name | Version |
-|------|---------|
+| ---- | ------- |
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.14.2 |
-| <a name="requirement_oci"></a> [oci](#requirement\_oci) | ~> 7.30 |
+| <a name="requirement_oci"></a> [oci](#requirement\_oci) | ~> 8.28 |
 
 ## Providers
 
 | Name | Version |
-|------|---------|
-| <a name="provider_oci"></a> [oci](#provider\_oci) | 7.32.0 |
+| ---- | ------- |
+| <a name="provider_oci"></a> [oci](#provider\_oci) | 8.29.0 |
 
 ## Modules
 
@@ -190,7 +158,7 @@ No modules.
 ## Resources
 
 | Name | Type |
-|------|------|
+| ---- | ---- |
 | [oci_core_instance.this](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/core_instance) | resource |
 | [oci_core_volume.block](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/core_volume) | resource |
 | [oci_core_volume_attachment.block](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/core_volume_attachment) | resource |
@@ -200,8 +168,9 @@ No modules.
 ## Inputs
 
 | Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
+| ---- | ----------- | ---- | ------- | :------: |
 | <a name="input_assign_public_ip"></a> [assign\_public\_ip](#input\_assign\_public\_ip) | Whether to assign a public IP address | `bool` | `true` | no |
+| <a name="input_availability_config"></a> [availability\_config](#input\_availability\_config) | Optional availability\_config block for oci\_core\_instance | <pre>object({<br/>    is_live_migration_preferred = optional(bool, null)<br/>    recovery_action             = optional(string, null)<br/>  })</pre> | `null` | no |
 | <a name="input_availability_domain"></a> [availability\_domain](#input\_availability\_domain) | Availability domain for the instance. If not specified, will be distributed across ADs | `string` | `null` | no |
 | <a name="input_block_volumes"></a> [block\_volumes](#input\_block\_volumes) | Map of block volumes to create and attach | <pre>map(object({<br/>    display_name         = string<br/>    size_in_gbs          = number<br/>    availability_domain  = optional(string, null)<br/>    instance_index       = number<br/>    device               = optional(string, null)<br/>    vpus_per_gb          = optional(string, "10")<br/>    is_auto_tune_enabled = optional(bool, false)<br/>  }))</pre> | `{}` | no |
 | <a name="input_boot_volume_size_in_gbs"></a> [boot\_volume\_size\_in\_gbs](#input\_boot\_volume\_size\_in\_gbs) | Size of the boot volume in GBs | `number` | `50` | no |
@@ -214,6 +183,8 @@ No modules.
 | <a name="input_enable_monitoring"></a> [enable\_monitoring](#input\_enable\_monitoring) | Enable OCI monitoring agent | `bool` | `true` | no |
 | <a name="input_enable_pv_encryption_in_transit"></a> [enable\_pv\_encryption\_in\_transit](#input\_enable\_pv\_encryption\_in\_transit) | Enable encryption in transit for paravirtualized boot volumes | `bool` | `true` | no |
 | <a name="input_environment"></a> [environment](#input\_environment) | Environment name for tagging | `string` | `"development"` | no |
+| <a name="input_extended_metadata"></a> [extended\_metadata](#input\_extended\_metadata) | Extended metadata key/value pairs for the instance | `map(string)` | `{}` | no |
+| <a name="input_fault_domain"></a> [fault\_domain](#input\_fault\_domain) | Fault domain for the instance. Null lets OCI choose. | `string` | `null` | no |
 | <a name="input_flexible_shapes"></a> [flexible\_shapes](#input\_flexible\_shapes) | List of shapes that require ocpus/memory\_in\_gbs (e.g. VM.Standard.A1.Flex, VM.Standard.E3.Flex) | `list(string)` | <pre>[<br/>  "VM.Standard.A1.Flex",<br/>  "VM.Standard.E3.Flex",<br/>  "VM.Standard.E4.Flex"<br/>]</pre> | no |
 | <a name="input_freeform_tags"></a> [freeform\_tags](#input\_freeform\_tags) | Freeform tags to apply to all resources | `map(string)` | `{}` | no |
 | <a name="input_hostname_label"></a> [hostname\_label](#input\_hostname\_label) | Hostname label for the instance | `string` | `null` | no |
@@ -223,9 +194,12 @@ No modules.
 | <a name="input_image_sort_by"></a> [image\_sort\_by](#input\_image\_sort\_by) | Sort order for image selection (TIMECREATED, DISPLAYNAME) | `string` | `"TIMECREATED"` | no |
 | <a name="input_image_sort_order"></a> [image\_sort\_order](#input\_image\_sort\_order) | Sort direction for image selection (ASC, DESC) | `string` | `"DESC"` | no |
 | <a name="input_instance_count"></a> [instance\_count](#input\_instance\_count) | Number of compute instances to create | `number` | `1` | no |
+| <a name="input_instance_options"></a> [instance\_options](#input\_instance\_options) | Optional instance\_options block for oci\_core\_instance | <pre>object({<br/>    are_legacy_imds_endpoints_disabled = optional(bool, null)<br/>  })</pre> | `null` | no |
+| <a name="input_launch_options"></a> [launch\_options](#input\_launch\_options) | Optional launch\_options block for oci\_core\_instance | <pre>object({<br/>    boot_volume_type                    = optional(string, null)<br/>    firmware                            = optional(string, null)<br/>    network_type                        = optional(string, null)<br/>    remote_data_volume_type             = optional(string, null)<br/>    is_pv_encryption_in_transit_enabled = optional(bool, null)<br/>    is_consistent_volume_naming_enabled = optional(bool, null)<br/>  })</pre> | `null` | no |
 | <a name="input_memory_in_gbs"></a> [memory\_in\_gbs](#input\_memory\_in\_gbs) | Memory in GBs for flexible shapes (e.g. VM.Standard.A1.Flex) | `number` | `6` | no |
 | <a name="input_nsg_ids"></a> [nsg\_ids](#input\_nsg\_ids) | List of Network Security Group OCIDs to attach | `list(string)` | `[]` | no |
 | <a name="input_ocpus"></a> [ocpus](#input\_ocpus) | Number of OCPUs for flexible shapes (e.g. VM.Standard.A1.Flex) | `number` | `1` | no |
+| <a name="input_preserve_boot_volume"></a> [preserve\_boot\_volume](#input\_preserve\_boot\_volume) | Whether to preserve the boot volume when the instance is terminated | `bool` | `false` | no |
 | <a name="input_private_ip"></a> [private\_ip](#input\_private\_ip) | Private IP address for the instance | `string` | `null` | no |
 | <a name="input_project"></a> [project](#input\_project) | Project name for tagging | `string` | `"oci-modules"` | no |
 | <a name="input_shape"></a> [shape](#input\_shape) | Shape of the compute instance (e.g. VM.Standard.E2.1.Micro, VM.Standard.A1.Flex, VM.Standard.E4.Flex) | `string` | `"VM.Standard.E2.1.Micro"` | no |
@@ -233,13 +207,13 @@ No modules.
 | <a name="input_ssh_public_keys"></a> [ssh\_public\_keys](#input\_ssh\_public\_keys) | SSH public key(s) for the instance. Multiple keys should be newline separated. | `string` | n/a | yes |
 | <a name="input_subnet_id"></a> [subnet\_id](#input\_subnet\_id) | OCID of the subnet where the instance will be created | `string` | n/a | yes |
 | <a name="input_tenancy_ocid"></a> [tenancy\_ocid](#input\_tenancy\_ocid) | OCID of the tenancy | `string` | n/a | yes |
-| <a name="input_user_data"></a> [user\_data](#input\_user\_data) | User data script to run on instance launch | `string` | `null` | no |
+| <a name="input_user_data"></a> [user\_data](#input\_user\_data) | Base64-encoded cloud-init / user\_data supplied by the caller. This module does not embed application bootstrap scripts. Changes to user\_data are ignored after create (see lifecycle) to avoid unintended recreation; taint/replace the instance to re-apply. | `string` | `null` | no |
 | <a name="input_vnic_display_name"></a> [vnic\_display\_name](#input\_vnic\_display\_name) | Display name for the VNIC | `string` | `null` | no |
 
 ## Outputs
 
 | Name | Description |
-|------|-------------|
+| ---- | ----------- |
 | <a name="output_block_volume_attachment_ids"></a> [block\_volume\_attachment\_ids](#output\_block\_volume\_attachment\_ids) | OCIDs of the block volume attachments |
 | <a name="output_block_volume_ids"></a> [block\_volume\_ids](#output\_block\_volume\_ids) | OCIDs of the block volumes |
 | <a name="output_boot_volume_ids"></a> [boot\_volume\_ids](#output\_boot\_volume\_ids) | OCIDs of the boot volumes |

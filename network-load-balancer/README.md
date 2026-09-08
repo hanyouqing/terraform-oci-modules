@@ -77,13 +77,6 @@ module "network_load_balancer" {
 }
 ```
 
-## Requirements
-
-| Name | Version |
-|------|---------|
-| terraform | >= 1.14.2 |
-| oci | ~> 7.30 |
-
 ## Cost Estimate
 
 | Resource | Configuration | Estimated Monthly Cost |
@@ -108,15 +101,15 @@ module "network_load_balancer" {
 ## Requirements
 
 | Name | Version |
-|------|---------|
+| ---- | ------- |
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.14.2 |
-| <a name="requirement_oci"></a> [oci](#requirement\_oci) | ~> 7.30 |
+| <a name="requirement_oci"></a> [oci](#requirement\_oci) | ~> 8.28 |
 
 ## Providers
 
 | Name | Version |
-|------|---------|
-| <a name="provider_oci"></a> [oci](#provider\_oci) | 7.32.0 |
+| ---- | ------- |
+| <a name="provider_oci"></a> [oci](#provider\_oci) | 8.29.0 |
 
 ## Modules
 
@@ -125,7 +118,7 @@ No modules.
 ## Resources
 
 | Name | Type |
-|------|------|
+| ---- | ---- |
 | [oci_network_load_balancer_backend.this](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/network_load_balancer_backend) | resource |
 | [oci_network_load_balancer_backend_set.this](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/network_load_balancer_backend_set) | resource |
 | [oci_network_load_balancer_listener.this](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/network_load_balancer_listener) | resource |
@@ -134,7 +127,7 @@ No modules.
 ## Inputs
 
 | Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
+| ---- | ----------- | ---- | ------- | :------: |
 | <a name="input_backend_sets"></a> [backend\_sets](#input\_backend\_sets) | Map of backend set configurations. Policy options: FIVE\_TUPLE, THREE\_TUPLE, TWO\_TUPLE. | <pre>map(object({<br/>    policy                    = string<br/>    is_fail_open              = optional(bool, false)<br/>    is_instant_failover       = optional(bool, false)<br/>    is_preserve_source        = optional(bool, false)<br/>    ip_version                = optional(string, "IPV4")<br/>    are_operationally_grouped = optional(bool, false)<br/>    health_checker = object({<br/>      protocol            = string<br/>      port                = optional(number, 0)<br/>      interval_in_millis  = optional(number, 10000)<br/>      timeout_in_millis   = optional(number, 3000)<br/>      retries             = optional(number, 3)<br/>      url_path            = optional(string, "/")<br/>      return_code         = optional(number, 200)<br/>      request_data        = optional(string)<br/>      response_data       = optional(string)<br/>      response_body_regex = optional(string)<br/>    })<br/>  }))</pre> | `{}` | no |
 | <a name="input_backends"></a> [backends](#input\_backends) | Map of backend server configurations. | <pre>map(object({<br/>    backend_set_name = string<br/>    ip_address       = optional(string)<br/>    target_id        = optional(string)<br/>    port             = number<br/>    is_backup        = optional(bool, false)<br/>    is_drain         = optional(bool, false)<br/>    is_offline       = optional(bool, false)<br/>    weight           = optional(number, 1)<br/>  }))</pre> | `{}` | no |
 | <a name="input_compartment_id"></a> [compartment\_id](#input\_compartment\_id) | The OCID of the compartment to create the Network Load Balancer in. | `string` | n/a | yes |
@@ -154,7 +147,7 @@ No modules.
 ## Outputs
 
 | Name | Description |
-|------|-------------|
+| ---- | ----------- |
 | <a name="output_backend_ids"></a> [backend\_ids](#output\_backend\_ids) | Map of backend names to their composite IDs. |
 | <a name="output_backend_set_ids"></a> [backend\_set\_ids](#output\_backend\_set\_ids) | Map of backend set names to their composite IDs. |
 | <a name="output_backend_set_names"></a> [backend\_set\_names](#output\_backend\_set\_names) | List of backend set names. |

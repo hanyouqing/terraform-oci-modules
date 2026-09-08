@@ -6,11 +6,13 @@ output "database_ids" {
 output "database_connection_strings" {
   description = "Connection strings for the Autonomous Databases"
   value       = { for k, v in oci_database_autonomous_database.this : k => v.connection_strings }
+  sensitive   = true
 }
 
 output "database_connection_urls" {
   description = "Connection URLs for the Autonomous Databases"
   value       = { for k, v in oci_database_autonomous_database.this : k => v.connection_urls }
+  sensitive   = true
 }
 
 output "database_private_endpoints" {
@@ -23,6 +25,7 @@ output "database_public_endpoints" {
   value = {
     for k, v in oci_database_autonomous_database.this : k => length(v.connection_strings) > 0 && length(v.connection_strings[0].profiles) > 0 ? v.connection_strings[0].profiles[0].value : null
   }
+  sensitive = true
 }
 
 output "zzz_reminders" {
@@ -59,9 +62,5 @@ output "zzz_reminders" {
       is_free_tier   = length(oci_database_autonomous_database.this) > 0 ? values(oci_database_autonomous_database.this)[0].is_free_tier : false
       workload_type  = length(oci_database_autonomous_database.this) > 0 ? values(oci_database_autonomous_database.this)[0].db_workload : "N/A"
     }
-    connection_info = length(oci_database_autonomous_database.this) > 0 ? {
-      connection_string   = values(oci_database_autonomous_database.this)[0].connection_strings[0].profiles[0].value
-      service_console_url = values(oci_database_autonomous_database.this)[0].service_console_url
-    } : null
   }
 }

@@ -36,6 +36,7 @@ variable "secrets" {
   }))
   description = "Secrets"
   default     = {}
+  sensitive   = true
 }
 
 variable "project" {

@@ -18,13 +18,23 @@ dependency "vcn" {
   }
 }
 
+dependency "compute" {
+  config_path = "../compute"
+
+  mock_outputs_allowed_terraform_commands = ["validate", "plan", "init"]
+  mock_outputs = {
+    instance_private_ips = ["10.0.1.10"]
+  }
+}
+
 inputs = {
-  subnet_id = dependency.vcn.outputs.public_subnet_ids["public-1"]
+  is_private = false
+  subnet_id  = dependency.vcn.outputs.public_subnet_ids["public-1"]
 
   backends = {
-    backend-1 = {
+    for idx, ip in dependency.compute.outputs.instance_private_ips : "backend-${idx + 1}" => {
       backend_set_name = "app-backend-set"
-      ip_address       = "10.0.10.10"
+      ip_address       = ip
       port             = 80
       weight           = 1
     }

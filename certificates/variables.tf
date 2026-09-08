@@ -45,6 +45,13 @@ variable "certificate_authorities" {
 
   validation {
     condition = alltrue([
+      for ca in var.certificate_authorities : can(regex("^ocid1\\.key\\.oc1\\.", ca.kms_key_id))
+    ])
+    error_message = "Each certificate_authorities kms_key_id must be a valid OCI KMS key OCID."
+  }
+
+  validation {
+    condition = alltrue([
       for ca in var.certificate_authorities : contains([
         "ROOT_CA_GENERATED_INTERNALLY",
         "SUBORDINATE_CA_ISSUED_BY_INTERNAL_CA"
@@ -136,6 +143,13 @@ variable "certificates" {
       for cert in var.certificates : cert.ca_key != null || cert.issuer_certificate_authority_id != null
     ])
     error_message = "Each certificate must have either ca_key (referencing a key in certificate_authorities) or issuer_certificate_authority_id (external CA OCID)."
+  }
+
+  validation {
+    condition = alltrue([
+      for cert in var.certificates : cert.issuer_certificate_authority_id == null || can(regex("^ocid1\\.certificateauthority\\.oc1\\.", cert.issuer_certificate_authority_id))
+    ])
+    error_message = "issuer_certificate_authority_id must be a valid OCI certificate authority OCID when set."
   }
 }
 

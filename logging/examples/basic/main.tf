@@ -3,7 +3,7 @@ terraform {
   required_providers {
     oci = {
       source  = "oracle/oci"
-      version = "~> 7.30"
+      version = "~> 8.28"
     }
   }
 }
@@ -21,10 +21,10 @@ module "logging" {
   }
 
   logs = {
-    compute-logs = {
+    app-custom = {
       log_group_key      = "app-logs"
-      display_name       = "compute-logs"
-      log_type           = "SERVICE"
+      display_name       = "app-custom-logs"
+      log_type           = "CUSTOM"
       is_enabled         = true
       retention_duration = 30
     }

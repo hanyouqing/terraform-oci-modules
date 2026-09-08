@@ -14,15 +14,15 @@ dependency "vcn" {
 
   mock_outputs_allowed_terraform_commands = ["validate", "plan", "init"]
   mock_outputs = {
-    public_subnet_ids = { "public-1" = "ocid1.subnet.oc1..mock" }
+    private_subnet_ids = { "private-1" = "ocid1.subnet.oc1..mock" }
   }
 }
 
-# Always Free allows 2 x VM.Standard.E2.1.Micro.
-# Alternative: VM.Standard.A1.Flex with ocpus=4, memory_in_gbs=24 (Always Free ARM quota).
+# Production: private subnet, no public IP. Access via Bastion.
 inputs = {
-  subnet_id       = dependency.vcn.outputs.public_subnet_ids["public-1"]
-  ssh_public_keys = get_env("TF_VAR_ssh_public_keys", "")
+  subnet_id        = dependency.vcn.outputs.private_subnet_ids["private-1"]
+  ssh_public_keys  = get_env("TF_VAR_ssh_public_keys", "")
+  assign_public_ip = false
 
   shape          = "VM.Standard.E2.1.Micro"
   instance_count = 2

@@ -18,8 +18,8 @@ dependency "vcn" {
   }
 }
 
+# CIDR comes from _envcommon via TF_VAR_bastion_allowed_cidr (required for apply).
 inputs = {
-  target_subnet_id             = dependency.vcn.outputs.private_subnet_ids["private-1"]
-  client_cidr_block_allow_list = [get_env("TF_VAR_bastion_allowed_cidr", "0.0.0.0/0")]
-  name                         = "oci-modules-production-bastion"
+  target_subnet_id = dependency.vcn.outputs.private_subnet_ids["private-1"]
+  name             = "oci-modules-production-bastion"
 }

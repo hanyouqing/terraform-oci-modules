@@ -38,9 +38,12 @@ resource "oci_core_network_security_group_security_rule" "ingress" {
         min = tcp_options.value.destination_port_min
         max = tcp_options.value.destination_port_max
       }
-      source_port_range {
-        min = tcp_options.value.source_port_min
-        max = tcp_options.value.source_port_max
+      dynamic "source_port_range" {
+        for_each = tcp_options.value.source_port_min != null && tcp_options.value.source_port_max != null ? [1] : []
+        content {
+          min = tcp_options.value.source_port_min
+          max = tcp_options.value.source_port_max
+        }
       }
     }
   }
@@ -52,9 +55,12 @@ resource "oci_core_network_security_group_security_rule" "ingress" {
         min = udp_options.value.destination_port_min
         max = udp_options.value.destination_port_max
       }
-      source_port_range {
-        min = udp_options.value.source_port_min
-        max = udp_options.value.source_port_max
+      dynamic "source_port_range" {
+        for_each = udp_options.value.source_port_min != null && udp_options.value.source_port_max != null ? [1] : []
+        content {
+          min = udp_options.value.source_port_min
+          max = udp_options.value.source_port_max
+        }
       }
     }
   }
@@ -88,9 +94,12 @@ resource "oci_core_network_security_group_security_rule" "egress" {
         min = tcp_options.value.destination_port_min
         max = tcp_options.value.destination_port_max
       }
-      source_port_range {
-        min = tcp_options.value.source_port_min
-        max = tcp_options.value.source_port_max
+      dynamic "source_port_range" {
+        for_each = tcp_options.value.source_port_min != null && tcp_options.value.source_port_max != null ? [1] : []
+        content {
+          min = tcp_options.value.source_port_min
+          max = tcp_options.value.source_port_max
+        }
       }
     }
   }
@@ -102,9 +111,12 @@ resource "oci_core_network_security_group_security_rule" "egress" {
         min = udp_options.value.destination_port_min
         max = udp_options.value.destination_port_max
       }
-      source_port_range {
-        min = udp_options.value.source_port_min
-        max = udp_options.value.source_port_max
+      dynamic "source_port_range" {
+        for_each = udp_options.value.source_port_min != null && udp_options.value.source_port_max != null ? [1] : []
+        content {
+          min = udp_options.value.source_port_min
+          max = udp_options.value.source_port_max
+        }
       }
     }
   }

@@ -10,8 +10,7 @@ variable "target_subnet_id" {
 
 variable "bastion_client_cidr_block_allow_list" {
   type        = list(string)
-  description = "List of CIDR blocks allowed to connect to the bastion"
-  default     = []
+  description = "List of CIDR blocks allowed to connect to the bastion (required; use your admin IP/32)"
 }
 
 variable "ssh_public_key" {

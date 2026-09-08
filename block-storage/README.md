@@ -60,38 +60,6 @@ module "block_storage" {
 }
 ```
 
-## Requirements
-
-| Name | Version |
-|------|---------|
-| terraform | >= 1.14.2 |
-| oci | ~> 6.0 |
-
-## Providers
-
-| Name | Version |
-|------|---------|
-| oci | ~> 6.0 |
-
-## Inputs
-
-| Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
-| compartment_id | OCID of the compartment where the block volumes will be created | `string` | n/a | yes |
-| tenancy_ocid | OCID of the tenancy | `string` | n/a | yes |
-| volumes | Map of block volumes to create | `map(object)` | `{}` | no |
-| create_backups | Whether to create backups for volumes | `bool` | `false` | no |
-| backup_policies | Map of backup policies to create | `map(object)` | `{}` | no |
-| volume_attachments | Map of volume attachments | `map(object)` | `{}` | no |
-
-## Outputs
-
-| Name | Description |
-|------|-------------|
-| volume_ids | OCIDs of the block volumes |
-| backup_ids | OCIDs of the volume backups |
-| total_storage_gb | Total storage size in GBs |
-
 ## Cost Estimate
 
 The following cost estimates are based on typical configurations and OCI standard pricing. Actual costs may vary based on region, volume performance, and backup retention.
@@ -150,15 +118,15 @@ See the [examples](../examples/block-storage/) directory for complete examples.
 ## Requirements
 
 | Name | Version |
-|------|---------|
+| ---- | ------- |
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.14.2 |
-| <a name="requirement_oci"></a> [oci](#requirement\_oci) | ~> 7.30 |
+| <a name="requirement_oci"></a> [oci](#requirement\_oci) | ~> 8.28 |
 
 ## Providers
 
 | Name | Version |
-|------|---------|
-| <a name="provider_oci"></a> [oci](#provider\_oci) | ~> 7.30 |
+| ---- | ------- |
+| <a name="provider_oci"></a> [oci](#provider\_oci) | 8.29.0 |
 
 ## Modules
 
@@ -167,7 +135,7 @@ No modules.
 ## Resources
 
 | Name | Type |
-|------|------|
+| ---- | ---- |
 | [oci_core_volume.this](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/core_volume) | resource |
 | [oci_core_volume_attachment.this](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/core_volume_attachment) | resource |
 | [oci_core_volume_backup.this](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/core_volume_backup) | resource |
@@ -177,7 +145,7 @@ No modules.
 ## Inputs
 
 | Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
+| ---- | ----------- | ---- | ------- | :------: |
 | <a name="input_backup_policies"></a> [backup\_policies](#input\_backup\_policies) | Map of backup policies to create | <pre>map(object({<br/>    display_name = string<br/>    schedules = list(object({<br/>      backup_type       = string<br/>      period            = string<br/>      retention_seconds = number<br/>      hour_of_day       = number<br/>      day_of_month      = number<br/>      day_of_week       = string<br/>      month             = string<br/>      time_zone         = string<br/>    }))<br/>  }))</pre> | `{}` | no |
 | <a name="input_compartment_id"></a> [compartment\_id](#input\_compartment\_id) | OCID of the compartment where the block volumes will be created | `string` | n/a | yes |
 | <a name="input_create_backups"></a> [create\_backups](#input\_create\_backups) | Whether to create backups for volumes | `bool` | `false` | no |
@@ -192,7 +160,7 @@ No modules.
 ## Outputs
 
 | Name | Description |
-|------|-------------|
+| ---- | ----------- |
 | <a name="output_attachment_ids"></a> [attachment\_ids](#output\_attachment\_ids) | OCIDs of the volume attachments |
 | <a name="output_backup_ids"></a> [backup\_ids](#output\_backup\_ids) | OCIDs of the volume backups |
 | <a name="output_backup_policy_ids"></a> [backup\_policy\_ids](#output\_backup\_policy\_ids) | OCIDs of the backup policies |

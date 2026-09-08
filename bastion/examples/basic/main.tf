@@ -3,7 +3,7 @@ terraform {
   required_providers {
     oci = {
       source  = "oracle/oci"
-      version = "~> 7.30"
+      version = "~> 8.28"
     }
   }
 }
@@ -16,8 +16,10 @@ module "bastion" {
   bastion_type     = "STANDARD"
   name             = "always-free-bastion"
 
-  # Recommended to restrict to your own public IP
+  # Recommended: export TF_VAR_bastion_allowed_cidr='203.0.113.10/32'
+  # World-open 0.0.0.0/0 is blocked unless allow_world_open_access=true (lab only).
   client_cidr_block_allow_list = var.bastion_client_cidr_block_allow_list
+  allow_world_open_access      = false
 
   sessions = {
     "test-session" = {

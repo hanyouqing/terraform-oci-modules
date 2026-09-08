@@ -22,10 +22,20 @@ variable "logs" {
     log_group_key      = string
     display_name       = string
     log_type           = string
-    is_enabled         = bool
-    retention_duration = number
+    is_enabled         = optional(bool, true)
+    retention_duration = optional(number, 30)
+    configuration = optional(object({
+      source = object({
+        category    = string
+        resource    = string
+        service     = string
+        source_type = optional(string, "OCISERVICE")
+        parameters  = optional(map(string), {})
+      })
+      compartment_id = optional(string, null)
+    }), null)
   }))
-  description = "Map of logs to create"
+  description = "Map of logs to create. For SERVICE logs, set configuration.source with category/resource/service."
   default     = {}
 
   validation {
@@ -40,6 +50,13 @@ variable "logs" {
       for log in var.logs : log.retention_duration >= 1 && log.retention_duration <= 180
     ])
     error_message = "retention_duration must be between 1 and 180 days"
+  }
+
+  validation {
+    condition = alltrue([
+      for log in var.logs : log.log_type != "SERVICE" || log.configuration != null
+    ])
+    error_message = "SERVICE logs require a configuration block."
   }
 }
 

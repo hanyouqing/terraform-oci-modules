@@ -18,17 +18,21 @@ dependency "vault" {
   }
 }
 
+locals {
+  cert_cn = trimspace(get_env("TF_VAR_cert_common_name", ""))
+}
+
+# Fail-closed: no leaf certificates until TF_VAR_cert_common_name is set.
 inputs = {
-  # Production: add certificates for web services
-  certificates = {
+  certificates = local.cert_cn != "" ? {
     web-cert = {
       name        = "web-server-cert"
       ca_key      = "root-ca"
-      common_name = "app.example.com"
+      common_name = local.cert_cn
       subject_alternative_names = [
-        { type = "DNS", value = "app.example.com" },
-        { type = "DNS", value = "*.app.example.com" }
+        { type = "DNS", value = local.cert_cn },
+        { type = "DNS", value = "*.${local.cert_cn}" }
       ]
     }
-  }
+  } : {}
 }

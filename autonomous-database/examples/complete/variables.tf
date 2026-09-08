@@ -26,6 +26,7 @@ variable "databases" {
   }))
   description = "Autonomous Databases"
   default     = {}
+  sensitive   = true
 }
 
 variable "project" {

@@ -68,13 +68,6 @@ module "load_balancer" {
 }
 ```
 
-## Requirements
-
-| Name | Version |
-|------|---------|
-| terraform | >= 1.14.2 |
-| oci | ~> 6.0 |
-
 ## Cost Estimate
 
 The following cost estimates are based on typical configurations and OCI standard pricing. Actual costs may vary based on region, bandwidth, and data transfer volumes.
@@ -130,15 +123,15 @@ See the [examples](../examples/load-balancer/) directory for complete examples.
 ## Requirements
 
 | Name | Version |
-|------|---------|
+| ---- | ------- |
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.14.2 |
-| <a name="requirement_oci"></a> [oci](#requirement\_oci) | ~> 7.30 |
+| <a name="requirement_oci"></a> [oci](#requirement\_oci) | ~> 8.28 |
 
 ## Providers
 
 | Name | Version |
-|------|---------|
-| <a name="provider_oci"></a> [oci](#provider\_oci) | 7.32.0 |
+| ---- | ------- |
+| <a name="provider_oci"></a> [oci](#provider\_oci) | 8.29.0 |
 
 ## Modules
 
@@ -147,7 +140,7 @@ No modules.
 ## Resources
 
 | Name | Type |
-|------|------|
+| ---- | ---- |
 | [oci_load_balancer_backend.this](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/load_balancer_backend) | resource |
 | [oci_load_balancer_backend_set.this](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/load_balancer_backend_set) | resource |
 | [oci_load_balancer_listener.this](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/load_balancer_listener) | resource |
@@ -156,7 +149,7 @@ No modules.
 ## Inputs
 
 | Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
+| ---- | ----------- | ---- | ------- | :------: |
 | <a name="input_backend_sets"></a> [backend\_sets](#input\_backend\_sets) | Map of backend sets to create | <pre>map(object({<br/>    policy = string<br/>    health_checker = object({<br/>      protocol            = string<br/>      port                = number<br/>      url_path            = string<br/>      interval_ms         = number<br/>      timeout_in_millis   = number<br/>      retries             = number<br/>      response_body_regex = string<br/>    })<br/>    ssl_configuration = optional(object({<br/>      certificate_ids                   = optional(list(string), [])<br/>      certificate_name                  = optional(string, "")<br/>      verify_depth                      = optional(number, 1)<br/>      verify_peer_certificate           = optional(bool, false)<br/>      protocols                         = optional(list(string), [])<br/>      cipher_suite_name                 = optional(string, "")<br/>      server_order_preference           = optional(string, "")<br/>      trusted_certificate_authority_ids = optional(list(string), [])<br/>    }))<br/>  }))</pre> | `{}` | no |
 | <a name="input_backends"></a> [backends](#input\_backends) | Map of backends to create | <pre>map(object({<br/>    backendset_name = string<br/>    ip_address      = string<br/>    port            = number<br/>    backup          = bool<br/>    drain           = bool<br/>    offline         = bool<br/>    weight          = number<br/>  }))</pre> | `{}` | no |
 | <a name="input_compartment_id"></a> [compartment\_id](#input\_compartment\_id) | OCID of the compartment where the load balancer will be created | `string` | n/a | yes |
@@ -175,7 +168,7 @@ No modules.
 ## Outputs
 
 | Name | Description |
-|------|-------------|
+| ---- | ----------- |
 | <a name="output_backend_set_names"></a> [backend\_set\_names](#output\_backend\_set\_names) | Names of the backend sets |
 | <a name="output_listener_names"></a> [listener\_names](#output\_listener\_names) | Names of the listeners |
 | <a name="output_load_balancer_id"></a> [load\_balancer\_id](#output\_load\_balancer\_id) | OCID of the load balancer |

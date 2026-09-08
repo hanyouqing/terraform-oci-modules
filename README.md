@@ -24,7 +24,7 @@ For **Terragrunt** (remote state, generated provider, DRY stack configs), see [t
 ## Prerequisites
 
 - [Terraform](https://www.terraform.io/downloads.html) >= 1.14.2
-- [OCI Provider for Terraform](https://registry.terraform.io/providers/oracle/oci/latest/docs) `~> 7.30` (see each module’s `versions.tf`)
+- [OCI Provider for Terraform](https://registry.terraform.io/providers/oracle/oci/latest/docs) `~> 8.28` (see each module’s `versions.tf`)
 - [OCI CLI](https://docs.oracle.com/en-us/iaas/Content/API/SDKDocs/cliinstall.htm) configured (verify with `oci iam region list --output table`)
 - [OCI credentials](#setting-up-oci-credentials-for-the-terraform-provider) for the Terraform provider — the [OCI CLI](#setting-up-credentials-with-the-oci-cli) (`oci setup config`) is the usual way to create `~/.oci/config`; alternatively use environment variables from `.env.sh` only
 - Oracle Cloud Infrastructure account with appropriate permissions (enable the Always Free tier if you use demo/Always Free defaults)
@@ -34,8 +34,8 @@ For **Terragrunt** (remote state, generated provider, DRY stack configs), see [t
 
 ### Infrastructure
 
-- **VCN**: Complete Virtual Cloud Network setup with public, private, and database subnets, Internet Gateway, NAT Gateway, Service Gateway, route tables, and security lists
-- **Compute**: Always Free compute instances (VM.Standard.E2.1.Micro and VM.Standard.A1.Flex) with boot volumes, block volumes, and network configuration
+- **VCN**: Complete Virtual Cloud Network setup with public, private, and database subnets, Internet Gateway, NAT Gateway, Service Gateway, route tables, security lists, and NSGs. See `vcn/examples/edge-public` for a minimal public-edge topology
+- **Compute**: Always Free compute instances (VM.Standard.E2.1.Micro and VM.Standard.A1.Flex) with boot volumes, block volumes, network configuration, and optional launch/instance options. See `compute/examples/edge-arm` for a 2 OCPU / 12 GB / 50 GB ARM profile (caller-supplied `user_data`)
 - **Block Storage**: Block volumes with backup policies and attachments
 - **Object Storage**: Object Storage buckets with lifecycle policies and pre-authenticated requests
 - **Load Balancer**: Flexible load balancer with backend sets, listeners, and SSL/TLS support

@@ -17,10 +17,20 @@ variable "logs" {
     log_group_key      = string
     display_name       = string
     log_type           = string
-    is_enabled         = bool
-    retention_duration = number
+    is_enabled         = optional(bool, true)
+    retention_duration = optional(number, 30)
+    configuration = optional(object({
+      source = object({
+        category    = string
+        resource    = string
+        service     = string
+        source_type = optional(string, "OCISERVICE")
+        parameters  = optional(map(string), {})
+      })
+      compartment_id = optional(string, null)
+    }), null)
   }))
-  description = "Logs"
+  description = "Logs (SERVICE logs require configuration)"
   default     = {}
 }
 

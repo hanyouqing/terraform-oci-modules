@@ -45,7 +45,8 @@ module "autonomous_database" {
       private_endpoint_label   = null
       subnet_id                = null
       vcn_id                   = null
-      whitelisted_ips          = ["0.0.0.0/0"]
+      whitelisted_ips          = ["203.0.113.10/32"]
+      # For labs only: set allow_world_open_access = true and whitelisted_ips = ["0.0.0.0/0"]
       freeform_tags            = {}
       defined_tags             = {}
     }
@@ -55,34 +56,6 @@ module "autonomous_database" {
   environment = "production"
 }
 ```
-
-## Requirements
-
-| Name | Version |
-|------|---------|
-| terraform | >= 1.14.2 |
-| oci | ~> 6.0 |
-
-## Providers
-
-| Name | Version |
-|------|---------|
-| oci | ~> 6.0 |
-
-## Inputs
-
-| Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
-| compartment_id | OCID of the compartment where the Autonomous Database will be created | `string` | n/a | yes |
-| databases | Map of Autonomous Databases to create | `map(object)` | `{}` | no |
-
-## Outputs
-
-| Name | Description |
-|------|-------------|
-| database_ids | OCIDs of the Autonomous Databases |
-| database_connection_strings | Connection strings for the Autonomous Databases |
-| database_connection_urls | Connection URLs for the Autonomous Databases |
 
 ## Cost Estimate
 
@@ -141,15 +114,15 @@ See the [examples](../examples/autonomous-database/) directory for complete exam
 ## Requirements
 
 | Name | Version |
-|------|---------|
+| ---- | ------- |
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.14.2 |
-| <a name="requirement_oci"></a> [oci](#requirement\_oci) | ~> 7.30 |
+| <a name="requirement_oci"></a> [oci](#requirement\_oci) | ~> 8.28 |
 
 ## Providers
 
 | Name | Version |
-|------|---------|
-| <a name="provider_oci"></a> [oci](#provider\_oci) | 7.32.0 |
+| ---- | ------- |
+| <a name="provider_oci"></a> [oci](#provider\_oci) | 8.29.0 |
 
 ## Modules
 
@@ -158,13 +131,14 @@ No modules.
 ## Resources
 
 | Name | Type |
-|------|------|
+| ---- | ---- |
 | [oci_database_autonomous_database.this](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/database_autonomous_database) | resource |
 
 ## Inputs
 
 | Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
+| ---- | ----------- | ---- | ------- | :------: |
+| <a name="input_allow_world_open_access"></a> [allow\_world\_open\_access](#input\_allow\_world\_open\_access) | Set true only for short-lived labs to allow 0.0.0.0/0 in whitelisted\_ips. Production must keep this false. | `bool` | `false` | no |
 | <a name="input_compartment_id"></a> [compartment\_id](#input\_compartment\_id) | OCID of the compartment where the Autonomous Database will be created | `string` | n/a | yes |
 | <a name="input_databases"></a> [databases](#input\_databases) | Map of Autonomous Databases to create. For Always Free, is\_free\_tier=true, cpu\_core\_count=1, data\_storage\_size\_in\_tbs=1. | <pre>map(object({<br/>    db_name                                        = string<br/>    display_name                                   = string<br/>    admin_password                                 = string<br/>    db_workload                                    = string<br/>    is_free_tier                                   = bool<br/>    license_model                                  = string<br/>    cpu_core_count                                 = number<br/>    data_storage_size_in_tbs                       = number<br/>    is_auto_scaling_enabled                        = optional(bool, false)<br/>    is_dedicated                                   = optional(bool, false)<br/>    is_mtls_connection_required                    = optional(bool, true)<br/>    is_preview_version_with_service_terms_accepted = optional(bool, false)<br/>    nsg_ids                                        = optional(list(string), [])<br/>    private_endpoint_label                         = optional(string, null)<br/>    subnet_id                                      = optional(string, null)<br/>    whitelisted_ips                                = optional(list(string), [])<br/>    freeform_tags                                  = optional(map(string), {})<br/>    defined_tags                                   = optional(map(string), {})<br/>  }))</pre> | `{}` | no |
 | <a name="input_defined_tags"></a> [defined\_tags](#input\_defined\_tags) | Defined tags to apply to all resources | `map(string)` | `{}` | no |
@@ -175,7 +149,7 @@ No modules.
 ## Outputs
 
 | Name | Description |
-|------|-------------|
+| ---- | ----------- |
 | <a name="output_database_connection_strings"></a> [database\_connection\_strings](#output\_database\_connection\_strings) | Connection strings for the Autonomous Databases |
 | <a name="output_database_connection_urls"></a> [database\_connection\_urls](#output\_database\_connection\_urls) | Connection URLs for the Autonomous Databases |
 | <a name="output_database_ids"></a> [database\_ids](#output\_database\_ids) | OCIDs of the Autonomous Databases |

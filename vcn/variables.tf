@@ -110,10 +110,10 @@ variable "public_subnets" {
     cidr_block          = string
     display_name        = string
     dns_label           = optional(string, "")
-    availability_domain = string
+    availability_domain = optional(string, "")
     security_list_ids   = optional(list(string), null)
   }))
-  description = "Map of public subnets to create"
+  description = "Map of public subnets to create. Empty availability_domain creates a regional subnet."
   default     = {}
 }
 
@@ -122,10 +122,10 @@ variable "private_subnets" {
     cidr_block          = string
     display_name        = string
     dns_label           = optional(string, "")
-    availability_domain = string
+    availability_domain = optional(string, "")
     security_list_ids   = optional(list(string), null)
   }))
-  description = "Map of private subnets to create"
+  description = "Map of private subnets to create. Empty availability_domain creates a regional subnet."
   default     = {}
 }
 

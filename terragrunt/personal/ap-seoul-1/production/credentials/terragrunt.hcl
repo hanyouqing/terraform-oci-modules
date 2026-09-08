@@ -9,19 +9,23 @@ include "envcommon" {
   merge_strategy = "deep"
 }
 
-# Production: SMTP credentials for email delivery + auth token for CI/CD
+locals {
+  user_ocid = trimspace(get_env("TF_VAR_user_ocid", ""))
+}
+
+# Production: empty until TF_VAR_user_ocid is set (no placeholder OCIDs).
 inputs = {
-  auth_tokens = {
+  user_id = local.user_ocid != "" ? local.user_ocid : null
+
+  auth_tokens = local.user_ocid != "" ? {
     ci-cd = {
-      user_id     = "ocid1.user.oc1..example"
       description = "Auth token for CI/CD pipeline"
     }
-  }
+  } : {}
 
-  smtp_credentials = {
+  smtp_credentials = local.user_ocid != "" ? {
     email-sender = {
-      user_id     = "ocid1.user.oc1..example"
       description = "SMTP credential for email delivery"
     }
-  }
+  } : {}
 }

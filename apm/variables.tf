@@ -89,6 +89,13 @@ variable "synthetics_monitors" {
     ])
     error_message = "Each monitor must have either apm_domain_key (referencing a key in apm_domains) or apm_domain_id (external APM domain OCID)."
   }
+
+  validation {
+    condition = alltrue([
+      for m in var.synthetics_monitors : m.apm_domain_id == null || can(regex("^ocid1\\.apmdomain\\.oc1\\.", m.apm_domain_id))
+    ])
+    error_message = "apm_domain_id must be a valid OCI APM domain OCID when set."
+  }
 }
 
 variable "project" {

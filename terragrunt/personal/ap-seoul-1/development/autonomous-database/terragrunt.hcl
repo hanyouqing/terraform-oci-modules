@@ -9,7 +9,16 @@ include "envcommon" {
   merge_strategy = "deep"
 }
 
+locals {
+  adb_cidr = trimspace(get_env("TF_VAR_adb_allowed_cidr", ""))
+  allow_world = get_env("TF_VAR_adb_allow_world_open", "false") == "true"
+}
+
 inputs = {
+  # Development may open wider access only when TF_VAR_adb_allow_world_open=true.
+  # Otherwise set TF_VAR_adb_allowed_cidr (required for public endpoint).
+  allow_world_open_access = local.allow_world
+
   databases = {
     adb-dev = {
       db_name                                        = "devdb"
@@ -27,7 +36,10 @@ inputs = {
       nsg_ids                                        = []
       private_endpoint_label                         = null
       subnet_id                                      = null
-      whitelisted_ips                                = ["0.0.0.0/0"]
+      whitelisted_ips = (
+        local.allow_world ? ["0.0.0.0/0"] :
+        (local.adb_cidr != "" ? [local.adb_cidr] : [])
+      )
     }
   }
 }

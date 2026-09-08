@@ -23,21 +23,54 @@ locals {
     ocpus         = var.ocpus
     memory_in_gbs = var.memory_in_gbs
   }] : []
+
+  launch_options_list      = var.launch_options != null ? [var.launch_options] : []
+  instance_options_list    = var.instance_options != null ? [var.instance_options] : []
+  availability_config_list = var.availability_config != null ? [var.availability_config] : []
 }
 
 resource "oci_core_instance" "this" {
   count = var.instance_count
 
-  compartment_id      = var.compartment_id
-  availability_domain = var.availability_domain != null ? var.availability_domain : data.oci_identity_availability_domains.ads.availability_domains[count.index % length(data.oci_identity_availability_domains.ads.availability_domains)].name
-  display_name        = var.display_name != null ? "${var.display_name}-${count.index + 1}" : "compute-instance-${count.index + 1}"
-  shape               = var.shape
+  compartment_id       = var.compartment_id
+  availability_domain  = var.availability_domain != null ? var.availability_domain : data.oci_identity_availability_domains.ads.availability_domains[count.index % length(data.oci_identity_availability_domains.ads.availability_domains)].name
+  fault_domain         = var.fault_domain
+  display_name         = var.display_name != null ? "${var.display_name}-${count.index + 1}" : "compute-instance-${count.index + 1}"
+  shape                = var.shape
+  preserve_boot_volume = var.preserve_boot_volume
 
   dynamic "shape_config" {
     for_each = local.shape_config_list
     content {
       ocpus         = shape_config.value.ocpus
       memory_in_gbs = shape_config.value.memory_in_gbs
+    }
+  }
+
+  dynamic "launch_options" {
+    for_each = local.launch_options_list
+    content {
+      boot_volume_type                    = launch_options.value.boot_volume_type
+      firmware                            = launch_options.value.firmware
+      network_type                        = launch_options.value.network_type
+      remote_data_volume_type             = launch_options.value.remote_data_volume_type
+      is_pv_encryption_in_transit_enabled = launch_options.value.is_pv_encryption_in_transit_enabled
+      is_consistent_volume_naming_enabled = launch_options.value.is_consistent_volume_naming_enabled
+    }
+  }
+
+  dynamic "instance_options" {
+    for_each = local.instance_options_list
+    content {
+      are_legacy_imds_endpoints_disabled = instance_options.value.are_legacy_imds_endpoints_disabled
+    }
+  }
+
+  dynamic "availability_config" {
+    for_each = local.availability_config_list
+    content {
+      is_live_migration_preferred = availability_config.value.is_live_migration_preferred
+      recovery_action             = availability_config.value.recovery_action
     }
   }
 
@@ -58,10 +91,14 @@ resource "oci_core_instance" "this" {
     boot_volume_vpus_per_gb = var.boot_volume_vpus_per_gb
   }
 
-  metadata = {
-    ssh_authorized_keys = var.ssh_public_keys
-    user_data           = var.user_data
-  }
+  metadata = merge(
+    {
+      ssh_authorized_keys = var.ssh_public_keys
+    },
+    var.user_data != null ? { user_data = var.user_data } : {}
+  )
+
+  extended_metadata = var.extended_metadata
 
   agent_config {
     is_monitoring_disabled = !var.enable_monitoring
@@ -86,6 +123,18 @@ resource "oci_core_instance" "this" {
       create_vnic_details[0].private_ip,
       metadata["user_data"]
     ]
+
+    precondition {
+      condition     = local.image_id != null
+      error_message = "No compute image found. Set image_id or adjust image_operating_system / image_operating_system_version / shape."
+    }
+
+    precondition {
+      condition = !(var.shape == "VM.Standard.A1.Flex" && var.instance_count > 0) || (
+        var.ocpus * var.instance_count <= 4 && var.memory_in_gbs * var.instance_count <= 24
+      )
+      error_message = "Always Free A1.Flex tenancy quota is at most 4 OCPUs and 24 GB memory across instances in this module call."
+    }
   }
 }
 

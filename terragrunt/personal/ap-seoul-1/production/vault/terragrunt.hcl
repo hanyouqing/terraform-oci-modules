@@ -20,5 +20,13 @@ inputs = {
       curve_id        = null
       protection_mode = "SOFTWARE"
     }
+    # Used by certificates module (_envcommon/certificates.hcl → key_ids["ca-key"]).
+    ca-key = {
+      display_name    = "oci-modules-production-ca-key"
+      algorithm       = "AES"
+      length          = 32
+      curve_id        = null
+      protection_mode = "SOFTWARE"
+    }
   }
 }

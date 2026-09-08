@@ -3,7 +3,7 @@ terraform {
   required_providers {
     oci = {
       source  = "oracle/oci"
-      version = "~> 7.30"
+      version = "~> 8.28"
     }
   }
 }
@@ -12,6 +12,8 @@ module "autonomous_database" {
   source = "../../"
 
   compartment_id = var.compartment_id
+  # Lab-only: open ACL. Production stacks must keep allow_world_open_access=false and use tight CIDRs or private endpoints.
+  allow_world_open_access = true
 
   databases = {
     adb-1 = {

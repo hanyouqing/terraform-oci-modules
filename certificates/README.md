@@ -78,70 +78,6 @@ module "vault" {
 # Then reference: kms_key_id = module.vault.key_ids["ca-key"]
 ```
 
-## Requirements
-
-| Name | Version |
-|------|---------|
-| terraform | >= 1.14.2 |
-| oci | ~> 7.30 |
-
-## Providers
-
-| Name | Version |
-|------|---------|
-| oci | ~> 7.30 |
-
-## Inputs
-
-| Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
-| compartment_id | OCID of the compartment | `string` | n/a | yes |
-| certificate_authorities | Map of CAs to create | `map(object)` | `{}` | no |
-| certificates | Map of certificates to create | `map(object)` | `{}` | no |
-| project | Project name for tagging | `string` | `"oci-modules"` | no |
-| environment | Environment name for tagging | `string` | `"development"` | no |
-| freeform_tags | Freeform tags for all resources | `map(string)` | `{}` | no |
-| defined_tags | Defined tags for all resources | `map(map(string))` | `{}` | no |
-
-### Certificate Authority Object
-
-| Field | Description | Type | Default |
-|-------|-------------|------|---------|
-| name | CA display name | `string` | — |
-| kms_key_id | OCID of KMS key for CA protection | `string` | — |
-| common_name | CA subject common name | `string` | — |
-| config_type | ROOT_CA_GENERATED_INTERNALLY or SUBORDINATE_CA_ISSUED_BY_INTERNAL_CA | `string` | `"ROOT_CA_GENERATED_INTERNALLY"` |
-| signing_algorithm | Signing algorithm | `string` | `"SHA256_WITH_RSA"` |
-| key_algorithm | Key algorithm | `string` | `"RSA2048"` |
-| country | Subject country | `string` | `null` |
-| organization | Subject organization | `string` | `null` |
-| time_of_validity_not_after | Validity end (ISO 8601) | `string` | `null` |
-| certificate_authority_max_validity_duration | Max CA validity (ISO 8601 duration) | `string` | `null` |
-| leaf_certificate_max_validity_duration | Max leaf cert validity (ISO 8601 duration) | `string` | `null` |
-
-### Certificate Object
-
-| Field | Description | Type | Default |
-|-------|-------------|------|---------|
-| name | Certificate display name | `string` | — |
-| common_name | Subject common name | `string` | — |
-| ca_key | Key in `certificate_authorities` map | `string` | `null` |
-| issuer_certificate_authority_id | External CA OCID (if not using ca_key) | `string` | `null` |
-| certificate_profile_type | TLS_SERVER_OR_CLIENT, TLS_SERVER, TLS_CLIENT, TLS_CODE_SIGN | `string` | `"TLS_SERVER_OR_CLIENT"` |
-| subject_alternative_names | SANs list (type + value) | `list(object)` | `[]` |
-| time_of_validity_not_after | Validity end (ISO 8601) | `string` | `null` |
-
-## Outputs
-
-| Name | Description |
-|------|-------------|
-| certificate_authority_ids | OCIDs of the CAs |
-| certificate_authority_names | Names of the CAs |
-| certificate_authority_states | Lifecycle states of the CAs |
-| certificate_ids | OCIDs of the certificates |
-| certificate_names | Names of the certificates |
-| certificate_states | Lifecycle states of the certificates |
-
 ## Cost Estimate
 
 ### Always Free Tier
@@ -188,15 +124,15 @@ The following Certificates resources are **free** within Always Free tier limits
 ## Requirements
 
 | Name | Version |
-|------|---------|
+| ---- | ------- |
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.14.2 |
-| <a name="requirement_oci"></a> [oci](#requirement\_oci) | ~> 7.30 |
+| <a name="requirement_oci"></a> [oci](#requirement\_oci) | ~> 8.28 |
 
 ## Providers
 
 | Name | Version |
-|------|---------|
-| <a name="provider_oci"></a> [oci](#provider\_oci) | 7.32.0 |
+| ---- | ------- |
+| <a name="provider_oci"></a> [oci](#provider\_oci) | 8.29.0 |
 
 ## Modules
 
@@ -205,14 +141,14 @@ No modules.
 ## Resources
 
 | Name | Type |
-|------|------|
+| ---- | ---- |
 | [oci_certificates_management_certificate.this](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/certificates_management_certificate) | resource |
 | [oci_certificates_management_certificate_authority.this](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/certificates_management_certificate_authority) | resource |
 
 ## Inputs
 
 | Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
+| ---- | ----------- | ---- | ------- | :------: |
 | <a name="input_certificate_authorities"></a> [certificate\_authorities](#input\_certificate\_authorities) | Map of Certificate Authorities to create. Always Free: 5 CAs per tenancy. | <pre>map(object({<br/>    name        = string<br/>    description = optional(string, "")<br/>    kms_key_id  = string<br/><br/>    # CA config<br/>    config_type                     = optional(string, "ROOT_CA_GENERATED_INTERNALLY")<br/>    issuer_certificate_authority_id = optional(string, null)<br/>    signing_algorithm               = optional(string, "SHA256_WITH_RSA")<br/>    key_algorithm                   = optional(string, "RSA2048")<br/>    version_name                    = optional(string, null)<br/><br/>    # Subject<br/>    common_name         = string<br/>    country             = optional(string, null)<br/>    organization        = optional(string, null)<br/>    organizational_unit = optional(string, null)<br/>    state_name          = optional(string, null)<br/>    locality            = optional(string, null)<br/><br/>    # Validity (ISO 8601 timestamps)<br/>    time_of_validity_not_before = optional(string, null)<br/>    time_of_validity_not_after  = optional(string, null)<br/><br/>    # Rules<br/>    certificate_authority_max_validity_duration = optional(string, null)<br/>    leaf_certificate_max_validity_duration      = optional(string, null)<br/><br/>    freeform_tags = optional(map(string), {})<br/>    defined_tags  = optional(map(string), {})<br/>  }))</pre> | `{}` | no |
 | <a name="input_certificates"></a> [certificates](#input\_certificates) | Map of certificates to create. Always Free: 150 certificates per tenancy. Use ca\_key to reference a CA in certificate\_authorities, or issuer\_certificate\_authority\_id for an external CA OCID. | <pre>map(object({<br/>    name        = string<br/>    description = optional(string, "")<br/><br/>    # Certificate config<br/>    config_type              = optional(string, "ISSUED_BY_INTERNAL_CA")<br/>    certificate_profile_type = optional(string, "TLS_SERVER_OR_CLIENT")<br/>    key_algorithm            = optional(string, "RSA2048")<br/>    signature_algorithm      = optional(string, "SHA256_WITH_RSA")<br/><br/>    # Reference to CA — either a key in certificate_authorities or a direct OCID<br/>    ca_key                          = optional(string, null)<br/>    issuer_certificate_authority_id = optional(string, null)<br/><br/>    # Subject<br/>    common_name         = string<br/>    country             = optional(string, null)<br/>    organization        = optional(string, null)<br/>    organizational_unit = optional(string, null)<br/>    state_name          = optional(string, null)<br/>    locality            = optional(string, null)<br/><br/>    # Subject Alternative Names<br/>    subject_alternative_names = optional(list(object({<br/>      type  = string<br/>      value = string<br/>    })), [])<br/><br/>    # Validity (ISO 8601 timestamps)<br/>    time_of_validity_not_before = optional(string, null)<br/>    time_of_validity_not_after  = optional(string, null)<br/><br/>    freeform_tags = optional(map(string), {})<br/>    defined_tags  = optional(map(string), {})<br/>  }))</pre> | `{}` | no |
 | <a name="input_compartment_id"></a> [compartment\_id](#input\_compartment\_id) | OCID of the compartment where certificate authorities and certificates will be created | `string` | n/a | yes |
@@ -224,7 +160,7 @@ No modules.
 ## Outputs
 
 | Name | Description |
-|------|-------------|
+| ---- | ----------- |
 | <a name="output_certificate_authority_ids"></a> [certificate\_authority\_ids](#output\_certificate\_authority\_ids) | OCIDs of the Certificate Authorities |
 | <a name="output_certificate_authority_names"></a> [certificate\_authority\_names](#output\_certificate\_authority\_names) | Names of the Certificate Authorities |
 | <a name="output_certificate_authority_states"></a> [certificate\_authority\_states](#output\_certificate\_authority\_states) | Lifecycle states of the Certificate Authorities |

@@ -3,7 +3,7 @@ terraform {
   required_providers {
     oci = {
       source  = "oracle/oci"
-      version = "~> 7.30"
+      version = "~> 8.28"
     }
   }
 }
@@ -17,6 +17,7 @@ module "bastion" {
   name             = var.name
 
   client_cidr_block_allow_list = var.client_cidr_block_allow_list
+  allow_world_open_access      = var.allow_world_open_access
   max_session_ttl_in_seconds   = var.max_session_ttl_in_seconds
 
   sessions = var.sessions

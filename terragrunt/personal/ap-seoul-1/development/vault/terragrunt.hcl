@@ -18,5 +18,12 @@ inputs = {
       curve_id        = null
       protection_mode = "SOFTWARE"
     }
+    ca-key = {
+      display_name    = "oci-modules-development-ca-key"
+      algorithm       = "AES"
+      length          = 32
+      curve_id        = null
+      protection_mode = "SOFTWARE"
+    }
   }
 }

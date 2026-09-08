@@ -27,6 +27,14 @@ variable "mysql_systems" {
   }))
   description = "Map of MySQL systems to create. For Always Free, use shape_name='MySQL.Free' and data_storage_size_in_gb=50."
   default     = {}
+  sensitive   = true
+
+  validation {
+    condition = alltrue([
+      for mysql in var.mysql_systems : can(regex("^ocid1\\.subnet\\.oc1\\.", mysql.subnet_id))
+    ])
+    error_message = "Each mysql_systems subnet_id must be a valid OCI subnet OCID."
+  }
 
   validation {
     condition = alltrue([
@@ -40,6 +48,13 @@ variable "mysql_systems" {
       for mysql in var.mysql_systems : mysql.backup_policy.retention_in_days >= 1 && mysql.backup_policy.retention_in_days <= 35
     ])
     error_message = "backup_policy.retention_in_days must be between 1 and 35 days"
+  }
+
+  validation {
+    condition = alltrue([
+      for mysql in var.mysql_systems : length(mysql.admin_password) >= 8 && length(mysql.admin_password) <= 32
+    ])
+    error_message = "Each mysql_systems.admin_password must be 8-32 characters."
   }
 }
 

@@ -22,7 +22,7 @@
 - ✅ Fixed duplicate terraform block definition issue
 
 ### 3. ✅ Provider Version Management
-- ✅ All modules uniformly use `~> 7.30`
+- ✅ All modules uniformly use `~> 8.28`
 - ✅ Terraform Core version requirement: `>= 1.14.2`
 - ✅ Version constraints are reasonable
 

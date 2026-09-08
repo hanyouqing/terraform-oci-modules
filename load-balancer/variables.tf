@@ -51,6 +51,18 @@ variable "shape_details" {
 variable "subnet_ids" {
   type        = list(string)
   description = "List of subnet OCIDs for the load balancer"
+
+  validation {
+    condition = alltrue([
+      for id in var.subnet_ids : can(regex("^ocid1\\.subnet\\.oc1\\.", id))
+    ])
+    error_message = "Each subnet_ids entry must be a valid OCI subnet OCID."
+  }
+
+  validation {
+    condition     = length(var.subnet_ids) >= 1
+    error_message = "subnet_ids must contain at least one subnet OCID."
+  }
 }
 
 variable "nsg_ids" {

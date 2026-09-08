@@ -16,23 +16,26 @@ variable "region" {
 
 variable "buckets" {
   type = map(object({
-    name          = string
-    namespace     = optional(string, null)
-    access_type   = optional(string, "NoPublicAccess")
-    storage_tier  = optional(string, "Standard")
-    versioning    = optional(string, "Enabled")
-    kms_key_id    = optional(string, null)
-    freeform_tags = optional(map(string), {})
-    defined_tags  = optional(map(string), {})
+    name                  = string
+    namespace             = optional(string, null)
+    access_type           = optional(string, "NoPublicAccess")
+    storage_tier          = optional(string, "Standard")
+    versioning            = optional(string, "Enabled")
+    kms_key_id            = optional(string, null)
+    auto_tiering          = optional(string, "Disabled")
+    object_events_enabled = optional(bool, false)
+    metadata              = optional(map(string), {})
+    freeform_tags         = optional(map(string), {})
+    defined_tags          = optional(map(string), {})
   }))
-  description = "Map of buckets to create. name must be alphanumeric with no spaces, max 256 characters. storage_tier can be Standard or Archive."
+  description = "Map of buckets to create. name must be alphanumeric with hyphens/underscores/periods, max 256 characters. storage_tier: Standard or Archive. auto_tiering: Disabled or InfrequentAccess."
   default     = {}
 
   validation {
     condition = alltrue([
-      for b in var.buckets : can(regex("^[a-zA-Z0-9_-]{1,256}$", b.name))
+      for b in var.buckets : can(regex("^[a-zA-Z0-9_.-]{1,256}$", b.name))
     ])
-    error_message = "Each bucket name must be alphanumeric with underscores or dashes, max 256 characters."
+    error_message = "Each bucket name must be alphanumeric with underscores, dashes, or periods, max 256 characters."
   }
 
   validation {
@@ -46,7 +49,21 @@ variable "buckets" {
     condition = alltrue([
       for b in var.buckets : contains(["Enabled", "Disabled"], b.versioning)
     ])
-    error_message = "versioning must be Enabled or Disabled."
+    error_message = "versioning on create must be Enabled or Disabled (Suspended is update-only)."
+  }
+
+  validation {
+    condition = alltrue([
+      for b in var.buckets : contains(["Disabled", "InfrequentAccess"], b.auto_tiering)
+    ])
+    error_message = "auto_tiering must be Disabled or InfrequentAccess."
+  }
+
+  validation {
+    condition = alltrue([
+      for b in var.buckets : contains(["NoPublicAccess", "ObjectRead", "ObjectReadWithoutList"], b.access_type)
+    ])
+    error_message = "access_type must be NoPublicAccess, ObjectRead, or ObjectReadWithoutList."
   }
 }
 

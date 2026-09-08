@@ -5,14 +5,24 @@ This module creates a Virtual Cloud Network (VCN) in Oracle Cloud Infrastructure
 ## Features
 
 - Create VCN with customizable CIDR blocks
-- Create public and private subnets
+- Create public and private subnets (regional when `availability_domain` is empty)
 - Internet Gateway for public subnets
 - NAT Gateway for private subnets (optional)
 - Service Gateway for OCI services (optional)
 - Route tables for public and private subnets
-- Security lists (Locked down by default for security)
+- Security lists (locked down by default; caller supplies ingress rules)
+- Network Security Groups with ingress/egress rules
 - Support for IPv6 (optional)
+- Optional DRG, LPG, and VCN flow logs
 - Comprehensive tagging support
+
+## Examples
+
+| Example | Description |
+|---------|-------------|
+| `examples/basic` | Always Free–friendly public subnet only |
+| `examples/complete` | Full topology with NAT/SGW/NSG options |
+| `examples/edge-public` | Minimal public-edge VCN (IGW + HTTPS ingress + optional SSH CIDRs + NSG) |
 
 ## Usage
 
@@ -53,65 +63,6 @@ module "vcn" {
   environment = "production"
 }
 ```
-
-## Requirements
-
-| Name | Version |
-|------|---------|
-| terraform | >= 1.14.2 |
-| oci | ~> 6.0 |
-
-## Providers
-
-| Name | Version |
-|------|---------|
-| oci | ~> 6.0 |
-
-## Inputs
-
-| Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
-| compartment_id | OCID of the compartment where the VCN will be created | `string` | n/a | yes |
-| tenancy_ocid | OCID of the tenancy | `string` | n/a | yes |
-| vcn_display_name | Display name for the VCN | `string` | `"vcn"` | no |
-| vcn_cidr_blocks | List of CIDR blocks for the VCN | `list(string)` | `["10.0.0.0/16"]` | no |
-| vcn_dns_label | DNS label for the VCN | `string` | `null` | no |
-| enable_ipv6 | Enable IPv6 for the VCN | `bool` | `false` | no |
-| create_internet_gateway | Whether to create an Internet Gateway | `bool` | `true` | no |
-| internet_gateway_display_name | Display name for the Internet Gateway | `string` | `"internet-gateway"` | no |
-| internet_gateway_enabled | Whether the Internet Gateway is enabled | `bool` | `true` | no |
-| create_nat_gateway | Whether to create a NAT Gateway | `bool` | `false` | no |
-| nat_gateway_display_name | Display name for the NAT Gateway | `string` | `"nat-gateway"` | no |
-| nat_gateway_block_traffic | Whether to block traffic on the NAT Gateway | `bool` | `false` | no |
-| create_service_gateway | Whether to create a Service Gateway | `bool` | `false` | no |
-| service_gateway_display_name | Display name for the Service Gateway | `string` | `"service-gateway"` | no |
-| service_gateway_services | List of services for the Service Gateway | `list(object` | `[]` | no |
-| public_subnets | Map of public subnets to create | `map(object` | `{}` | no |
-| private_subnets | Map of private subnets to create | `map(object` | `{}` | no |
-| project | Project name for tagging | `string` | `"oci-modules"` | no |
-| environment | Environment name for tagging | `string` | `"development"` | no |
-| freeform_tags | Freeform tags to apply to all resources | `map(string)` | `{}` | no |
-| defined_tags | Defined tags to apply to all resources | `map(map(string))` | `{}` | no |
-
-## Outputs
-
-| Name | Description |
-|------|-------------|
-| vcn_id | OCID of the VCN |
-| vcn_cidr_blocks | CIDR blocks of the VCN |
-| vcn_display_name | Display name of the VCN |
-| internet_gateway_id | OCID of the Internet Gateway |
-| nat_gateway_id | OCID of the NAT Gateway |
-| service_gateway_id | OCID of the Service Gateway |
-| public_subnet_ids | Map of public subnet IDs |
-| private_subnet_ids | Map of private subnet IDs |
-| public_subnet_cidrs | Map of public subnet CIDR blocks |
-| private_subnet_cidrs | Map of private subnet CIDR blocks |
-| public_route_table_ids | Map of public route table IDs |
-| private_route_table_ids | Map of private route table IDs |
-| public_security_list_ids | Map of public security list IDs |
-| private_security_list_ids | Map of private security list IDs |
-| availability_domains | List of availability domain names |
 
 ## Cost Estimate
 
@@ -166,15 +117,15 @@ See the [examples](../examples/vcn/) directory for complete examples.
 ## Requirements
 
 | Name | Version |
-|------|---------|
+| ---- | ------- |
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.14.2 |
-| <a name="requirement_oci"></a> [oci](#requirement\_oci) | ~> 7.30 |
+| <a name="requirement_oci"></a> [oci](#requirement\_oci) | ~> 8.28 |
 
 ## Providers
 
 | Name | Version |
-|------|---------|
-| <a name="provider_oci"></a> [oci](#provider\_oci) | 7.32.0 |
+| ---- | ------- |
+| <a name="provider_oci"></a> [oci](#provider\_oci) | 8.29.0 |
 
 ## Modules
 
@@ -183,7 +134,7 @@ No modules.
 ## Resources
 
 | Name | Type |
-|------|------|
+| ---- | ---- |
 | [oci_core_drg.this](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/core_drg) | resource |
 | [oci_core_drg_attachment.vcn](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/core_drg_attachment) | resource |
 | [oci_core_drg_route_distribution.this](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/core_drg_route_distribution) | resource |
@@ -196,8 +147,6 @@ No modules.
 | [oci_core_network_security_group_security_rule.ingress](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/core_network_security_group_security_rule) | resource |
 | [oci_core_route_table.private](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/core_route_table) | resource |
 | [oci_core_route_table.public](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/core_route_table) | resource |
-| [oci_core_route_table_attachment.private](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/core_route_table_attachment) | resource |
-| [oci_core_route_table_attachment.public](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/core_route_table_attachment) | resource |
 | [oci_core_security_list.private](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/core_security_list) | resource |
 | [oci_core_security_list.public](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/core_security_list) | resource |
 | [oci_core_service_gateway.this](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/core_service_gateway) | resource |
@@ -206,12 +155,13 @@ No modules.
 | [oci_core_vcn.this](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/core_vcn) | resource |
 | [oci_logging_log.vcn_flow_log](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/logging_log) | resource |
 | [oci_logging_log_group.vcn_flow_logs](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/logging_log_group) | resource |
+| [oci_core_services.sgw_osn](https://registry.terraform.io/providers/oracle/oci/latest/docs/data-sources/core_services) | data source |
 | [oci_identity_availability_domains.ads](https://registry.terraform.io/providers/oracle/oci/latest/docs/data-sources/identity_availability_domains) | data source |
 
 ## Inputs
 
 | Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
+| ---- | ----------- | ---- | ------- | :------: |
 | <a name="input_attach_drg_to_vcn"></a> [attach\_drg\_to\_vcn](#input\_attach\_drg\_to\_vcn) | Whether to attach DRG to VCN | `bool` | `false` | no |
 | <a name="input_compartment_id"></a> [compartment\_id](#input\_compartment\_id) | OCID of the compartment where the VCN will be created | `string` | n/a | yes |
 | <a name="input_create_drg"></a> [create\_drg](#input\_create\_drg) | Whether to create a Dynamic Routing Gateway | `bool` | `false` | no |
@@ -236,13 +186,13 @@ No modules.
 | <a name="input_nsg_ingress_rules"></a> [nsg\_ingress\_rules](#input\_nsg\_ingress\_rules) | Map of NSG ingress rules to create | <pre>map(object({<br/>    nsg_key      = string<br/>    protocol     = string<br/>    description  = optional(string, "")<br/>    source       = string<br/>    source_type  = string<br/>    is_stateless = optional(bool, false)<br/>    tcp_options = optional(object({<br/>      destination_port_min = number<br/>      destination_port_max = number<br/>      source_port_min      = optional(number, null)<br/>      source_port_max      = optional(number, null)<br/>    }), null)<br/>    udp_options = optional(object({<br/>      destination_port_min = number<br/>      destination_port_max = number<br/>      source_port_min      = optional(number, null)<br/>      source_port_max      = optional(number, null)<br/>    }), null)<br/>    icmp_options = optional(object({<br/>      type = number<br/>      code = optional(number, null)<br/>    }), null)<br/>  }))</pre> | `{}` | no |
 | <a name="input_private_subnet_egress_rules"></a> [private\_subnet\_egress\_rules](#input\_private\_subnet\_egress\_rules) | Egress rules for default private subnet security lists. Set to null to use default (allow all outbound) | <pre>list(object({<br/>    protocol         = string<br/>    destination      = string<br/>    destination_type = optional(string, "CIDR_BLOCK")<br/>    description      = optional(string, "")<br/>    tcp_options = optional(object({<br/>      min = number<br/>      max = number<br/>    }), null)<br/>    udp_options = optional(object({<br/>      min = number<br/>      max = number<br/>    }), null)<br/>    icmp_options = optional(object({<br/>      type = number<br/>      code = optional(number, null)<br/>    }), null)<br/>  }))</pre> | `null` | no |
 | <a name="input_private_subnet_ingress_rules"></a> [private\_subnet\_ingress\_rules](#input\_private\_subnet\_ingress\_rules) | Ingress rules for default private subnet security lists. source=null uses first VCN CIDR. Default is empty (locked down). User must provide rules to allow traffic. | <pre>list(object({<br/>    protocol    = string<br/>    source      = optional(string, null)<br/>    source_type = optional(string, "CIDR_BLOCK")<br/>    description = optional(string, "")<br/>    tcp_options = optional(object({<br/>      min = number<br/>      max = number<br/>    }), null)<br/>    udp_options = optional(object({<br/>      min = number<br/>      max = number<br/>    }), null)<br/>    icmp_options = optional(object({<br/>      type = number<br/>      code = optional(number, null)<br/>    }), null)<br/>  }))</pre> | `[]` | no |
-| <a name="input_private_subnets"></a> [private\_subnets](#input\_private\_subnets) | Map of private subnets to create | <pre>map(object({<br/>    cidr_block          = string<br/>    display_name        = string<br/>    dns_label           = optional(string, "")<br/>    availability_domain = string<br/>    security_list_ids   = optional(list(string), null)<br/>  }))</pre> | `{}` | no |
+| <a name="input_private_subnets"></a> [private\_subnets](#input\_private\_subnets) | Map of private subnets to create. Empty availability\_domain creates a regional subnet. | <pre>map(object({<br/>    cidr_block          = string<br/>    display_name        = string<br/>    dns_label           = optional(string, "")<br/>    availability_domain = optional(string, "")<br/>    security_list_ids   = optional(list(string), null)<br/>  }))</pre> | `{}` | no |
 | <a name="input_project"></a> [project](#input\_project) | Project name for tagging | `string` | `"oci-modules"` | no |
 | <a name="input_public_subnet_egress_rules"></a> [public\_subnet\_egress\_rules](#input\_public\_subnet\_egress\_rules) | Egress rules for default public subnet security lists. Set to null to use default (allow all outbound) | <pre>list(object({<br/>    protocol         = string<br/>    destination      = string<br/>    destination_type = optional(string, "CIDR_BLOCK")<br/>    description      = optional(string, "")<br/>    tcp_options = optional(object({<br/>      min = number<br/>      max = number<br/>    }), null)<br/>    udp_options = optional(object({<br/>      min = number<br/>      max = number<br/>    }), null)<br/>    icmp_options = optional(object({<br/>      type = number<br/>      code = optional(number, null)<br/>    }), null)<br/>  }))</pre> | `null` | no |
 | <a name="input_public_subnet_ingress_rules"></a> [public\_subnet\_ingress\_rules](#input\_public\_subnet\_ingress\_rules) | Ingress rules for default public subnet security lists. Default is empty (locked down). User must provide rules to allow traffic. | <pre>list(object({<br/>    protocol    = string<br/>    source      = string<br/>    source_type = optional(string, "CIDR_BLOCK")<br/>    description = optional(string, "")<br/>    tcp_options = optional(object({<br/>      min = number<br/>      max = number<br/>    }), null)<br/>    udp_options = optional(object({<br/>      min = number<br/>      max = number<br/>    }), null)<br/>    icmp_options = optional(object({<br/>      type = number<br/>      code = optional(number, null)<br/>    }), null)<br/>  }))</pre> | `[]` | no |
-| <a name="input_public_subnets"></a> [public\_subnets](#input\_public\_subnets) | Map of public subnets to create | <pre>map(object({<br/>    cidr_block          = string<br/>    display_name        = string<br/>    dns_label           = optional(string, "")<br/>    availability_domain = string<br/>    security_list_ids   = optional(list(string), null)<br/>  }))</pre> | `{}` | no |
+| <a name="input_public_subnets"></a> [public\_subnets](#input\_public\_subnets) | Map of public subnets to create. Empty availability\_domain creates a regional subnet. | <pre>map(object({<br/>    cidr_block          = string<br/>    display_name        = string<br/>    dns_label           = optional(string, "")<br/>    availability_domain = optional(string, "")<br/>    security_list_ids   = optional(list(string), null)<br/>  }))</pre> | `{}` | no |
 | <a name="input_service_gateway_display_name"></a> [service\_gateway\_display\_name](#input\_service\_gateway\_display\_name) | Display name for the Service Gateway | `string` | `"service-gateway"` | no |
-| <a name="input_service_gateway_services"></a> [service\_gateway\_services](#input\_service\_gateway\_services) | List of services for the Service Gateway | <pre>list(object({<br/>    service_id   = string<br/>    service_name = string<br/>    cidr_block   = string<br/>  }))</pre> | `[]` | no |
+| <a name="input_service_gateway_services"></a> [service\_gateway\_services](#input\_service\_gateway\_services) | Services attached to the Service Gateway. If empty and create\_service\_gateway is true, the regional All * Services In Oracle Services Network entry is resolved automatically. | <pre>list(object({<br/>    service_id   = string<br/>    service_name = string<br/>    cidr_block   = string<br/>  }))</pre> | `[]` | no |
 | <a name="input_tenancy_ocid"></a> [tenancy\_ocid](#input\_tenancy\_ocid) | OCID of the tenancy | `string` | n/a | yes |
 | <a name="input_vcn_cidr_blocks"></a> [vcn\_cidr\_blocks](#input\_vcn\_cidr\_blocks) | List of CIDR blocks for the VCN | `list(string)` | <pre>[<br/>  "10.0.0.0/16"<br/>]</pre> | no |
 | <a name="input_vcn_display_name"></a> [vcn\_display\_name](#input\_vcn\_display\_name) | Display name for the VCN | `string` | `"vcn"` | no |
@@ -253,7 +203,7 @@ No modules.
 ## Outputs
 
 | Name | Description |
-|------|-------------|
+| ---- | ----------- |
 | <a name="output_availability_domains"></a> [availability\_domains](#output\_availability\_domains) | List of availability domain names |
 | <a name="output_drg_attachment_id"></a> [drg\_attachment\_id](#output\_drg\_attachment\_id) | OCID of the DRG attachment to VCN |
 | <a name="output_drg_id"></a> [drg\_id](#output\_drg\_id) | OCID of the Dynamic Routing Gateway |

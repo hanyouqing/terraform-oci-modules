@@ -9,10 +9,12 @@ locals {
 }
 
 terraform {
-  source = "git::https://github.com/hanyouqing/terraform-oci-modules.git//credentials"
+  # Prefer local workspace path while developing; pin a git ref for published stacks.
+  source = "${dirname(find_in_parent_folders("root.hcl"))}/../credentials"
 }
 
 inputs = {
+  user_id              = null
   api_keys             = {}
   auth_tokens          = {}
   customer_secret_keys = {}

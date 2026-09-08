@@ -43,7 +43,7 @@ locals {
   env     = local.env_vars.locals.environment
   project = local.env_vars.locals.project
 
-  # Remote state bucket (Object Storage). Same formula as object-storage stack: terraform-${env.hcl project}-tfstate
+  # Remote state bucket (Object Storage). Same formula as object-storage stack: <project>-tfstate
   state_bucket = "${local.project}-tfstate"
 
   # Same OCI API key file as the Terraform oci provider (backend "oci" reads ~/.oci/config by default).
@@ -66,8 +66,8 @@ locals {
 #     root.hcl runs `oci --profile <config_file_profile> os ns get` (needs oci on PATH).
 #   • OCI API key — same ~/.oci/config profile as the provider (config_file_profile in account.hcl).
 #     extra_arguments set OCI_CLI_CONFIG_FILE so backend and provider share one config file.
-#   • Create the state bucket once (Console or oci os bucket create). Name: <project>-<account>-tfstate
-#     (see local.state_bucket). Object Storage permissions: OBJECT_* on that bucket (Oracle doc above).
+#   • Create the state bucket once (Console or oci os bucket create). Name: <project>-tfstate
+#     (see local.state_bucket, e.g. oci-modules-tfstate). Object Storage permissions: OBJECT_* on that bucket.
 #
 # Modules with dependency { } blocks resolve outputs via each dependency's backend; all use this backend.
 #

@@ -3,7 +3,7 @@ terraform {
   required_providers {
     oci = {
       source  = "oracle/oci"
-      version = "~> 7.30"
+      version = "~> 8.28"
     }
   }
 }
@@ -12,6 +12,7 @@ data "oci_identity_availability_domains" "ads" {
   compartment_id = var.tenancy_ocid
 }
 
+# Locked-down basic example: no world-open SSH. HTTPS optional for public demos.
 module "vcn" {
   source = "../../"
 
@@ -32,16 +33,35 @@ module "vcn" {
       cidr_block          = "10.0.1.0/24"
       display_name        = "public-subnet-1"
       dns_label           = "public1"
-      availability_domain = data.oci_identity_availability_domains.ads.availability_domains[0].name
+      availability_domain = ""
       security_list_ids   = null
     }
   }
 
-  public_subnet_ingress_rules = [
-    { protocol = "6", source = "0.0.0.0/0", source_type = "CIDR_BLOCK", description = "Allow SSH from anywhere", tcp_options = { min = 22, max = 22 }, udp_options = null, icmp_options = null },
-    { protocol = "6", source = "0.0.0.0/0", source_type = "CIDR_BLOCK", description = "Allow HTTP from anywhere", tcp_options = { min = 80, max = 80 }, udp_options = null, icmp_options = null },
-    { protocol = "6", source = "0.0.0.0/0", source_type = "CIDR_BLOCK", description = "Allow HTTPS from anywhere", tcp_options = { min = 443, max = 443 }, udp_options = null, icmp_options = null },
-  ]
+  public_subnet_ingress_rules = concat(
+    [
+      {
+        protocol     = "6"
+        source       = "0.0.0.0/0"
+        source_type  = "CIDR_BLOCK"
+        description  = "HTTPS"
+        tcp_options  = { min = 443, max = 443 }
+        udp_options  = null
+        icmp_options = null
+      }
+    ],
+    [
+      for cidr in var.ssh_allow_cidrs : {
+        protocol     = "6"
+        source       = cidr
+        source_type  = "CIDR_BLOCK"
+        description  = "SSH from allowed CIDR"
+        tcp_options  = { min = 22, max = 22 }
+        udp_options  = null
+        icmp_options = null
+      }
+    ]
+  )
 
   private_subnets = {}
 

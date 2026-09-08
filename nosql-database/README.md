@@ -54,63 +54,6 @@ module "nosql_database" {
 }
 ```
 
-## Requirements
-
-| Name | Version |
-|------|---------|
-| terraform | >= 1.14.2 |
-| oci | ~> 7.30 |
-
-## Providers
-
-| Name | Version |
-|------|---------|
-| oci | ~> 7.30 |
-
-## Inputs
-
-| Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
-| compartment_id | OCID of the compartment | `string` | n/a | yes |
-| tables | Map of NoSQL tables to create | `map(object)` | `{}` | no |
-| indexes | Map of secondary indexes to create | `map(object)` | `{}` | no |
-| project | Project name for tagging | `string` | `"oci-modules"` | no |
-| environment | Environment name for tagging | `string` | `"development"` | no |
-| freeform_tags | Freeform tags for all resources | `map(string)` | `{}` | no |
-| defined_tags | Defined tags for all resources | `map(map(string))` | `{}` | no |
-
-### Table Object
-
-| Field | Description | Type | Default |
-|-------|-------------|------|---------|
-| name | Table name | `string` | — |
-| ddl_statement | DDL CREATE TABLE statement | `string` | — |
-| max_read_units | Max sustained read throughput | `number` | `50` |
-| max_write_units | Max sustained write throughput | `number` | `50` |
-| max_storage_in_gbs | Max storage in GB | `number` | `25` |
-| capacity_mode | PROVISIONED or ON_DEMAND | `string` | `"PROVISIONED"` |
-| is_auto_reclaimable | Reclaim after idle period | `bool` | `false` |
-
-### Index Object
-
-| Field | Description | Type | Default |
-|-------|-------------|------|---------|
-| table_key | Key referencing a table in `tables` | `string` | — |
-| name | Index name | `string` | — |
-| is_if_not_exists | Skip if index already exists | `bool` | `true` |
-| keys | List of key columns | `list(object)` | — |
-
-## Outputs
-
-| Name | Description |
-|------|-------------|
-| table_ids | OCIDs of the NoSQL tables |
-| table_names | Names of the NoSQL tables |
-| table_states | Lifecycle states of the tables |
-| table_schemas | Table schemas |
-| table_limits | Read/write units and storage per table |
-| index_ids | Index names and states |
-
 ## Cost Estimate
 
 ### Always Free Tier
@@ -156,15 +99,15 @@ The following NoSQL Database resources are **free** within Always Free tier limi
 ## Requirements
 
 | Name | Version |
-|------|---------|
+| ---- | ------- |
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.14.2 |
-| <a name="requirement_oci"></a> [oci](#requirement\_oci) | ~> 7.30 |
+| <a name="requirement_oci"></a> [oci](#requirement\_oci) | ~> 8.28 |
 
 ## Providers
 
 | Name | Version |
-|------|---------|
-| <a name="provider_oci"></a> [oci](#provider\_oci) | 7.32.0 |
+| ---- | ------- |
+| <a name="provider_oci"></a> [oci](#provider\_oci) | 8.29.0 |
 
 ## Modules
 
@@ -173,14 +116,14 @@ No modules.
 ## Resources
 
 | Name | Type |
-|------|------|
+| ---- | ---- |
 | [oci_nosql_index.this](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/nosql_index) | resource |
 | [oci_nosql_table.this](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/nosql_table) | resource |
 
 ## Inputs
 
 | Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
+| ---- | ----------- | ---- | ------- | :------: |
 | <a name="input_compartment_id"></a> [compartment\_id](#input\_compartment\_id) | OCID of the compartment where NoSQL tables will be created | `string` | n/a | yes |
 | <a name="input_defined_tags"></a> [defined\_tags](#input\_defined\_tags) | Defined tags to apply to all resources | `map(string)` | `{}` | no |
 | <a name="input_environment"></a> [environment](#input\_environment) | Environment name for tagging | `string` | `"development"` | no |
@@ -192,7 +135,7 @@ No modules.
 ## Outputs
 
 | Name | Description |
-|------|-------------|
+| ---- | ----------- |
 | <a name="output_index_ids"></a> [index\_ids](#output\_index\_ids) | Names and states of the NoSQL indexes |
 | <a name="output_table_ids"></a> [table\_ids](#output\_table\_ids) | OCIDs of the NoSQL tables |
 | <a name="output_table_limits"></a> [table\_limits](#output\_table\_limits) | Table limits (read/write units, storage) for each table |

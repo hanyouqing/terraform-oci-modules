@@ -9,12 +9,14 @@ locals {
 }
 
 terraform {
-  source = "git::https://github.com/hanyouqing/terraform-oci-modules.git//network-load-balancer"
+  # Prefer local workspace path while developing; pin a git ref for published stacks.
+  source = "${dirname(find_in_parent_folders("root.hcl"))}/../network-load-balancer"
 }
 
 inputs = {
   display_name = "${local.project}-${local.env}-nlb"
-  is_private   = false
+  # Default private; edge/dev leaves that need a public NLB must set is_private = false.
+  is_private = true
 
   is_preserve_source_destination = false
   is_symmetric_hash_enabled      = false

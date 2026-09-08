@@ -90,6 +90,10 @@ Root root.hcl                                 → provider_tg.tf + backend.tf + 
 - Provider generation (`provider_tg.tf`) with region and OCI profile from `account.hcl`
 - Shared inputs: `project`, `environment`, `compartment_id`, `tenancy_ocid`, `freeform_tags`
 
+`_envcommon/*.hcl` uses **local** `terraform.source` paths (`../<module>`) so workspace edits apply before push. For published stacks, pin a git ref instead, for example:
+
+`source = "git::https://github.com/hanyouqing/terraform-oci-modules.git//compute?ref=vX.Y.Z"`
+
 **Shared inputs (`freeform_tags`)** include `Project`, `Environment`, `Account`, `Region`, and `ManagedBy` for cost attribution and resource discovery.
 
 ## Quick Start
@@ -153,12 +157,12 @@ locals {
 
 Remote state uses Oracle’s **recommended** native backend ([Using Object Storage for State Files](https://docs.oracle.com/en-us/iaas/Content/dev/terraform/object-storage-state.htm), [HashiCorp: `backend "oci"`](https://developer.hashicorp.com/terraform/language/backend/oci)). It requires **Terraform ≥ 1.12** (this repo’s modules use **≥ 1.14.2**). Authentication is the **same OCI API key profile** as the Terraform provider (`config_file_profile` in `account.hcl`, typically `~/.oci/config`). `root.hcl` sets `OCI_CLI_CONFIG_FILE` for Terraform so the backend and provider share one config file (per-account path `~/.oci/<account_name>/config` when `account_name` is not the placeholder; otherwise `~/.oci/config`).
 
-**Create the state bucket once** (name must match `local.state_bucket` in `root.hcl`: `<project>-<account_name>-tfstate`):
+**Create the state bucket once** (name must match `local.state_bucket` in `root.hcl`: `<project>-tfstate`):
 
 ```bash
 oci os bucket create \
   --compartment-id "ocid1.compartment.oc1..xxxx" \
-  --name "oci-modules-personal-tfstate" \
+  --name "oci-modules-tfstate" \
   --versioning Enabled
 ```
 
@@ -176,7 +180,7 @@ Remote state is stored **in** the same Object Storage bucket that the **`object-
 
 The `object-storage` stack can **generate** `import.tf` via a `generate` block in `terragrunt/personal/.../object-storage/terragrunt.hcl` when **`TG_IMPORT_TFSTATE_BUCKET=true`** and **`TF_VAR_namespace`** is set (same namespace the module uses). Otherwise it writes a short comment stub. See also the template comments in [object-storage/import.tf](../object-storage/import.tf) in the module.
 
-1. **Create** the bucket (Console or `oci os bucket create`) using the same name as `local.tfstate_bucket_name` / `local.state_bucket` in `terragrunt.hcl` and [root.hcl](root.hcl) (e.g. `terraform-<project>-tfstate` in this repo).
+1. **Create** the bucket (Console or `oci os bucket create`) using the same name as `local.tfstate_bucket_name` / `local.state_bucket` in `terragrunt.hcl` and [root.hcl](root.hcl) (e.g. `<project>-tfstate` in this repo).
 2. **Export** the Object Storage namespace (required for module inputs and import generation):
    ```bash
    export TF_VAR_namespace="$(oci os ns get --query data --raw-output)"
@@ -213,7 +217,7 @@ export TF_VAR_alert_email="ops@example.com"
 export TF_VAR_sender_email="noreply@yourdomain.com"
 
 # Bastion (restrict to your IP in production)
-export TF_VAR_bastion_allowed_cidr="0.0.0.0/0"
+export TF_VAR_bastion_allowed_cidr="203.0.113.10/32"
 ```
 
 ### 7. Deploy
@@ -371,8 +375,8 @@ terragrunt run-all init --upgrade
 |-------|-----|
 | `No valid credential sources found` | Run `oci setup config` or check `config_file_profile` in `account.hcl` matches `~/.oci/config` |
 | `failed to get object storage namespace` | Verify `namespace` in `account.hcl` matches `oci os ns get` output |
-| `BucketNotFound` / `does not exist in the namespace` on **`terraform init`** | **Namespace:** `TF_VAR_namespace` must be the **Object Storage namespace** from `oci os ns get --query data --raw-output` — not your account name. Wrong namespace → wrong URL and 404. Leave `TF_VAR_namespace` unset (or `REPLACE_ME`) so `root.hcl` runs `oci os ns get`, or set it to the exact CLI value. **Bucket:** create it once: `oci os bucket create --compartment-id <ocid> --name "<project>-<account>-tfstate" --versioning Enabled` (name must match `local.state_bucket` in `root.hcl`). |
-| `Error accessing state bucket` / backend auth failures | Create the bucket (`<project>-<account>-tfstate`), verify `namespace` and `region`, and ensure `~/.oci/config` (or `OCI_CLI_CONFIG_FILE`) has a valid API key profile. IAM must allow Object Storage access on that bucket. |
+| `BucketNotFound` / `does not exist in the namespace` on **`terraform init`** | **Namespace:** `TF_VAR_namespace` must be the **Object Storage namespace** from `oci os ns get --query data --raw-output` — not your account name. Wrong namespace → wrong URL and 404. Leave `TF_VAR_namespace` unset (or `REPLACE_ME`) so `root.hcl` runs `oci os ns get`, or set it to the exact CLI value. **Bucket:** create it once: `oci os bucket create --compartment-id <ocid> --name "<project>-tfstate" --versioning Enabled` (name must match `local.state_bucket` in `root.hcl`). |
+| `Error accessing state bucket` / backend auth failures | Create the bucket (`<project>-tfstate`), verify `namespace` and `region`, and ensure `~/.oci/config` (or `OCI_CLI_CONFIG_FILE`) has a valid API key profile. IAM must allow Object Storage access on that bucket. |
 | `No valid credential sources` (backend) | Same as provider: check `config_file_profile`, `OCI_CLI_CONFIG_FILE`, and file permissions on the API key (`chmod 600`). |
 | `Permissions on ~/.oci/config are too open` | Run `oci setup repair-file-permissions --file ~/.oci/config` (or set `OCI_CLI_SUPPRESS_FILE_PERMISSIONS_WARNING=True` to hide the warning only). |
 | `Backend initialization required` on **`terragrunt init`** (often `terraform output` on `../vcn`) | Dependency mocks now include **`init`** so init does not require the dependency to be initialized first. Or init dependencies first: `cd ../vcn && terragrunt init`, or `terragrunt run-all init` from the env directory. |

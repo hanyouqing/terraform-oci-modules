@@ -15,7 +15,10 @@ Account-level values (`compartment_id`, `tenancy_ocid`, `freeform_tags`) are inj
 
 ## `terraform.source`
 
-Each file uses a **literal** Git module source so configs are copy-paste friendly, e.g. `git::https://github.com/hanyouqing/terraform-oci-modules.git//vcn`. To use a local clone, set `terraform { source = "..." }` in the leaf `terragrunt.hcl` for that stack.
+Each file points at the **local workspace** module path
+(`${dirname(find_in_parent_folders("root.hcl"))}/../<module>`) so edits apply before push.
+For published stacks, pin a git ref instead, e.g.
+`git::https://github.com/hanyouqing/terraform-oci-modules.git//vcn?ref=vX.Y.Z`.
 
 ## `ad_index`
 

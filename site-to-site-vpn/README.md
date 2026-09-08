@@ -65,63 +65,6 @@ module "vcn" {
 # Then reference: drg_id = module.vcn.drg_id
 ```
 
-## Requirements
-
-| Name | Version |
-|------|---------|
-| terraform | >= 1.14.2 |
-| oci | ~> 7.30 |
-
-## Providers
-
-| Name | Version |
-|------|---------|
-| oci | ~> 7.30 |
-
-## Inputs
-
-| Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
-| compartment_id | OCID of the compartment | `string` | n/a | yes |
-| cpes | Map of CPE objects | `map(object)` | `{}` | no |
-| ipsec_connections | Map of IPSec connections | `map(object)` | `{}` | no |
-| project | Project name for tagging | `string` | `"oci-modules"` | no |
-| environment | Environment name for tagging | `string` | `"development"` | no |
-| freeform_tags | Freeform tags for all resources | `map(string)` | `{}` | no |
-| defined_tags | Defined tags for all resources | `map(map(string))` | `{}` | no |
-
-### CPE Object
-
-| Field | Description | Type | Default |
-|-------|-------------|------|---------|
-| display_name | CPE display name | `string` | — |
-| ip_address | Public IP of on-premises VPN device | `string` | — |
-| cpe_device_shape_id | Vendor/model shape ID | `string` | `null` |
-| is_private | Private CPE for FastConnect | `bool` | `false` |
-
-### IPSec Connection Object
-
-| Field | Description | Type | Default |
-|-------|-------------|------|---------|
-| display_name | Connection display name | `string` | — |
-| drg_id | OCID of the DRG | `string` | — |
-| cpe_key | Key in `cpes` variable | `string` | `null` |
-| cpe_id | External CPE OCID (if not using cpe_key) | `string` | `null` |
-| static_routes | On-premises CIDR blocks (1-10) | `list(string)` | — |
-| cpe_local_identifier | CPE local identifier | `string` | `null` |
-| cpe_local_identifier_type | IP_ADDRESS or HOSTNAME | `string` | `null` |
-
-## Outputs
-
-| Name | Description |
-|------|-------------|
-| cpe_ids | OCIDs of the CPE objects |
-| cpe_ip_addresses | IP addresses of the CPE objects |
-| ipsec_connection_ids | OCIDs of the IPSec connections |
-| ipsec_connection_states | States of the connections |
-| tunnel_details | Tunnel IDs, VPN IPs, status, routing for each connection |
-| tunnel_vpn_ips | Oracle VPN endpoint IPs (for CPE configuration) |
-
 ## Tunnel Management
 
 Each IPSec connection automatically creates 2 redundant tunnels. After creation, configure tunnels using `oci_core_ipsec_connection_tunnel_management` for:
@@ -174,15 +117,15 @@ The following Site-to-Site VPN resources are **free** within Always Free tier li
 ## Requirements
 
 | Name | Version |
-|------|---------|
+| ---- | ------- |
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.14.2 |
-| <a name="requirement_oci"></a> [oci](#requirement\_oci) | ~> 7.30 |
+| <a name="requirement_oci"></a> [oci](#requirement\_oci) | ~> 8.28 |
 
 ## Providers
 
 | Name | Version |
-|------|---------|
-| <a name="provider_oci"></a> [oci](#provider\_oci) | 7.32.0 |
+| ---- | ------- |
+| <a name="provider_oci"></a> [oci](#provider\_oci) | 8.29.0 |
 
 ## Modules
 
@@ -191,7 +134,7 @@ No modules.
 ## Resources
 
 | Name | Type |
-|------|------|
+| ---- | ---- |
 | [oci_core_cpe.this](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/core_cpe) | resource |
 | [oci_core_ipsec.this](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/core_ipsec) | resource |
 | [oci_core_ipsec_connection_tunnels.this](https://registry.terraform.io/providers/oracle/oci/latest/docs/data-sources/core_ipsec_connection_tunnels) | data source |
@@ -199,7 +142,7 @@ No modules.
 ## Inputs
 
 | Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
+| ---- | ----------- | ---- | ------- | :------: |
 | <a name="input_compartment_id"></a> [compartment\_id](#input\_compartment\_id) | OCID of the compartment where VPN resources will be created | `string` | n/a | yes |
 | <a name="input_cpes"></a> [cpes](#input\_cpes) | Map of Customer-Premises Equipment (CPE) objects representing on-premises VPN devices. | <pre>map(object({<br/>    display_name        = string<br/>    ip_address          = string<br/>    cpe_device_shape_id = optional(string, null)<br/>    is_private          = optional(bool, false)<br/>    freeform_tags       = optional(map(string), {})<br/>    defined_tags        = optional(map(string), {})<br/>  }))</pre> | `{}` | no |
 | <a name="input_defined_tags"></a> [defined\_tags](#input\_defined\_tags) | Defined tags to apply to all resources | `map(string)` | `{}` | no |
@@ -211,7 +154,7 @@ No modules.
 ## Outputs
 
 | Name | Description |
-|------|-------------|
+| ---- | ----------- |
 | <a name="output_cpe_ids"></a> [cpe\_ids](#output\_cpe\_ids) | OCIDs of the Customer-Premises Equipment objects |
 | <a name="output_cpe_ip_addresses"></a> [cpe\_ip\_addresses](#output\_cpe\_ip\_addresses) | IP addresses of the CPE objects |
 | <a name="output_ipsec_connection_ids"></a> [ipsec\_connection\_ids](#output\_ipsec\_connection\_ids) | OCIDs of the IPSec connections |

@@ -9,6 +9,10 @@ include "envcommon" {
   merge_strategy = "deep"
 }
 
+locals {
+  alert_email = trimspace(get_env("TF_VAR_alert_email", ""))
+}
+
 inputs = {
   topics = {
     alerts-topic = {
@@ -17,11 +21,12 @@ inputs = {
     }
   }
 
-  subscriptions = {
+  # Fail-closed: no subscription until TF_VAR_alert_email is set.
+  subscriptions = local.alert_email != "" ? {
     email-sub = {
       topic_key = "alerts-topic"
       protocol  = "EMAIL"
-      endpoint  = get_env("TF_VAR_alert_email", "admin@example.com")
+      endpoint  = local.alert_email
     }
-  }
+  } : {}
 }

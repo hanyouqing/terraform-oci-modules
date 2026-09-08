@@ -49,6 +49,13 @@ variable "ipsec_connections" {
 
   validation {
     condition = alltrue([
+      for conn in var.ipsec_connections : can(regex("^ocid1\\.drg\\.oc1\\.", conn.drg_id))
+    ])
+    error_message = "Each ipsec_connections drg_id must be a valid OCI DRG OCID."
+  }
+
+  validation {
+    condition = alltrue([
       for conn in var.ipsec_connections : conn.cpe_key != null || conn.cpe_id != null
     ])
     error_message = "Each IPSec connection must have either cpe_key (referencing a key in cpes) or cpe_id (external CPE OCID)."
@@ -68,6 +75,13 @@ variable "ipsec_connections" {
       ])
     ])
     error_message = "All static_routes must be valid CIDR blocks (e.g., 10.0.0.0/16)."
+  }
+
+  validation {
+    condition = alltrue([
+      for conn in var.ipsec_connections : conn.cpe_id == null || can(regex("^ocid1\\.cpe\\.oc1\\.", conn.cpe_id))
+    ])
+    error_message = "cpe_id must be a valid OCI CPE OCID when set."
   }
 
   validation {

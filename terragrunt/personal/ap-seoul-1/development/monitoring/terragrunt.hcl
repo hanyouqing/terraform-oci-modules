@@ -18,12 +18,16 @@ dependency "notifications" {
   }
 }
 
+locals {
+  metric_compartment_id = include.root.locals.compartment_id
+}
+
 inputs = {
   alarms = {
     high-cpu-alarm = {
       display_name          = "oci-modules-development-high-cpu"
       is_enabled            = true
-      metric_compartment_id = get_env("TF_VAR_compartment_id", "")
+      metric_compartment_id = local.metric_compartment_id
       namespace             = "oci_computeagent"
       query                 = "CpuUtilization[1m].mean() > 80"
       severity              = "WARNING"

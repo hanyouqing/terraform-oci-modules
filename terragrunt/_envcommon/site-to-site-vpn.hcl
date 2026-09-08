@@ -9,7 +9,8 @@ locals {
 }
 
 terraform {
-  source = "git::https://github.com/hanyouqing/terraform-oci-modules.git//site-to-site-vpn"
+  # Prefer local workspace path while developing; pin a git ref for published stacks.
+  source = "${dirname(find_in_parent_folders("root.hcl"))}/../site-to-site-vpn"
 }
 
 inputs = {

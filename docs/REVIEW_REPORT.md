@@ -1,7 +1,7 @@
 # Terraform OCI Modules Review Report
 
 ## Review Date
-December 2024
+September 2026 (provider ~> 8.28 modernization)
 
 ## Review Scope
 Comprehensive review of all 13 modules to ensure:
@@ -14,12 +14,12 @@ Comprehensive review of all 13 modules to ensure:
 ## I. Provider Version Check
 
 ### ✅ Current Status
-- **All modules uniformly use**: `~> 7.30`
+- **All modules uniformly use**: `~> 8.28`
 - **Terraform Core version requirement**: `>= 1.14.2`
 - **Version constraint strategy**: Using `~>` allows patch and minor updates, avoiding breaking changes
 
 ### ✅ Assessment Results
-- **Version constraints are reasonable**: `~> 7.30` allows all versions of 7.30.x, but not 8.0.0, avoiding major version breaking changes
+- **Version constraints are reasonable**: `~> 8.28` allows 8.28.x and newer 8.x patch/minor releases, but not 9.0.0
 - **Good consistency**: All modules and examples use the same version constraints
 - **Recommendation**: Regularly check Terraform Registry to confirm if there are newer stable versions
 

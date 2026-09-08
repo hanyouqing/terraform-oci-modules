@@ -16,6 +16,7 @@ output "bucket_uris" {
 output "preauth_request_uris" {
   description = "URIs of the pre-authenticated requests"
   value       = { for k, v in oci_objectstorage_preauthrequest.this : k => v.full_path }
+  sensitive   = true
 }
 
 output "namespace" {

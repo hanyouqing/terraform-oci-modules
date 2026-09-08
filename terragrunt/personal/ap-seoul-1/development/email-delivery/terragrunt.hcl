@@ -9,10 +9,14 @@ include "envcommon" {
   merge_strategy = "deep"
 }
 
+locals {
+  sender_email = trimspace(get_env("TF_VAR_sender_email", ""))
+}
+
 inputs = {
-  senders = {
+  senders = local.sender_email != "" ? {
     noreply = {
-      email_address = get_env("TF_VAR_sender_email", "noreply@example.com")
+      email_address = local.sender_email
     }
-  }
+  } : {}
 }

@@ -7,8 +7,11 @@ This module creates and manages Object Storage buckets in Oracle Cloud Infrastru
 - Create multiple buckets with different storage tiers
 - Lifecycle policy management
 - Pre-authenticated request support
-- Versioning support
+- Versioning support (`Enabled` / `Disabled` on create; `Suspended` is update-only via Console/API)
 - Access type configuration
+- Auto-tiering (`Disabled` / `InfrequentAccess`)
+- Object events emission toggle
+- User-defined metadata
 - Comprehensive tagging support
 
 ## Always Free Limits
@@ -16,6 +19,14 @@ This module creates and manages Object Storage buckets in Oracle Cloud Infrastru
 - **Total Storage**: 20 GB (free tier accounts)
 - **API Requests**: 50,000 requests per month
 - **Storage Tiers**: Standard, Infrequent Access, Archive
+
+## Examples
+
+| Example | Description |
+|---------|-------------|
+| `examples/basic` | Private app bucket |
+| `examples/complete` | Multi-bucket with lifecycle / PAR |
+| `examples/tfstate-bucket` | Versioned private bucket for Terraform `backend "oci"` |
 
 ## Usage
 
@@ -42,37 +53,6 @@ module "object_storage" {
   environment = "production"
 }
 ```
-
-## Requirements
-
-| Name | Version |
-|------|---------|
-| terraform | >= 1.14.2 |
-| oci | ~> 6.0 |
-
-## Providers
-
-| Name | Version |
-|------|---------|
-| oci | ~> 6.0 |
-
-## Inputs
-
-| Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
-| compartment_id | OCID of the compartment where the buckets will be created | `string` | n/a | yes |
-| region | OCI region for bucket URIs | `string` | `""` | no |
-| buckets | Map of buckets to create | `map(object)` | `{}` | no |
-| lifecycle_policies | Map of lifecycle policies to create | `map(object)` | `{}` | no |
-
-## Outputs
-
-| Name | Description |
-|------|-------------|
-| bucket_names | Names of the buckets |
-| bucket_namespaces | Namespaces of the buckets |
-| bucket_uris | URIs of the buckets |
-| namespace | Object Storage namespace |
 
 ## Cost Estimate
 
@@ -131,15 +111,15 @@ See the [examples](../examples/object-storage/) directory for complete examples.
 ## Requirements
 
 | Name | Version |
-|------|---------|
+| ---- | ------- |
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.14.2 |
-| <a name="requirement_oci"></a> [oci](#requirement\_oci) | ~> 7.30 |
+| <a name="requirement_oci"></a> [oci](#requirement\_oci) | ~> 8.28 |
 
 ## Providers
 
 | Name | Version |
-|------|---------|
-| <a name="provider_oci"></a> [oci](#provider\_oci) | 7.32.0 |
+| ---- | ------- |
+| <a name="provider_oci"></a> [oci](#provider\_oci) | 8.29.0 |
 
 ## Modules
 
@@ -148,7 +128,7 @@ No modules.
 ## Resources
 
 | Name | Type |
-|------|------|
+| ---- | ---- |
 | [oci_objectstorage_bucket.this](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/objectstorage_bucket) | resource |
 | [oci_objectstorage_object_lifecycle_policy.this](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/objectstorage_object_lifecycle_policy) | resource |
 | [oci_objectstorage_preauthrequest.this](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/objectstorage_preauthrequest) | resource |
@@ -157,8 +137,8 @@ No modules.
 ## Inputs
 
 | Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
-| <a name="input_buckets"></a> [buckets](#input\_buckets) | Map of buckets to create. name must be alphanumeric with no spaces, max 256 characters. storage\_tier can be Standard or Archive. | <pre>map(object({<br/>    name          = string<br/>    namespace     = optional(string, null)<br/>    access_type   = optional(string, "NoPublicAccess")<br/>    storage_tier  = optional(string, "Standard")<br/>    versioning    = optional(string, "Enabled")<br/>    kms_key_id    = optional(string, null)<br/>    freeform_tags = optional(map(string), {})<br/>    defined_tags  = optional(map(string), {})<br/>  }))</pre> | `{}` | no |
+| ---- | ----------- | ---- | ------- | :------: |
+| <a name="input_buckets"></a> [buckets](#input\_buckets) | Map of buckets to create. name must be alphanumeric with hyphens/underscores/periods, max 256 characters. storage\_tier: Standard or Archive. auto\_tiering: Disabled or InfrequentAccess. | <pre>map(object({<br/>    name                  = string<br/>    namespace             = optional(string, null)<br/>    access_type           = optional(string, "NoPublicAccess")<br/>    storage_tier          = optional(string, "Standard")<br/>    versioning            = optional(string, "Enabled")<br/>    kms_key_id            = optional(string, null)<br/>    auto_tiering          = optional(string, "Disabled")<br/>    object_events_enabled = optional(bool, false)<br/>    metadata              = optional(map(string), {})<br/>    freeform_tags         = optional(map(string), {})<br/>    defined_tags          = optional(map(string), {})<br/>  }))</pre> | `{}` | no |
 | <a name="input_compartment_id"></a> [compartment\_id](#input\_compartment\_id) | OCID of the compartment where the buckets will be created | `string` | n/a | yes |
 | <a name="input_defined_tags"></a> [defined\_tags](#input\_defined\_tags) | Defined tags to apply to all resources | `map(string)` | `{}` | no |
 | <a name="input_environment"></a> [environment](#input\_environment) | Environment name for tagging | `string` | `"development"` | no |
@@ -171,7 +151,7 @@ No modules.
 ## Outputs
 
 | Name | Description |
-|------|-------------|
+| ---- | ----------- |
 | <a name="output_bucket_names"></a> [bucket\_names](#output\_bucket\_names) | Names of the buckets |
 | <a name="output_bucket_namespaces"></a> [bucket\_namespaces](#output\_bucket\_namespaces) | Namespaces of the buckets |
 | <a name="output_bucket_uris"></a> [bucket\_uris](#output\_bucket\_uris) | URIs of the buckets (format: https://objectstorage.<region>.oraclecloud.com/n/<namespace>/b/<name>/o) |

@@ -22,8 +22,14 @@ variable "name" {
 
 variable "client_cidr_block_allow_list" {
   type        = list(string)
-  description = "Client CIDR block allow list"
-  default     = ["0.0.0.0/0"]
+  description = "Client CIDR block allow list (admin IP/32). Do not default to 0.0.0.0/0."
+  default     = ["203.0.113.10/32"]
+}
+
+variable "allow_world_open_access" {
+  type        = bool
+  description = "Lab override to allow 0.0.0.0/0"
+  default     = false
 }
 
 variable "max_session_ttl_in_seconds" {

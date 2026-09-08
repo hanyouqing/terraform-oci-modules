@@ -37,16 +37,16 @@ resource "oci_kms_key" "this" {
 }
 
 resource "oci_vault_secret" "this" {
-  for_each = var.secrets
+  for_each = toset(nonsensitive(keys(var.secrets)))
 
   compartment_id = var.compartment_id
   secret_content {
-    content      = each.value.secret_content
-    content_type = each.value.content_type
+    content      = var.secrets[each.key].secret_content
+    content_type = var.secrets[each.key].content_type
   }
   vault_id    = oci_kms_vault.this.id
-  secret_name = each.value.secret_name
-  key_id      = each.value.key_id
+  secret_name = var.secrets[each.key].secret_name
+  key_id      = var.secrets[each.key].key_id
 
   freeform_tags = merge(
     var.freeform_tags,

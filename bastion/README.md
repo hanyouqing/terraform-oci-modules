@@ -24,7 +24,7 @@ module "bastion" {
   bastion_type      = "STANDARD"
   name              = "my-bastion"
 
-  client_cidr_block_allow_list = ["0.0.0.0/0"]
+  client_cidr_block_allow_list = ["203.0.113.10/32"]
 
   sessions = {
     session-1 = {
@@ -43,13 +43,6 @@ module "bastion" {
   environment = "production"
 }
 ```
-
-## Requirements
-
-| Name | Version |
-|------|---------|
-| terraform | >= 1.14.2 |
-| oci | ~> 6.0 |
 
 ## Cost Estimate
 
@@ -94,15 +87,15 @@ See the [examples](../examples/bastion/) directory for complete examples.
 ## Requirements
 
 | Name | Version |
-|------|---------|
+| ---- | ------- |
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.14.2 |
-| <a name="requirement_oci"></a> [oci](#requirement\_oci) | ~> 7.30 |
+| <a name="requirement_oci"></a> [oci](#requirement\_oci) | ~> 8.28 |
 
 ## Providers
 
 | Name | Version |
-|------|---------|
-| <a name="provider_oci"></a> [oci](#provider\_oci) | 7.32.0 |
+| ---- | ------- |
+| <a name="provider_oci"></a> [oci](#provider\_oci) | 8.29.0 |
 
 ## Modules
 
@@ -111,16 +104,17 @@ No modules.
 ## Resources
 
 | Name | Type |
-|------|------|
+| ---- | ---- |
 | [oci_bastion_bastion.this](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/bastion_bastion) | resource |
 | [oci_bastion_session.this](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/bastion_session) | resource |
 
 ## Inputs
 
 | Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
+| ---- | ----------- | ---- | ------- | :------: |
+| <a name="input_allow_world_open_access"></a> [allow\_world\_open\_access](#input\_allow\_world\_open\_access) | Set true only for short-lived labs to allow 0.0.0.0/0 in client\_cidr\_block\_allow\_list. Production must keep this false. | `bool` | `false` | no |
 | <a name="input_bastion_type"></a> [bastion\_type](#input\_bastion\_type) | Type of bastion: STANDARD or SESSION | `string` | `"STANDARD"` | no |
-| <a name="input_client_cidr_block_allow_list"></a> [client\_cidr\_block\_allow\_list](#input\_client\_cidr\_block\_allow\_list) | List of CIDR blocks allowed to connect to the bastion. Recommended to restrict to your own public IP (e.g., ['1.2.3.4/32']). | `list(string)` | `[]` | no |
+| <a name="input_client_cidr_block_allow_list"></a> [client\_cidr\_block\_allow\_list](#input\_client\_cidr\_block\_allow\_list) | CIDR blocks allowed to connect to the bastion. Must not use 0.0.0.0/0 unless allow\_world\_open\_access is true. Example: ['203.0.113.10/32']. | `list(string)` | `[]` | no |
 | <a name="input_compartment_id"></a> [compartment\_id](#input\_compartment\_id) | OCID of the compartment where the bastion will be created | `string` | n/a | yes |
 | <a name="input_defined_tags"></a> [defined\_tags](#input\_defined\_tags) | Defined tags to apply to all resources (OCI provider expects map(string) for this resource) | `map(string)` | `{}` | no |
 | <a name="input_environment"></a> [environment](#input\_environment) | Environment name for tagging | `string` | `"development"` | no |
@@ -134,7 +128,7 @@ No modules.
 ## Outputs
 
 | Name | Description |
-|------|-------------|
+| ---- | ----------- |
 | <a name="output_bastion_id"></a> [bastion\_id](#output\_bastion\_id) | OCID of the bastion |
 | <a name="output_bastion_name"></a> [bastion\_name](#output\_bastion\_name) | Name of the bastion |
 | <a name="output_session_ids"></a> [session\_ids](#output\_session\_ids) | OCIDs of the bastion sessions |

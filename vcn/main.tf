@@ -117,8 +117,9 @@ resource "oci_core_subnet" "public" {
   cidr_block                 = each.value.cidr_block
   display_name               = each.value.display_name
   dns_label                  = each.value.dns_label != "" ? each.value.dns_label : null
-  availability_domain        = each.value.availability_domain
+  availability_domain        = each.value.availability_domain != "" ? each.value.availability_domain : null
   prohibit_public_ip_on_vnic = false
+  route_table_id             = oci_core_route_table.public[each.key].id
   security_list_ids          = each.value.security_list_ids != null ? each.value.security_list_ids : [oci_core_security_list.public[each.key].id]
 
   freeform_tags = merge(
@@ -141,8 +142,9 @@ resource "oci_core_subnet" "private" {
   cidr_block                 = each.value.cidr_block
   display_name               = each.value.display_name
   dns_label                  = each.value.dns_label != "" ? each.value.dns_label : null
-  availability_domain        = each.value.availability_domain
+  availability_domain        = each.value.availability_domain != "" ? each.value.availability_domain : null
   prohibit_public_ip_on_vnic = true
+  route_table_id             = oci_core_route_table.private[each.key].id
   security_list_ids          = each.value.security_list_ids != null ? each.value.security_list_ids : [oci_core_security_list.private[each.key].id]
 
   freeform_tags = merge(
@@ -214,20 +216,6 @@ resource "oci_core_route_table" "private" {
       "Module"    = "github.com/hanyouqing/terraform-oci-modules/vcn/route-table/private"
     }
   )
-}
-
-resource "oci_core_route_table_attachment" "public" {
-  for_each = var.public_subnets
-
-  subnet_id      = oci_core_subnet.public[each.key].id
-  route_table_id = oci_core_route_table.public[each.key].id
-}
-
-resource "oci_core_route_table_attachment" "private" {
-  for_each = var.private_subnets
-
-  subnet_id      = oci_core_subnet.private[each.key].id
-  route_table_id = oci_core_route_table.private[each.key].id
 }
 
 locals {

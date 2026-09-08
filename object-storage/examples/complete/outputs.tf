@@ -16,6 +16,7 @@ output "bucket_uris" {
 output "preauth_request_uris" {
   description = "Pre-authenticated request URIs"
   value       = module.object_storage.preauth_request_uris
+  sensitive   = true
 }
 
 output "namespace" {

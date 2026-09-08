@@ -31,6 +31,7 @@ variable "databases" {
   }))
   description = "Map of Autonomous Databases to create. For Always Free, is_free_tier=true, cpu_core_count=1, data_storage_size_in_tbs=1."
   default     = {}
+  sensitive   = true
 
   validation {
     condition = alltrue([
@@ -52,6 +53,19 @@ variable "databases" {
     ])
     error_message = "license_model must be either 'LICENSE_INCLUDED' or 'BRING_YOUR_OWN_LICENSE'"
   }
+
+  validation {
+    condition = alltrue([
+      for db in var.databases : length(db.admin_password) >= 12 && length(db.admin_password) <= 30
+    ])
+    error_message = "Each databases.admin_password must be 12-30 characters (OCI Autonomous Database requirement)."
+  }
+}
+
+variable "allow_world_open_access" {
+  type        = bool
+  description = "Set true only for short-lived labs to allow 0.0.0.0/0 in whitelisted_ips. Production must keep this false."
+  default     = false
 }
 
 variable "project" {

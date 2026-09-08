@@ -9,20 +9,31 @@ include "envcommon" {
   merge_strategy = "deep"
 }
 
-# Override subnet ADs with a data source call isn't possible in terragrunt inputs,
-# so we use a placeholder — the module will use the first AD when availability_domain
-# is passed as an empty string and the resource ignores empty strings.
-# For production use, set real AD names here or pass via TF_VAR_*
+# Development edge profile: single public subnet + IGW only (no NAT/SGW/private).
 inputs = {
+  create_nat_gateway     = false
+  create_service_gateway = false
+
+  private_subnets = {}
+
   public_subnets = {
     public-1 = {
+      cidr_block          = "10.0.1.0/24"
+      display_name        = "public-1"
+      dns_label           = "public1"
       availability_domain = get_env("TF_VAR_availability_domain", "")
     }
   }
 
-  private_subnets = {
-    private-1 = {
-      availability_domain = get_env("TF_VAR_availability_domain", "")
+  public_subnet_ingress_rules = [
+    {
+      protocol     = "6"
+      source       = "0.0.0.0/0"
+      source_type  = "CIDR_BLOCK"
+      description  = "HTTPS"
+      tcp_options  = { min = 443, max = 443 }
+      udp_options  = null
+      icmp_options = null
     }
-  }
+  ]
 }

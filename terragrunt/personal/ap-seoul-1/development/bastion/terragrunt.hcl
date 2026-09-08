@@ -15,10 +15,11 @@ dependency "vcn" {
   mock_outputs_allowed_terraform_commands = ["validate", "plan", "init"]
   mock_outputs = {
     private_subnet_ids = { "private-1" = "ocid1.subnet.oc1..mock" }
+    public_subnet_ids  = { "public-1" = "ocid1.subnet.oc1..mock" }
   }
 }
 
+# CIDR from _envcommon / TF_VAR_bastion_allowed_cidr.
 inputs = {
-  target_subnet_id             = dependency.vcn.outputs.private_subnet_ids["private-1"]
-  client_cidr_block_allow_list = [get_env("TF_VAR_bastion_allowed_cidr", "0.0.0.0/0")]
+  target_subnet_id = dependency.vcn.outputs.private_subnet_ids["private-1"]
 }

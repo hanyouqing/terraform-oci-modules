@@ -8,13 +8,17 @@ resource "oci_objectstorage_bucket" "this" {
   compartment_id = var.compartment_id
   # Prefer explicit namespace when set; otherwise tenancy namespace. Trim avoids empty-string edge cases.
   namespace = length(trimspace(try(each.value.namespace, ""))) > 0 ? trimspace(each.value.namespace) : data.oci_objectstorage_namespace.this.namespace
-  name = each.value.name
+  name      = each.value.name
 
   depends_on = [data.oci_objectstorage_namespace.this]
-  access_type    = each.value.access_type
-  storage_tier   = each.value.storage_tier
-  versioning     = each.value.versioning
-  kms_key_id     = each.value.kms_key_id
+
+  access_type           = each.value.access_type
+  storage_tier          = each.value.storage_tier
+  versioning            = each.value.versioning
+  kms_key_id            = each.value.kms_key_id
+  auto_tiering          = each.value.auto_tiering
+  object_events_enabled = each.value.object_events_enabled
+  metadata              = length(each.value.metadata) > 0 ? each.value.metadata : null
 
   freeform_tags = merge(
     {

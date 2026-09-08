@@ -9,12 +9,17 @@ include "envcommon" {
   merge_strategy = "deep"
 }
 
-# Development: create an auth token for dev automation
+locals {
+  user_ocid = trimspace(get_env("TF_VAR_user_ocid", ""))
+}
+
+# Development: empty until TF_VAR_user_ocid is set (no placeholder OCIDs).
 inputs = {
-  auth_tokens = {
+  user_id = local.user_ocid != "" ? local.user_ocid : null
+
+  auth_tokens = local.user_ocid != "" ? {
     dev-automation = {
-      user_id     = "ocid1.user.oc1..example"
       description = "Auth token for development automation"
     }
-  }
+  } : {}
 }

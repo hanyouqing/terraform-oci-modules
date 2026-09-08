@@ -82,15 +82,15 @@ module "credentials" {
 ## Requirements
 
 | Name | Version |
-|------|---------|
+| ---- | ------- |
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.14.2 |
-| <a name="requirement_oci"></a> [oci](#requirement\_oci) | ~> 7.30 |
+| <a name="requirement_oci"></a> [oci](#requirement\_oci) | ~> 8.28 |
 
 ## Providers
 
 | Name | Version |
-|------|---------|
-| <a name="provider_oci"></a> [oci](#provider\_oci) | 7.32.0 |
+| ---- | ------- |
+| <a name="provider_oci"></a> [oci](#provider\_oci) | 8.29.0 |
 
 ## Modules
 
@@ -99,7 +99,7 @@ No modules.
 ## Resources
 
 | Name | Type |
-|------|------|
+| ---- | ---- |
 | [oci_identity_api_key.this](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/identity_api_key) | resource |
 | [oci_identity_auth_token.this](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/identity_auth_token) | resource |
 | [oci_identity_customer_secret_key.this](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/identity_customer_secret_key) | resource |
@@ -108,8 +108,8 @@ No modules.
 ## Inputs
 
 | Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
-| <a name="input_api_keys"></a> [api\_keys](#input\_api\_keys) | Map of API signing keys to create. Each key requires a PEM-encoded RSA public key. | <pre>map(object({<br/>    key_value = string<br/>  }))</pre> | `{}` | no |
+| ---- | ----------- | ---- | ------- | :------: |
+| <a name="input_api_keys"></a> [api\_keys](#input\_api\_keys) | Map of API signing keys to create. Each key requires a PEM-encoded RSA public key. Treat key material as secret; avoid logging terraform plans that include these values. | <pre>map(object({<br/>    key_value = string<br/>  }))</pre> | `{}` | no |
 | <a name="input_auth_tokens"></a> [auth\_tokens](#input\_auth\_tokens) | Map of auth tokens to create. Auth tokens are Oracle-compatible authentication tokens for services like Swift and HDFS. | <pre>map(object({<br/>    description = string<br/>  }))</pre> | `{}` | no |
 | <a name="input_customer_secret_keys"></a> [customer\_secret\_keys](#input\_customer\_secret\_keys) | Map of customer secret keys to create. Used for Amazon S3-compatible API access to Object Storage. | <pre>map(object({<br/>    display_name = string<br/>  }))</pre> | `{}` | no |
 | <a name="input_defined_tags"></a> [defined\_tags](#input\_defined\_tags) | Defined tags to apply to all resources (where supported) | `map(string)` | `{}` | no |
@@ -122,7 +122,7 @@ No modules.
 ## Outputs
 
 | Name | Description |
-|------|-------------|
+| ---- | ----------- |
 | <a name="output_api_key_fingerprints"></a> [api\_key\_fingerprints](#output\_api\_key\_fingerprints) | Map of API key fingerprints. |
 | <a name="output_api_key_ids"></a> [api\_key\_ids](#output\_api\_key\_ids) | Map of API key identifiers. |
 | <a name="output_auth_token_ids"></a> [auth\_token\_ids](#output\_auth\_token\_ids) | Map of auth token identifiers. |

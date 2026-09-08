@@ -8,13 +8,22 @@ resource "oci_bastion_bastion" "this" {
 
   freeform_tags = merge(
     {
-      "ManagedBy" = "terraform"
-      "Module"    = "github.com/hanyouqing/terraform-oci-modules/bastion"
+      "ManagedBy"   = "terraform"
+      "Module"      = "github.com/hanyouqing/terraform-oci-modules/bastion"
+      "Project"     = var.project
+      "Environment" = var.environment
     },
     var.freeform_tags
   )
 
   defined_tags = var.defined_tags
+
+  lifecycle {
+    precondition {
+      condition     = var.allow_world_open_access || !contains(var.client_cidr_block_allow_list, "0.0.0.0/0")
+      error_message = "Bastion client_cidr_block_allow_list must not include 0.0.0.0/0 unless allow_world_open_access=true."
+    }
+  }
 }
 
 resource "oci_bastion_session" "this" {
@@ -32,5 +41,6 @@ resource "oci_bastion_session" "this" {
     target_resource_port                       = each.value.target_resource_port
     target_resource_private_ip_address         = each.value.target_resource_private_ip_address
   }
+  # oci_bastion_session does not support freeform_tags/defined_tags
   session_ttl_in_seconds = each.value.session_ttl_in_seconds
 }

@@ -115,7 +115,7 @@ output "zzz_reminders" {
       "Verify NAT Gateway: ${var.create_nat_gateway ? "oci network nat-gateway get --nat-gateway-id ${oci_core_nat_gateway.this[0].id}" : "Not created"}"
     ]
     security_notes = [
-      "Default security lists allow all traffic - restrict as needed",
+      "Default security lists are locked down (no ingress) until you pass public_subnet_ingress_rules / private_subnet_ingress_rules",
       "Use NSGs for fine-grained network security (recommended)",
       "Private subnets should not have direct internet access (use NAT Gateway)",
       "Review and restrict security list rules to minimum required"

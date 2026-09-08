@@ -65,6 +65,7 @@ variable "secrets" {
   }))
   description = "Map of secrets to create (secret_name maps to oci_vault_secret.secret_name)"
   default     = {}
+  sensitive   = true
 
   validation {
     condition = alltrue([

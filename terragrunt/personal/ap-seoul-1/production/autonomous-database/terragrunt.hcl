@@ -9,7 +9,14 @@ include "envcommon" {
   merge_strategy = "deep"
 }
 
+locals {
+  # Always Free ADB cannot use private endpoints; require a tight ACL.
+  adb_cidr = trimspace(get_env("TF_VAR_adb_allowed_cidr", ""))
+}
+
 inputs = {
+  allow_world_open_access = false
+
   databases = {
     adb-prod = {
       db_name                                        = "proddb"
@@ -27,7 +34,7 @@ inputs = {
       nsg_ids                                        = []
       private_endpoint_label                         = null
       subnet_id                                      = null
-      whitelisted_ips                                = ["0.0.0.0/0"]
+      whitelisted_ips                                = local.adb_cidr != "" ? [local.adb_cidr] : []
     }
   }
 }

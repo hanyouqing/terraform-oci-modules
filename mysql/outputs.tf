@@ -6,6 +6,7 @@ output "mysql_system_ids" {
 output "mysql_endpoints" {
   description = "Endpoints of the MySQL systems"
   value       = { for k, v in oci_mysql_mysql_db_system.this : k => v.endpoints }
+  sensitive   = true
 }
 
 output "zzz_reminders" {
@@ -41,10 +42,5 @@ output "zzz_reminders" {
       data_storage_gb = length(oci_mysql_mysql_db_system.this) > 0 ? values(oci_mysql_mysql_db_system.this)[0].data_storage_size_in_gb : 0
       mysql_version   = length(oci_mysql_mysql_db_system.this) > 0 ? values(oci_mysql_mysql_db_system.this)[0].mysql_version : "N/A"
     }
-    connection_info = length(oci_mysql_mysql_db_system.this) > 0 && length(values(oci_mysql_mysql_db_system.this)[0].endpoints) > 0 ? {
-      hostname      = values(oci_mysql_mysql_db_system.this)[0].endpoints[0].hostname
-      port          = values(oci_mysql_mysql_db_system.this)[0].endpoints[0].port
-      mysql_command = "mysql -h ${values(oci_mysql_mysql_db_system.this)[0].endpoints[0].hostname} -P ${values(oci_mysql_mysql_db_system.this)[0].endpoints[0].port} -u admin -p"
-    } : null
   }
 }

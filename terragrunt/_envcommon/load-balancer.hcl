@@ -9,13 +9,15 @@ locals {
 }
 
 terraform {
-  source = "git::https://github.com/hanyouqing/terraform-oci-modules.git//load-balancer"
+  # Prefer local workspace path while developing; pin a git ref for published stacks.
+  source = "${dirname(find_in_parent_folders("root.hcl"))}/../load-balancer"
 }
 
 inputs = {
   display_name = "${local.project}-${local.env}-lb"
   shape        = "flexible"
-  is_private   = false
+  # Default private; edge/dev leaves that need a public LB must set is_private = false.
+  is_private = true
 
   shape_details = {
     minimum_bandwidth_in_mbps = 10
@@ -41,7 +43,6 @@ inputs = {
   backends = {}
   listeners = {
     http-listener = {
-      name                     = "http-listener"
       default_backend_set_name = "app-backend-set"
       port                     = 80
       protocol                 = "HTTP"

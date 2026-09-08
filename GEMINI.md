@@ -27,11 +27,12 @@ module-name/
     │   ├── variables.tf
     │   ├── outputs.tf
     │   └── README.md
-    └── complete/       # Production-grade setup with all features enabled
-        ├── main.tf
-        ├── variables.tf
-        ├── outputs.tf
-        └── README.md
+    ├── complete/       # Production-grade setup with all features enabled
+    │   ├── main.tf
+    │   ├── variables.tf
+    │   ├── outputs.tf
+    │   └── README.md
+    └── (optional scenario examples, e.g. edge-public / edge-arm / tfstate-bucket)
 ```
 
 ## 3. Coding Standards
@@ -96,8 +97,8 @@ module-name/
 
 ## 7. Versioning
 
-- **Terraform**: `>= 1.3.0` (or stricter if needed).
-- **OCI Provider**: Pin to a recent major version `~> 5.0` or `~> 6.0`.
+- **Terraform**: `>= 1.14.2` (keep in sync with root README, Makefile, and CI).
+- **OCI Provider**: Pin to `~> 8.28` in every module and example `versions.tf` / `required_providers` block.
 
 ## 8. Specific Module Instructions
 

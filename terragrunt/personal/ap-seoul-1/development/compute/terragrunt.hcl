@@ -19,8 +19,9 @@ dependency "vcn" {
 }
 
 inputs = {
-  subnet_id       = dependency.vcn.outputs.public_subnet_ids["public-1"]
-  ssh_public_keys = get_env("TF_VAR_ssh_public_keys", "")
+  subnet_id         = dependency.vcn.outputs.public_subnet_ids["public-1"]
+  ssh_public_keys   = get_env("TF_VAR_ssh_public_keys", "")
+  assign_public_ip  = true
 
   shape          = "VM.Standard.E2.1.Micro"
   instance_count = 1

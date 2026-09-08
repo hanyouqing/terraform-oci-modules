@@ -3,12 +3,13 @@
 # -----------------------------------------------------------------------------
 
 variable "user_id" {
-  description = "The OCID of the user to manage credentials for."
+  description = "OCID of the user to manage credentials for. Required when any credential map is non-empty; leave empty/null when creating no credentials."
   type        = string
+  default     = null
 
   validation {
-    condition     = can(regex("^ocid1\\.user\\.", var.user_id))
-    error_message = "The user_id must be a valid OCI user OCID (ocid1.user...)."
+    condition     = var.user_id == null || var.user_id == "" || can(regex("^ocid1\\.user\\.", var.user_id))
+    error_message = "The user_id must be empty/null or a valid OCI user OCID (ocid1.user...)."
   }
 }
 
@@ -17,11 +18,12 @@ variable "user_id" {
 # -----------------------------------------------------------------------------
 
 variable "api_keys" {
-  description = "Map of API signing keys to create. Each key requires a PEM-encoded RSA public key."
+  description = "Map of API signing keys to create. Each key requires a PEM-encoded RSA public key. Treat key material as secret; avoid logging terraform plans that include these values."
   type = map(object({
     key_value = string
   }))
-  default = {}
+  default   = {}
+  sensitive = true
 
   validation {
     condition     = alltrue([for k, v in var.api_keys : can(regex("^-----BEGIN (RSA )?PUBLIC KEY-----", v.key_value))])
