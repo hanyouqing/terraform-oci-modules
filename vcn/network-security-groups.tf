@@ -9,8 +9,10 @@ resource "oci_core_network_security_group" "this" {
     var.freeform_tags,
     each.value.freeform_tags,
     {
-      "ManagedBy" = "terraform"
-      "Module"    = "github.com/hanyouqing/terraform-oci-modules/vcn/nsg"
+      "ManagedBy"   = "Terraform"
+      "Module"      = "github.com/hanyouqing/terraform-oci-modules/vcn/nsg"
+      "Project"     = var.project
+      "Environment" = var.environment
     }
   )
 

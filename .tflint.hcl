@@ -13,21 +13,18 @@
 # Documentation: https://github.com/terraform-linters/tflint
 # =============================================================================
 
+tflint {
+  required_version = ">= 0.50.0"
+}
+
 config {
-  # Enable module inspection
-  module = true
+  # Inspect local module calls (examples -> ../../). Recursive mode already
+  # walks each module directory as a root.
+  call_module_type = "local"
 
-  # Force required version
-  force = false
-
-  # Disable rules by default (set to true to enable all rules)
+  force               = false
   disabled_by_default = false
-
-  # Format output
-  format = "default"
-
-  # Enable color output
-  color = true
+  format              = "default"
 }
 
 # =============================================================================
@@ -39,12 +36,8 @@ plugin "terraform" {
   preset  = "recommended"
 }
 
-# OCI Provider Plugin
-plugin "oci" {
-  enabled = true
-  version = "0.1.0"
-  source  = "github.com/oracle/tflint-ruleset-oci"
-}
+# oracle/tflint-ruleset-oci is not published on GitHub; lint with the bundled
+# Terraform recommended preset only.
 
 # =============================================================================
 # Rule Configuration

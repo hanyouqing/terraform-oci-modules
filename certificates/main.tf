@@ -44,7 +44,7 @@ resource "oci_certificates_management_certificate_authority" "this" {
 
   freeform_tags = merge(
     {
-      "ManagedBy"   = "terraform"
+      "ManagedBy"   = "Terraform"
       "Module"      = "github.com/hanyouqing/terraform-oci-modules/certificates"
       "Project"     = var.project
       "Environment" = var.environment
@@ -104,7 +104,7 @@ resource "oci_certificates_management_certificate" "this" {
 
   freeform_tags = merge(
     {
-      "ManagedBy"   = "terraform"
+      "ManagedBy"   = "Terraform"
       "Module"      = "github.com/hanyouqing/terraform-oci-modules/certificates"
       "Project"     = var.project
       "Environment" = var.environment

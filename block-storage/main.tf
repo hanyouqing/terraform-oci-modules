@@ -1,7 +1,3 @@
-data "oci_identity_availability_domains" "ads" {
-  compartment_id = var.tenancy_ocid
-}
-
 resource "oci_core_volume" "this" {
   for_each = var.volumes
 
@@ -17,7 +13,7 @@ resource "oci_core_volume" "this" {
     var.freeform_tags,
     each.value.freeform_tags,
     {
-      "ManagedBy"   = "terraform"
+      "ManagedBy"   = "Terraform"
       "Module"      = "github.com/hanyouqing/terraform-oci-modules/block-storage"
       "Project"     = var.project
       "Environment" = var.environment
@@ -40,8 +36,10 @@ resource "oci_core_volume_backup" "this" {
   freeform_tags = merge(
     var.freeform_tags,
     {
-      "ManagedBy" = "terraform"
-      "Module"    = "github.com/hanyouqing/terraform-oci-modules/block-storage/backup"
+      "ManagedBy"   = "Terraform"
+      "Module"      = "github.com/hanyouqing/terraform-oci-modules/block-storage/backup"
+      "Project"     = var.project
+      "Environment" = var.environment
     }
   )
 }
@@ -69,8 +67,10 @@ resource "oci_core_volume_backup_policy" "this" {
   freeform_tags = merge(
     var.freeform_tags,
     {
-      "ManagedBy" = "terraform"
-      "Module"    = "github.com/hanyouqing/terraform-oci-modules/block-storage/backup-policy"
+      "ManagedBy"   = "Terraform"
+      "Module"      = "github.com/hanyouqing/terraform-oci-modules/block-storage/backup-policy"
+      "Project"     = var.project
+      "Environment" = var.environment
     }
   )
 }

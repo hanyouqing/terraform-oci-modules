@@ -1,12 +1,14 @@
 terraform {
-  required_version = ">= 1.14.2"
+  required_version = ">= 1.16.0"
   required_providers {
     oci = {
       source  = "oracle/oci"
-      version = "~> 8.28"
+      version = "~> 9.9"
     }
   }
 }
+
+provider "oci" {}
 
 # Always Free ARM profile commonly used for a single public edge instance:
 # VM.Standard.A1.Flex with 2 OCPU / 12 GB / 50 GB boot (within 4 OCPU / 24 GB tenancy quota).

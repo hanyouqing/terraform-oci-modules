@@ -8,6 +8,8 @@ variable "compartment_id" {
   }
 }
 
+# Retained so existing callers can keep passing tenancy_ocid.
+# tflint-ignore: terraform_unused_declarations
 variable "tenancy_ocid" {
   type        = string
   description = "OCID of the tenancy"
@@ -138,12 +140,22 @@ variable "project" {
   type        = string
   description = "Project name for tagging"
   default     = "oci-modules"
+
+  validation {
+    condition     = length(trimspace(var.project)) > 0
+    error_message = "project must be a non-empty string."
+  }
 }
 
 variable "environment" {
   type        = string
   description = "Environment name for tagging"
   default     = "development"
+
+  validation {
+    condition     = length(trimspace(var.environment)) > 0
+    error_message = "environment must be a non-empty string."
+  }
 }
 
 variable "freeform_tags" {

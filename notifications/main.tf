@@ -8,7 +8,7 @@ resource "oci_ons_notification_topic" "this" {
   freeform_tags = merge(
     var.freeform_tags,
     {
-      "ManagedBy"   = "terraform"
+      "ManagedBy"   = "Terraform"
       "Module"      = "github.com/hanyouqing/terraform-oci-modules/notifications"
       "Project"     = var.project
       "Environment" = var.environment
@@ -29,8 +29,10 @@ resource "oci_ons_subscription" "this" {
   freeform_tags = merge(
     var.freeform_tags,
     {
-      "ManagedBy" = "terraform"
-      "Module"    = "github.com/hanyouqing/terraform-oci-modules/notifications/subscription"
+      "ManagedBy"   = "Terraform"
+      "Module"      = "github.com/hanyouqing/terraform-oci-modules/notifications/subscription"
+      "Project"     = var.project
+      "Environment" = var.environment
     }
   )
 

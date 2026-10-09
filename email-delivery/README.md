@@ -82,15 +82,15 @@ See the [examples](../examples/email-delivery/) directory for complete examples.
 ## Requirements
 
 | Name | Version |
-| ---- | ------- |
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.14.2 |
-| <a name="requirement_oci"></a> [oci](#requirement\_oci) | ~> 8.28 |
+|------|---------|
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.16.0 |
+| <a name="requirement_oci"></a> [oci](#requirement\_oci) | ~> 9.9 |
 
 ## Providers
 
 | Name | Version |
-| ---- | ------- |
-| <a name="provider_oci"></a> [oci](#provider\_oci) | 8.29.0 |
+|------|---------|
+| <a name="provider_oci"></a> [oci](#provider\_oci) | ~> 9.9 |
 
 ## Modules
 
@@ -99,14 +99,14 @@ No modules.
 ## Resources
 
 | Name | Type |
-| ---- | ---- |
+|------|------|
 | [oci_email_sender.this](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/email_sender) | resource |
 | [oci_email_suppression.this](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/email_suppression) | resource |
 
 ## Inputs
 
 | Name | Description | Type | Default | Required |
-| ---- | ----------- | ---- | ------- | :------: |
+|------|-------------|------|---------|:--------:|
 | <a name="input_compartment_id"></a> [compartment\_id](#input\_compartment\_id) | OCID of the compartment where the email delivery resources will be created | `string` | n/a | yes |
 | <a name="input_defined_tags"></a> [defined\_tags](#input\_defined\_tags) | Defined tags to apply to all resources | `map(string)` | `{}` | no |
 | <a name="input_environment"></a> [environment](#input\_environment) | Environment name for tagging | `string` | `"development"` | no |
@@ -118,7 +118,7 @@ No modules.
 ## Outputs
 
 | Name | Description |
-| ---- | ----------- |
+|------|-------------|
 | <a name="output_sender_ids"></a> [sender\_ids](#output\_sender\_ids) | OCIDs of the email senders |
 | <a name="output_suppression_ids"></a> [suppression\_ids](#output\_suppression\_ids) | OCIDs of the email suppressions |
 | <a name="output_zzz_reminders"></a> [zzz\_reminders](#output\_zzz\_reminders) | Important reminders and next steps for Email Delivery module |

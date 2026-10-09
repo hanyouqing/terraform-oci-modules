@@ -99,15 +99,15 @@ The following NoSQL Database resources are **free** within Always Free tier limi
 ## Requirements
 
 | Name | Version |
-| ---- | ------- |
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.14.2 |
-| <a name="requirement_oci"></a> [oci](#requirement\_oci) | ~> 8.28 |
+|------|---------|
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.16.0 |
+| <a name="requirement_oci"></a> [oci](#requirement\_oci) | ~> 9.9 |
 
 ## Providers
 
 | Name | Version |
-| ---- | ------- |
-| <a name="provider_oci"></a> [oci](#provider\_oci) | 8.29.0 |
+|------|---------|
+| <a name="provider_oci"></a> [oci](#provider\_oci) | ~> 9.9 |
 
 ## Modules
 
@@ -116,14 +116,14 @@ No modules.
 ## Resources
 
 | Name | Type |
-| ---- | ---- |
+|------|------|
 | [oci_nosql_index.this](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/nosql_index) | resource |
 | [oci_nosql_table.this](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/nosql_table) | resource |
 
 ## Inputs
 
 | Name | Description | Type | Default | Required |
-| ---- | ----------- | ---- | ------- | :------: |
+|------|-------------|------|---------|:--------:|
 | <a name="input_compartment_id"></a> [compartment\_id](#input\_compartment\_id) | OCID of the compartment where NoSQL tables will be created | `string` | n/a | yes |
 | <a name="input_defined_tags"></a> [defined\_tags](#input\_defined\_tags) | Defined tags to apply to all resources | `map(string)` | `{}` | no |
 | <a name="input_environment"></a> [environment](#input\_environment) | Environment name for tagging | `string` | `"development"` | no |
@@ -135,7 +135,7 @@ No modules.
 ## Outputs
 
 | Name | Description |
-| ---- | ----------- |
+|------|-------------|
 | <a name="output_index_ids"></a> [index\_ids](#output\_index\_ids) | Names and states of the NoSQL indexes |
 | <a name="output_table_ids"></a> [table\_ids](#output\_table\_ids) | OCIDs of the NoSQL tables |
 | <a name="output_table_limits"></a> [table\_limits](#output\_table\_limits) | Table limits (read/write units, storage) for each table |

@@ -23,8 +23,8 @@ For **Terragrunt** (remote state, generated provider, DRY stack configs), see [t
 
 ## Prerequisites
 
-- [Terraform](https://www.terraform.io/downloads.html) >= 1.14.2
-- [OCI Provider for Terraform](https://registry.terraform.io/providers/oracle/oci/latest/docs) `~> 8.28` (see each module’s `versions.tf`)
+- [Terraform](https://www.terraform.io/downloads.html) >= 1.16.0
+- [OCI Provider for Terraform](https://registry.terraform.io/providers/oracle/oci/latest/docs) `~> 9.9` (see each module’s `versions.tf`)
 - [OCI CLI](https://docs.oracle.com/en-us/iaas/Content/API/SDKDocs/cliinstall.htm) configured (verify with `oci iam region list --output table`)
 - [OCI credentials](#setting-up-oci-credentials-for-the-terraform-provider) for the Terraform provider — the [OCI CLI](#setting-up-credentials-with-the-oci-cli) (`oci setup config`) is the usual way to create `~/.oci/config`; alternatively use environment variables from `.env.sh` only
 - Oracle Cloud Infrastructure account with appropriate permissions (enable the Always Free tier if you use demo/Always Free defaults)
@@ -114,7 +114,7 @@ Remote state avoids committing `.tfstate` and supports locking and team workflow
 
 | Approach | Notes |
 | --- | --- |
-| **OCI native backend** | **Recommended** by Oracle. Requires **Terraform v1.12.0 or greater** (this repo’s modules require **>= 1.14.2**). See *Data Source Configuration (OCI Backend)* on the page above. |
+| **OCI native backend** | **Recommended** by Oracle. Requires **Terraform v1.12.0 or greater** (this repo’s modules require **>= 1.16.0**). See *Data Source Configuration (OCI Backend)* on the page above. |
 | **S3-compatible `backend "s3"`** | **Deprecated** for new work—use only if you cannot use the native backend. Uses a Customer Secret Key and an endpoint such as `https://<namespace>.compat.objectstorage.<region>.oraclecloud.com`. Full steps are on the same Oracle page. |
 | **HTTP backend** | Uses a pre-authenticated request (PAR) for the state object; Oracle prefers the native backend over HTTP for Object Storage. |
 

@@ -117,15 +117,15 @@ See the [examples](../examples/vcn/) directory for complete examples.
 ## Requirements
 
 | Name | Version |
-| ---- | ------- |
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.14.2 |
-| <a name="requirement_oci"></a> [oci](#requirement\_oci) | ~> 8.28 |
+|------|---------|
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.16.0 |
+| <a name="requirement_oci"></a> [oci](#requirement\_oci) | ~> 9.9 |
 
 ## Providers
 
 | Name | Version |
-| ---- | ------- |
-| <a name="provider_oci"></a> [oci](#provider\_oci) | 8.29.0 |
+|------|---------|
+| <a name="provider_oci"></a> [oci](#provider\_oci) | ~> 9.9 |
 
 ## Modules
 
@@ -134,7 +134,7 @@ No modules.
 ## Resources
 
 | Name | Type |
-| ---- | ---- |
+|------|------|
 | [oci_core_drg.this](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/core_drg) | resource |
 | [oci_core_drg_attachment.vcn](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/core_drg_attachment) | resource |
 | [oci_core_drg_route_distribution.this](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/core_drg_route_distribution) | resource |
@@ -161,7 +161,7 @@ No modules.
 ## Inputs
 
 | Name | Description | Type | Default | Required |
-| ---- | ----------- | ---- | ------- | :------: |
+|------|-------------|------|---------|:--------:|
 | <a name="input_attach_drg_to_vcn"></a> [attach\_drg\_to\_vcn](#input\_attach\_drg\_to\_vcn) | Whether to attach DRG to VCN | `bool` | `false` | no |
 | <a name="input_compartment_id"></a> [compartment\_id](#input\_compartment\_id) | OCID of the compartment where the VCN will be created | `string` | n/a | yes |
 | <a name="input_create_drg"></a> [create\_drg](#input\_create\_drg) | Whether to create a Dynamic Routing Gateway | `bool` | `false` | no |
@@ -203,7 +203,7 @@ No modules.
 ## Outputs
 
 | Name | Description |
-| ---- | ----------- |
+|------|-------------|
 | <a name="output_availability_domains"></a> [availability\_domains](#output\_availability\_domains) | List of availability domain names |
 | <a name="output_drg_attachment_id"></a> [drg\_attachment\_id](#output\_drg\_attachment\_id) | OCID of the DRG attachment to VCN |
 | <a name="output_drg_id"></a> [drg\_id](#output\_drg\_id) | OCID of the Dynamic Routing Gateway |

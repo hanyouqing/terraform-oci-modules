@@ -21,9 +21,11 @@ resource "oci_database_autonomous_database" "this" {
 
   freeform_tags = merge(
     {
-      "ManagedBy"  = "terraform"
-      "Module"     = "github.com/hanyouqing/terraform-oci-modules/autonomous-database"
-      "AlwaysFree" = tostring(var.databases[each.key].is_free_tier)
+      "ManagedBy"   = "Terraform"
+      "Module"      = "github.com/hanyouqing/terraform-oci-modules/autonomous-database"
+      "Project"     = var.project
+      "Environment" = var.environment
+      "AlwaysFree"  = tostring(var.databases[each.key].is_free_tier)
     },
     var.freeform_tags,
     var.databases[each.key].freeform_tags

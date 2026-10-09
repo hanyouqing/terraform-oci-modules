@@ -7,7 +7,7 @@ Production-ready [Terragrunt](https://terragrunt.gruntwork.io/) wrapper for all 
 | Tool | Minimum Version |
 |------|----------------|
 | [Terragrunt](https://terragrunt.gruntwork.io/docs/getting-started/install/) | `>= 0.55` |
-| [Terraform](https://developer.hashicorp.com/terraform/downloads) | `>= 1.14.2` |
+| [Terraform](https://developer.hashicorp.com/terraform/downloads) | `>= 1.16.0` |
 | OCI CLI (for `oci setup config`) | `>= 3.x` |
 
 ## Directory Structure
@@ -155,7 +155,7 @@ locals {
 
 ### 5. Remote State (Terraform `backend "oci"`)
 
-Remote state uses Oracle’s **recommended** native backend ([Using Object Storage for State Files](https://docs.oracle.com/en-us/iaas/Content/dev/terraform/object-storage-state.htm), [HashiCorp: `backend "oci"`](https://developer.hashicorp.com/terraform/language/backend/oci)). It requires **Terraform ≥ 1.12** (this repo’s modules use **≥ 1.14.2**). Authentication is the **same OCI API key profile** as the Terraform provider (`config_file_profile` in `account.hcl`, typically `~/.oci/config`). `root.hcl` sets `OCI_CLI_CONFIG_FILE` for Terraform so the backend and provider share one config file (per-account path `~/.oci/<account_name>/config` when `account_name` is not the placeholder; otherwise `~/.oci/config`).
+Remote state uses Oracle’s **recommended** native backend ([Using Object Storage for State Files](https://docs.oracle.com/en-us/iaas/Content/dev/terraform/object-storage-state.htm), [HashiCorp: `backend "oci"`](https://developer.hashicorp.com/terraform/language/backend/oci)). It requires **Terraform ≥ 1.12** (this repo’s modules use **≥ 1.16.0**). Authentication is the **same OCI API key profile** as the Terraform provider (`config_file_profile` in `account.hcl`, typically `~/.oci/config`). `root.hcl` sets `OCI_CLI_CONFIG_FILE` for Terraform so the backend and provider share one config file (per-account path `~/.oci/<account_name>/config` when `account_name` is not the placeholder; otherwise `~/.oci/config`).
 
 **Create the state bucket once** (name must match `local.state_bucket` in `root.hcl`: `<project>-tfstate`):
 

@@ -8,8 +8,10 @@ resource "oci_logging_log_group" "vcn_flow_logs" {
   freeform_tags = merge(
     var.freeform_tags,
     {
-      "ManagedBy" = "terraform"
-      "Module"    = "github.com/hanyouqing/terraform-oci-modules/vcn/flow-logs/log-group"
+      "ManagedBy"   = "Terraform"
+      "Module"      = "github.com/hanyouqing/terraform-oci-modules/vcn/flow-logs/log-group"
+      "Project"     = var.project
+      "Environment" = var.environment
     }
   )
 }
@@ -35,8 +37,10 @@ resource "oci_logging_log" "vcn_flow_log" {
   freeform_tags = merge(
     var.freeform_tags,
     {
-      "ManagedBy" = "terraform"
-      "Module"    = "github.com/hanyouqing/terraform-oci-modules/vcn/flow-logs/log"
+      "ManagedBy"   = "Terraform"
+      "Module"      = "github.com/hanyouqing/terraform-oci-modules/vcn/flow-logs/log"
+      "Project"     = var.project
+      "Environment" = var.environment
     }
   )
 }

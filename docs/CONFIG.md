@@ -18,8 +18,7 @@ TFLint is a Terraform linter that finds errors and possible problems in Terrafor
 ### Features
 
 - Terraform rule set (recommended preset)
-- OCI provider plugin support
-- Module inspection enabled
+- Recursive inspection with an absolute `--config` path (TFLint 0.50+)
 - Comprehensive rule coverage
 
 ### Usage

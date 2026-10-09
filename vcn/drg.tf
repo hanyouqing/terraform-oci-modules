@@ -7,8 +7,10 @@ resource "oci_core_drg" "this" {
   freeform_tags = merge(
     var.freeform_tags,
     {
-      "ManagedBy" = "terraform"
-      "Module"    = "github.com/hanyouqing/terraform-oci-modules/vcn/drg"
+      "ManagedBy"   = "Terraform"
+      "Module"      = "github.com/hanyouqing/terraform-oci-modules/vcn/drg"
+      "Project"     = var.project
+      "Environment" = var.environment
     }
   )
 
@@ -28,8 +30,10 @@ resource "oci_core_drg_attachment" "vcn" {
   freeform_tags = merge(
     var.freeform_tags,
     {
-      "ManagedBy" = "terraform"
-      "Module"    = "github.com/hanyouqing/terraform-oci-modules/vcn/drg-attachment"
+      "ManagedBy"   = "Terraform"
+      "Module"      = "github.com/hanyouqing/terraform-oci-modules/vcn/drg-attachment"
+      "Project"     = var.project
+      "Environment" = var.environment
     }
   )
 }
@@ -43,8 +47,10 @@ resource "oci_core_drg_route_table" "this" {
   freeform_tags = merge(
     var.freeform_tags,
     {
-      "ManagedBy" = "terraform"
-      "Module"    = "github.com/hanyouqing/terraform-oci-modules/vcn/drg-route-table"
+      "ManagedBy"   = "Terraform"
+      "Module"      = "github.com/hanyouqing/terraform-oci-modules/vcn/drg-route-table"
+      "Project"     = var.project
+      "Environment" = var.environment
     }
   )
 }
@@ -59,8 +65,10 @@ resource "oci_core_drg_route_distribution" "this" {
   freeform_tags = merge(
     var.freeform_tags,
     {
-      "ManagedBy" = "terraform"
-      "Module"    = "github.com/hanyouqing/terraform-oci-modules/vcn/drg-route-distribution"
+      "ManagedBy"   = "Terraform"
+      "Module"      = "github.com/hanyouqing/terraform-oci-modules/vcn/drg-route-distribution"
+      "Project"     = var.project
+      "Environment" = var.environment
     }
   )
 }
@@ -77,8 +85,10 @@ resource "oci_core_local_peering_gateway" "this" {
   freeform_tags = merge(
     var.freeform_tags,
     {
-      "ManagedBy" = "terraform"
-      "Module"    = "github.com/hanyouqing/terraform-oci-modules/vcn/lpg"
+      "ManagedBy"   = "Terraform"
+      "Module"      = "github.com/hanyouqing/terraform-oci-modules/vcn/lpg"
+      "Project"     = var.project
+      "Environment" = var.environment
     }
   )
 

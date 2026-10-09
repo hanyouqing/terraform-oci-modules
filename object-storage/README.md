@@ -111,15 +111,15 @@ See the [examples](../examples/object-storage/) directory for complete examples.
 ## Requirements
 
 | Name | Version |
-| ---- | ------- |
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.14.2 |
-| <a name="requirement_oci"></a> [oci](#requirement\_oci) | ~> 8.28 |
+|------|---------|
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.16.0 |
+| <a name="requirement_oci"></a> [oci](#requirement\_oci) | ~> 9.9 |
 
 ## Providers
 
 | Name | Version |
-| ---- | ------- |
-| <a name="provider_oci"></a> [oci](#provider\_oci) | 8.29.0 |
+|------|---------|
+| <a name="provider_oci"></a> [oci](#provider\_oci) | ~> 9.9 |
 
 ## Modules
 
@@ -128,7 +128,7 @@ No modules.
 ## Resources
 
 | Name | Type |
-| ---- | ---- |
+|------|------|
 | [oci_objectstorage_bucket.this](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/objectstorage_bucket) | resource |
 | [oci_objectstorage_object_lifecycle_policy.this](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/objectstorage_object_lifecycle_policy) | resource |
 | [oci_objectstorage_preauthrequest.this](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/objectstorage_preauthrequest) | resource |
@@ -137,7 +137,7 @@ No modules.
 ## Inputs
 
 | Name | Description | Type | Default | Required |
-| ---- | ----------- | ---- | ------- | :------: |
+|------|-------------|------|---------|:--------:|
 | <a name="input_buckets"></a> [buckets](#input\_buckets) | Map of buckets to create. name must be alphanumeric with hyphens/underscores/periods, max 256 characters. storage\_tier: Standard or Archive. auto\_tiering: Disabled or InfrequentAccess. | <pre>map(object({<br/>    name                  = string<br/>    namespace             = optional(string, null)<br/>    access_type           = optional(string, "NoPublicAccess")<br/>    storage_tier          = optional(string, "Standard")<br/>    versioning            = optional(string, "Enabled")<br/>    kms_key_id            = optional(string, null)<br/>    auto_tiering          = optional(string, "Disabled")<br/>    object_events_enabled = optional(bool, false)<br/>    metadata              = optional(map(string), {})<br/>    freeform_tags         = optional(map(string), {})<br/>    defined_tags          = optional(map(string), {})<br/>  }))</pre> | `{}` | no |
 | <a name="input_compartment_id"></a> [compartment\_id](#input\_compartment\_id) | OCID of the compartment where the buckets will be created | `string` | n/a | yes |
 | <a name="input_defined_tags"></a> [defined\_tags](#input\_defined\_tags) | Defined tags to apply to all resources | `map(string)` | `{}` | no |
@@ -151,7 +151,7 @@ No modules.
 ## Outputs
 
 | Name | Description |
-| ---- | ----------- |
+|------|-------------|
 | <a name="output_bucket_names"></a> [bucket\_names](#output\_bucket\_names) | Names of the buckets |
 | <a name="output_bucket_namespaces"></a> [bucket\_namespaces](#output\_bucket\_namespaces) | Namespaces of the buckets |
 | <a name="output_bucket_uris"></a> [bucket\_uris](#output\_bucket\_uris) | URIs of the buckets (format: https://objectstorage.<region>.oraclecloud.com/n/<namespace>/b/<name>/o) |

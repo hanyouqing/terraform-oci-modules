@@ -4,7 +4,7 @@
 .DEFAULT_GOAL := help
 
 # Variables
-TERRAFORM_VERSION ?= 1.14.2
+TERRAFORM_VERSION ?= 1.16.5
 TF_VERSION_FILE := .terraform-version
 
 help: ## Show this help message
@@ -70,7 +70,7 @@ lint: ## Run tflint on all modules
 	@echo "Running tflint..."
 	@if command -v tflint > /dev/null; then \
 		if [ -f .tflint.hcl ]; then \
-			tflint --config .tflint.hcl --recursive; \
+			tflint --config "$(CURDIR)/.tflint.hcl" --recursive; \
 		else \
 			tflint --recursive; \
 		fi; \
@@ -95,9 +95,9 @@ lint-module: ## Lint a specific module (usage: make lint-module MODULE=vcn)
 	fi
 	@if command -v tflint > /dev/null; then \
 		if [ -f .tflint.hcl ]; then \
-			tflint --config .tflint.hcl $(MODULE); \
+			tflint --config "$(CURDIR)/.tflint.hcl" --chdir $(MODULE); \
 		else \
-			tflint $(MODULE); \
+			tflint --chdir $(MODULE); \
 		fi; \
 	else \
 		echo "tflint not installed. Run 'make install-tflint' to install."; \

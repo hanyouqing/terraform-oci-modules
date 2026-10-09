@@ -109,9 +109,11 @@ resource "oci_core_instance" "this" {
 
   freeform_tags = merge(
     {
-      "ManagedBy"  = "terraform"
-      "Module"     = "github.com/hanyouqing/terraform-oci-modules/compute"
-      "AlwaysFree" = tostring(local.is_always_free)
+      "ManagedBy"   = "Terraform"
+      "Module"      = "github.com/hanyouqing/terraform-oci-modules/compute"
+      "Project"     = var.project
+      "Environment" = var.environment
+      "AlwaysFree"  = tostring(local.is_always_free)
     },
     var.freeform_tags
   )
@@ -152,8 +154,10 @@ resource "oci_core_volume" "block" {
 
   freeform_tags = merge(
     {
-      "ManagedBy" = "terraform"
-      "Module"    = "github.com/hanyouqing/terraform-oci-modules/compute/block-volume"
+      "ManagedBy"   = "Terraform"
+      "Module"      = "github.com/hanyouqing/terraform-oci-modules/compute/block-volume"
+      "Project"     = var.project
+      "Environment" = var.environment
     },
     var.freeform_tags
   )

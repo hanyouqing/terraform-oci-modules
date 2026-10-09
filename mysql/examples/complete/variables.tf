@@ -3,11 +3,6 @@ variable "compartment_id" {
   description = "OCID of the compartment"
 }
 
-variable "tenancy_ocid" {
-  type        = string
-  description = "OCID of the tenancy"
-}
-
 variable "mysql_systems" {
   type = map(object({
     display_name            = string

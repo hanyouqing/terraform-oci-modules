@@ -22,8 +22,10 @@ resource "oci_objectstorage_bucket" "this" {
 
   freeform_tags = merge(
     {
-      "ManagedBy" = "terraform"
-      "Module"    = "github.com/hanyouqing/terraform-oci-modules/object-storage"
+      "ManagedBy"   = "Terraform"
+      "Module"      = "github.com/hanyouqing/terraform-oci-modules/object-storage"
+      "Project"     = var.project
+      "Environment" = var.environment
     },
     var.freeform_tags,
     each.value.freeform_tags

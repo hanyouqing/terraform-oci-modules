@@ -37,5 +37,5 @@ terraform output -json smtp_credential_passwords
 
 | Name | Version |
 |------|---------|
-| terraform | >= 1.14.2 |
-| oci | ~> 8.28 |
+| terraform | >= 1.16.0 |
+| oci | ~> 9.9 |
