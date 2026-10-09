@@ -18,9 +18,11 @@ resource "oci_nosql_table" "this" {
 
   freeform_tags = merge(
     {
-      "ManagedBy"  = "terraform"
-      "Module"     = "github.com/hanyouqing/terraform-oci-modules/nosql-database"
-      "AlwaysFree" = each.value.max_storage_in_gbs <= 25 ? "true" : "false"
+      "ManagedBy"   = "Terraform"
+      "Module"      = "github.com/hanyouqing/terraform-oci-modules/nosql-database"
+      "Project"     = var.project
+      "Environment" = var.environment
+      "AlwaysFree"  = each.value.max_storage_in_gbs <= 25 ? "true" : "false"
     },
     var.freeform_tags,
     each.value.freeform_tags

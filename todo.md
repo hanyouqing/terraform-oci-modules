@@ -1,6 +1,9 @@
 # Status
 
-- [x] Provider bump to `~> 8.28` across modules and examples
+- [x] Provider bump to `~> 9.9` across modules and examples (2026-10-09 weekly audit; latest registry 9.9.0)
+- [x] Terraform required_version floor `>= 1.16.0`; CI / `.terraform-version` pin `1.16.5`
+- [x] Default tags: `ManagedBy = "Terraform"` plus `Project` / `Environment` on tagged resources
+- [x] `project` and `environment` inputs require non-empty validation
 - [x] Phase 1: vcn / compute / object-storage (+ edge/tfstate examples, Terragrunt alignment)
 - [x] Phase 2: remaining modules quality pass
 - [x] Production pre-release review (pass 1–2): network hardening, sensitive outputs, private defaults

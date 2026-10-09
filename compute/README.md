@@ -141,15 +141,15 @@ See the [examples](../examples/compute/) directory for complete examples.
 ## Requirements
 
 | Name | Version |
-| ---- | ------- |
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.14.2 |
-| <a name="requirement_oci"></a> [oci](#requirement\_oci) | ~> 8.28 |
+|------|---------|
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.16.0 |
+| <a name="requirement_oci"></a> [oci](#requirement\_oci) | ~> 9.9 |
 
 ## Providers
 
 | Name | Version |
-| ---- | ------- |
-| <a name="provider_oci"></a> [oci](#provider\_oci) | 8.29.0 |
+|------|---------|
+| <a name="provider_oci"></a> [oci](#provider\_oci) | ~> 9.9 |
 
 ## Modules
 
@@ -158,7 +158,7 @@ No modules.
 ## Resources
 
 | Name | Type |
-| ---- | ---- |
+|------|------|
 | [oci_core_instance.this](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/core_instance) | resource |
 | [oci_core_volume.block](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/core_volume) | resource |
 | [oci_core_volume_attachment.block](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/core_volume_attachment) | resource |
@@ -168,8 +168,8 @@ No modules.
 ## Inputs
 
 | Name | Description | Type | Default | Required |
-| ---- | ----------- | ---- | ------- | :------: |
-| <a name="input_assign_public_ip"></a> [assign\_public\_ip](#input\_assign\_public\_ip) | Whether to assign a public IP address | `bool` | `true` | no |
+|------|-------------|------|---------|:--------:|
+| <a name="input_assign_public_ip"></a> [assign\_public\_ip](#input\_assign\_public\_ip) | Whether to assign a public IP address. Default false for least privilege; set true for public-edge instances. | `bool` | `false` | no |
 | <a name="input_availability_config"></a> [availability\_config](#input\_availability\_config) | Optional availability\_config block for oci\_core\_instance | <pre>object({<br/>    is_live_migration_preferred = optional(bool, null)<br/>    recovery_action             = optional(string, null)<br/>  })</pre> | `null` | no |
 | <a name="input_availability_domain"></a> [availability\_domain](#input\_availability\_domain) | Availability domain for the instance. If not specified, will be distributed across ADs | `string` | `null` | no |
 | <a name="input_block_volumes"></a> [block\_volumes](#input\_block\_volumes) | Map of block volumes to create and attach | <pre>map(object({<br/>    display_name         = string<br/>    size_in_gbs          = number<br/>    availability_domain  = optional(string, null)<br/>    instance_index       = number<br/>    device               = optional(string, null)<br/>    vpus_per_gb          = optional(string, "10")<br/>    is_auto_tune_enabled = optional(bool, false)<br/>  }))</pre> | `{}` | no |
@@ -213,7 +213,7 @@ No modules.
 ## Outputs
 
 | Name | Description |
-| ---- | ----------- |
+|------|-------------|
 | <a name="output_block_volume_attachment_ids"></a> [block\_volume\_attachment\_ids](#output\_block\_volume\_attachment\_ids) | OCIDs of the block volume attachments |
 | <a name="output_block_volume_ids"></a> [block\_volume\_ids](#output\_block\_volume\_ids) | OCIDs of the block volumes |
 | <a name="output_boot_volume_ids"></a> [boot\_volume\_ids](#output\_boot\_volume\_ids) | OCIDs of the boot volumes |

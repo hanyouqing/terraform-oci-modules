@@ -62,8 +62,10 @@ module-name/
   ```hcl
   freeform_tags = merge(
     {
-      "ManagedBy" = "terraform"
-      "Module"    = "terraform-oci-modules/<module-name>"
+      "ManagedBy"   = "Terraform"
+      "Module"      = "terraform-oci-modules/<module-name>"
+      "Project"     = var.project
+      "Environment" = var.environment
     },
     var.freeform_tags
   )
@@ -97,8 +99,8 @@ module-name/
 
 ## 7. Versioning
 
-- **Terraform**: `>= 1.14.2` (keep in sync with root README, Makefile, and CI).
-- **OCI Provider**: Pin to `~> 8.28` in every module and example `versions.tf` / `required_providers` block.
+- **Terraform**: `>= 1.16.0` (keep in sync with root README, Makefile, and CI).
+- **OCI Provider**: Pin to `~> 9.9` in every module and example `versions.tf` / `required_providers` block.
 
 ## 8. Specific Module Instructions
 

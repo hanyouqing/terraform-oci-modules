@@ -44,7 +44,7 @@ permissions:
 
 env:
   TERRAGRUNT_VERSION: "0.77.8"
-  TERRAFORM_VERSION: "~> 1.14"
+  TERRAFORM_VERSION: "1.16.5"
   WORKING_DIR: "terragrunt/personal/ap-seoul-1/development"
 
   # OCI Provider auth (written to ~/.oci/config)

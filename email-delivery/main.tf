@@ -7,7 +7,7 @@ resource "oci_email_sender" "this" {
   freeform_tags = merge(
     var.freeform_tags,
     {
-      "ManagedBy"   = "terraform"
+      "ManagedBy"   = "Terraform"
       "Module"      = "github.com/hanyouqing/terraform-oci-modules/email-delivery"
       "Project"     = var.project
       "Environment" = var.environment

@@ -94,15 +94,15 @@ The following APM resources are **free** within Always Free tier limits:
 ## Requirements
 
 | Name | Version |
-| ---- | ------- |
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.14.2 |
-| <a name="requirement_oci"></a> [oci](#requirement\_oci) | ~> 8.28 |
+|------|---------|
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.16.0 |
+| <a name="requirement_oci"></a> [oci](#requirement\_oci) | ~> 9.9 |
 
 ## Providers
 
 | Name | Version |
-| ---- | ------- |
-| <a name="provider_oci"></a> [oci](#provider\_oci) | 8.29.0 |
+|------|---------|
+| <a name="provider_oci"></a> [oci](#provider\_oci) | ~> 9.9 |
 
 ## Modules
 
@@ -111,14 +111,14 @@ No modules.
 ## Resources
 
 | Name | Type |
-| ---- | ---- |
+|------|------|
 | [oci_apm_apm_domain.this](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/apm_apm_domain) | resource |
 | [oci_apm_synthetics_monitor.this](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/apm_synthetics_monitor) | resource |
 
 ## Inputs
 
 | Name | Description | Type | Default | Required |
-| ---- | ----------- | ---- | ------- | :------: |
+|------|-------------|------|---------|:--------:|
 | <a name="input_apm_domains"></a> [apm\_domains](#input\_apm\_domains) | Map of APM domains to create. Always Free: 1 domain with 1,000 tracing events/hour. | <pre>map(object({<br/>    display_name  = string<br/>    description   = optional(string, "")<br/>    is_free_tier  = optional(bool, true)<br/>    freeform_tags = optional(map(string), {})<br/>    defined_tags  = optional(map(string), {})<br/>  }))</pre> | `{}` | no |
 | <a name="input_compartment_id"></a> [compartment\_id](#input\_compartment\_id) | OCID of the compartment where APM resources will be created | `string` | n/a | yes |
 | <a name="input_defined_tags"></a> [defined\_tags](#input\_defined\_tags) | Defined tags to apply to all resources | `map(string)` | `{}` | no |
@@ -130,7 +130,7 @@ No modules.
 ## Outputs
 
 | Name | Description |
-| ---- | ----------- |
+|------|-------------|
 | <a name="output_apm_domain_data_upload_endpoints"></a> [apm\_domain\_data\_upload\_endpoints](#output\_apm\_domain\_data\_upload\_endpoints) | Data upload endpoints for APM domains (used by agents) |
 | <a name="output_apm_domain_ids"></a> [apm\_domain\_ids](#output\_apm\_domain\_ids) | OCIDs of the APM domains |
 | <a name="output_apm_domain_states"></a> [apm\_domain\_states](#output\_apm\_domain\_states) | Lifecycle states of the APM domains |

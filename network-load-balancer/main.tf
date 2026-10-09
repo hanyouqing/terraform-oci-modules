@@ -7,7 +7,7 @@ locals {
 
   default_tags = merge(
     {
-      "ManagedBy"   = "terraform"
+      "ManagedBy"   = "Terraform"
       "Module"      = "github.com/hanyouqing/terraform-oci-modules/network-load-balancer"
       "Project"     = var.project
       "Environment" = var.environment

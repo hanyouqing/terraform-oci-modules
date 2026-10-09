@@ -82,15 +82,15 @@ module "credentials" {
 ## Requirements
 
 | Name | Version |
-| ---- | ------- |
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.14.2 |
-| <a name="requirement_oci"></a> [oci](#requirement\_oci) | ~> 8.28 |
+|------|---------|
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.16.0 |
+| <a name="requirement_oci"></a> [oci](#requirement\_oci) | ~> 9.9 |
 
 ## Providers
 
 | Name | Version |
-| ---- | ------- |
-| <a name="provider_oci"></a> [oci](#provider\_oci) | 8.29.0 |
+|------|---------|
+| <a name="provider_oci"></a> [oci](#provider\_oci) | ~> 9.9 |
 
 ## Modules
 
@@ -99,7 +99,7 @@ No modules.
 ## Resources
 
 | Name | Type |
-| ---- | ---- |
+|------|------|
 | [oci_identity_api_key.this](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/identity_api_key) | resource |
 | [oci_identity_auth_token.this](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/identity_auth_token) | resource |
 | [oci_identity_customer_secret_key.this](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/identity_customer_secret_key) | resource |
@@ -108,7 +108,7 @@ No modules.
 ## Inputs
 
 | Name | Description | Type | Default | Required |
-| ---- | ----------- | ---- | ------- | :------: |
+|------|-------------|------|---------|:--------:|
 | <a name="input_api_keys"></a> [api\_keys](#input\_api\_keys) | Map of API signing keys to create. Each key requires a PEM-encoded RSA public key. Treat key material as secret; avoid logging terraform plans that include these values. | <pre>map(object({<br/>    key_value = string<br/>  }))</pre> | `{}` | no |
 | <a name="input_auth_tokens"></a> [auth\_tokens](#input\_auth\_tokens) | Map of auth tokens to create. Auth tokens are Oracle-compatible authentication tokens for services like Swift and HDFS. | <pre>map(object({<br/>    description = string<br/>  }))</pre> | `{}` | no |
 | <a name="input_customer_secret_keys"></a> [customer\_secret\_keys](#input\_customer\_secret\_keys) | Map of customer secret keys to create. Used for Amazon S3-compatible API access to Object Storage. | <pre>map(object({<br/>    display_name = string<br/>  }))</pre> | `{}` | no |
@@ -117,12 +117,12 @@ No modules.
 | <a name="input_freeform_tags"></a> [freeform\_tags](#input\_freeform\_tags) | Freeform tags to apply to all resources (where supported) | `map(string)` | `{}` | no |
 | <a name="input_project"></a> [project](#input\_project) | Project name used for tagging and naming. | `string` | `"oci-modules"` | no |
 | <a name="input_smtp_credentials"></a> [smtp\_credentials](#input\_smtp\_credentials) | Map of SMTP credentials to create. Used for sending email via OCI Email Delivery SMTP interface. | <pre>map(object({<br/>    description = string<br/>  }))</pre> | `{}` | no |
-| <a name="input_user_id"></a> [user\_id](#input\_user\_id) | The OCID of the user to manage credentials for. | `string` | n/a | yes |
+| <a name="input_user_id"></a> [user\_id](#input\_user\_id) | OCID of the user to manage credentials for. Required when any credential map is non-empty; leave empty/null when creating no credentials. | `string` | `null` | no |
 
 ## Outputs
 
 | Name | Description |
-| ---- | ----------- |
+|------|-------------|
 | <a name="output_api_key_fingerprints"></a> [api\_key\_fingerprints](#output\_api\_key\_fingerprints) | Map of API key fingerprints. |
 | <a name="output_api_key_ids"></a> [api\_key\_ids](#output\_api\_key\_ids) | Map of API key identifiers. |
 | <a name="output_auth_token_ids"></a> [auth\_token\_ids](#output\_auth\_token\_ids) | Map of auth token identifiers. |

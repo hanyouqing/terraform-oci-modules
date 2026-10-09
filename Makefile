@@ -4,7 +4,7 @@
 .DEFAULT_GOAL := help
 
 # Variables
-TERRAFORM_VERSION ?= 1.14.2
+TERRAFORM_VERSION ?= 1.16.5
 TF_VERSION_FILE := .terraform-version
 
 help: ## Show this help message

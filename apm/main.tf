@@ -10,7 +10,7 @@ resource "oci_apm_apm_domain" "this" {
 
   freeform_tags = merge(
     {
-      "ManagedBy"   = "terraform"
+      "ManagedBy"   = "Terraform"
       "Module"      = "github.com/hanyouqing/terraform-oci-modules/apm"
       "Project"     = var.project
       "Environment" = var.environment
@@ -71,7 +71,7 @@ resource "oci_apm_synthetics_monitor" "this" {
 
   freeform_tags = merge(
     {
-      "ManagedBy"   = "terraform"
+      "ManagedBy"   = "Terraform"
       "Module"      = "github.com/hanyouqing/terraform-oci-modules/apm"
       "Project"     = var.project
       "Environment" = var.environment

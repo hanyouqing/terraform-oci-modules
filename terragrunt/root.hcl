@@ -57,7 +57,7 @@ locals {
 }
 
 # ── Remote State ──────────────────────────────────────────────────────────────
-# Terraform native OCI backend (Object Storage). Requires Terraform >= 1.12 (modules use >= 1.14.2).
+# Terraform native OCI backend (Object Storage). Requires Terraform >= 1.12 (modules use >= 1.16.0).
 # See: https://developer.hashicorp.com/terraform/language/backend/oci
 #      https://docs.oracle.com/en-us/iaas/Content/dev/terraform/object-storage-state.htm
 #

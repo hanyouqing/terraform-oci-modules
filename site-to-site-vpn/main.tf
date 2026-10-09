@@ -11,7 +11,7 @@ resource "oci_core_cpe" "this" {
 
   freeform_tags = merge(
     {
-      "ManagedBy"   = "terraform"
+      "ManagedBy"   = "Terraform"
       "Module"      = "github.com/hanyouqing/terraform-oci-modules/site-to-site-vpn"
       "Project"     = var.project
       "Environment" = var.environment
@@ -42,7 +42,7 @@ resource "oci_core_ipsec" "this" {
 
   freeform_tags = merge(
     {
-      "ManagedBy"   = "terraform"
+      "ManagedBy"   = "Terraform"
       "Module"      = "github.com/hanyouqing/terraform-oci-modules/site-to-site-vpn"
       "Project"     = var.project
       "Environment" = var.environment

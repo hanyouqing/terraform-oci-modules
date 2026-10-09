@@ -8,7 +8,7 @@ resource "oci_logging_log_group" "this" {
   freeform_tags = merge(
     var.freeform_tags,
     {
-      "ManagedBy"   = "terraform"
+      "ManagedBy"   = "Terraform"
       "Module"      = "github.com/hanyouqing/terraform-oci-modules/logging"
       "Project"     = var.project
       "Environment" = var.environment
@@ -45,7 +45,7 @@ resource "oci_logging_log" "this" {
   freeform_tags = merge(
     var.freeform_tags,
     {
-      "ManagedBy"   = "terraform"
+      "ManagedBy"   = "Terraform"
       "Module"      = "github.com/hanyouqing/terraform-oci-modules/logging/log"
       "Project"     = var.project
       "Environment" = var.environment

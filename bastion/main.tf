@@ -8,7 +8,7 @@ resource "oci_bastion_bastion" "this" {
 
   freeform_tags = merge(
     {
-      "ManagedBy"   = "terraform"
+      "ManagedBy"   = "Terraform"
       "Module"      = "github.com/hanyouqing/terraform-oci-modules/bastion"
       "Project"     = var.project
       "Environment" = var.environment

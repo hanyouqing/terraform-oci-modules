@@ -75,12 +75,22 @@ variable "project" {
   description = "Project name used for tagging and naming."
   type        = string
   default     = "oci-modules"
+
+  validation {
+    condition     = length(trimspace(var.project)) > 0
+    error_message = "project must be a non-empty string."
+  }
 }
 
 variable "environment" {
   description = "Environment name (e.g., development, staging, production)."
   type        = string
   default     = "development"
+
+  validation {
+    condition     = length(trimspace(var.environment)) > 0
+    error_message = "environment must be a non-empty string."
+  }
 }
 
 variable "freeform_tags" {
