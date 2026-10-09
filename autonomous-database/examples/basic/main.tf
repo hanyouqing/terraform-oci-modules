@@ -8,6 +8,8 @@ terraform {
   }
 }
 
+provider "oci" {}
+
 module "autonomous_database" {
   source = "../../"
 

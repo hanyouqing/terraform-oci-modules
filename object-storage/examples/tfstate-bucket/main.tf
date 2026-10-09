@@ -8,6 +8,8 @@ terraform {
   }
 }
 
+provider "oci" {}
+
 # Private versioned bucket suitable for Terraform remote state (OCI Object Storage backend).
 # Product stacks that use Cloudflare R2 are out of scope for this module example.
 module "object_storage" {

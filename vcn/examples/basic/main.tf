@@ -8,9 +8,7 @@ terraform {
   }
 }
 
-data "oci_identity_availability_domains" "ads" {
-  compartment_id = var.tenancy_ocid
-}
+provider "oci" {}
 
 # Locked-down basic example: no world-open SSH. HTTPS optional for public demos.
 module "vcn" {

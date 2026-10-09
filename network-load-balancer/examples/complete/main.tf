@@ -9,6 +9,8 @@ terraform {
   }
 }
 
+provider "oci" {}
+
 # Complete example: NLB with multiple listeners, backends, and protocols
 module "network_load_balancer" {
   source = "../../"

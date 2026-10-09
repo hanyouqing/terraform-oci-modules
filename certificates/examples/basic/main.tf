@@ -8,6 +8,8 @@ terraform {
   }
 }
 
+provider "oci" {}
+
 # Create a Vault + KMS key for CA protection (Always Free)
 module "vault" {
   source = "../../../vault"

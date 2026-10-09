@@ -9,6 +9,8 @@ terraform {
   }
 }
 
+provider "oci" {}
+
 # Basic example: create a single auth token for a user
 module "credentials" {
   source = "../../"

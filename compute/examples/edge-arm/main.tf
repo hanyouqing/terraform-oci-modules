@@ -8,6 +8,8 @@ terraform {
   }
 }
 
+provider "oci" {}
+
 # Always Free ARM profile commonly used for a single public edge instance:
 # VM.Standard.A1.Flex with 2 OCPU / 12 GB / 50 GB boot (within 4 OCPU / 24 GB tenancy quota).
 # user_data must be supplied by the caller as base64; this example leaves it null.

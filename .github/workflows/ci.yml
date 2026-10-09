@@ -73,9 +73,9 @@ jobs:
         with:
           tflint_version: latest
       - name: Init TFLint
-        run: tflint --init --config .tflint.hcl
+        run: tflint --init --config "${GITHUB_WORKSPACE}/.tflint.hcl"
       - name: Run TFLint
-        run: tflint --config .tflint.hcl --recursive
+        run: tflint --config "${GITHUB_WORKSPACE}/.tflint.hcl" --recursive
 
   docs-check:
     name: Docs Drift Check

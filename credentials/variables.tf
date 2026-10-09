@@ -71,6 +71,8 @@ variable "smtp_credentials" {
 # Common Variables
 # -----------------------------------------------------------------------------
 
+# Identity credential resources do not support tags; inputs kept for module API parity.
+# tflint-ignore: terraform_unused_declarations
 variable "project" {
   description = "Project name used for tagging and naming."
   type        = string
@@ -82,6 +84,7 @@ variable "project" {
   }
 }
 
+# tflint-ignore: terraform_unused_declarations
 variable "environment" {
   description = "Environment name (e.g., development, staging, production)."
   type        = string
@@ -93,12 +96,14 @@ variable "environment" {
   }
 }
 
+# tflint-ignore: terraform_unused_declarations
 variable "freeform_tags" {
   type        = map(string)
   description = "Freeform tags to apply to all resources (where supported)"
   default     = {}
 }
 
+# tflint-ignore: terraform_unused_declarations
 variable "defined_tags" {
   type        = map(string)
   description = "Defined tags to apply to all resources (where supported)"

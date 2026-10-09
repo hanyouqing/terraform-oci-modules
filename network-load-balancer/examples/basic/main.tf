@@ -9,6 +9,8 @@ terraform {
   }
 }
 
+provider "oci" {}
+
 # Basic example: single NLB with TCP listener (Always Free compatible)
 module "network_load_balancer" {
   source = "../../"

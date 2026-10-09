@@ -3,8 +3,6 @@
 # -----------------------------------------------------------------------------
 
 locals {
-  is_always_free = var.is_private == false || var.is_private == true
-
   default_tags = merge(
     {
       "ManagedBy"   = "Terraform"

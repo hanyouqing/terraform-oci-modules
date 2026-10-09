@@ -228,6 +228,8 @@ variable "enable_pv_encryption_in_transit" {
   default     = true
 }
 
+# Retained for backward compatibility; boot size is set via source_details.
+# tflint-ignore: terraform_unused_declarations
 variable "create_boot_volume" {
   type        = bool
   description = "Whether to create a separate boot volume"

@@ -1,7 +1,3 @@
-data "oci_identity_availability_domains" "ads" {
-  compartment_id = var.tenancy_ocid
-}
-
 resource "oci_core_volume" "this" {
   for_each = var.volumes
 

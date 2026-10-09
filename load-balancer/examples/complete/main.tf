@@ -8,6 +8,8 @@ terraform {
   }
 }
 
+provider "oci" {}
+
 module "load_balancer" {
   source = "../../"
 

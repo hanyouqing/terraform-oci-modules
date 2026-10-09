@@ -8,6 +8,8 @@ variable "compartment_id" {
   }
 }
 
+# Retained so existing callers can keep passing tenancy_ocid.
+# tflint-ignore: terraform_unused_declarations
 variable "tenancy_ocid" {
   type        = string
   description = "OCID of the tenancy"

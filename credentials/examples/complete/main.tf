@@ -9,6 +9,8 @@ terraform {
   }
 }
 
+provider "oci" {}
+
 # Complete example: all credential types with multiple entries
 module "credentials" {
   source = "../../"

@@ -8,9 +8,7 @@ terraform {
   }
 }
 
-data "oci_identity_availability_domains" "ads" {
-  compartment_id = var.tenancy_ocid
-}
+provider "oci" {}
 
 # Minimal public-edge VCN: IGW + one public subnet. Ingress is caller-defined
 # (example shows TCP 443 and optional SSH CIDRs). No application protocols here.

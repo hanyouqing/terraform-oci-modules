@@ -140,7 +140,6 @@ No modules.
 | [oci_core_volume_attachment.this](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/core_volume_attachment) | resource |
 | [oci_core_volume_backup.this](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/core_volume_backup) | resource |
 | [oci_core_volume_backup_policy.this](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/core_volume_backup_policy) | resource |
-| [oci_identity_availability_domains.ads](https://registry.terraform.io/providers/oracle/oci/latest/docs/data-sources/identity_availability_domains) | data source |
 
 ## Inputs
 
