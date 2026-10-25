@@ -1,0 +1,129 @@
+name: Solutions CI/CD
+
+on:
+  pull_request:
+    paths:
+      - "docs/oci-solutions-architect/examples/**"
+      - ".github/workflows/solutions-cicd.yml"
+      - "docs/oci-solutions-architect/examples/ci/**"
+  workflow_dispatch:
+    inputs:
+      action:
+        description: "plan or apply. Honors repository variable SOLUTIONS_APPLY_ENTRY."
+        required: true
+        type: choice
+        default: plan
+        options:
+          - plan
+          - apply
+      solution:
+        description: "One solution directory. Do not apply 03 without a real CPE."
+        required: true
+        type: choice
+        options:
+          - 00-iac-lifecycle
+          - 01-secure-landing-zone
+          - 02-three-tier-application
+          - 03-hybrid-site-to-site
+          - 04-data-platform
+          - 05-observability
+          - 06-edge-certificates
+          - 07-three-tier-application-paid
+          - 08-data-platform-paid
+          - 09-edge-certificates-paid
+
+permissions:
+  contents: read
+
+concurrency:
+  group: solutions-${{ github.event_name }}-${{ inputs.solution || 'validate' }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  validate:
+    name: Validate solutions
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "~> 1.16"
+          terraform_wrapper: false
+      - name: Format and validate
+        run: |
+          root="docs/oci-solutions-architect/examples"
+          terraform fmt -check -recursive "$root"
+          for dir in "$root"/*/; do
+            [ -f "${dir}main.tf" ] || continue
+            echo "::group::${dir}"
+            (cd "$dir" && terraform init -backend=false -input=false && terraform validate)
+            echo "::endgroup::"
+          done
+
+  plan:
+    name: Plan solution
+    if: github.event_name == 'workflow_dispatch' && inputs.action == 'plan'
+    runs-on: ubuntu-latest
+    env:
+      TERRAFORM_ACTION: plan
+      SOLUTION: ${{ inputs.solution }}
+      SOLUTIONS_APPLY_ENTRY: ${{ vars.SOLUTIONS_APPLY_ENTRY || 'github-actions' }}
+      OCI_CLI_TENANCY: ${{ secrets.OCI_CLI_TENANCY }}
+      OCI_CLI_USER: ${{ secrets.OCI_CLI_USER }}
+      OCI_CLI_FINGERPRINT: ${{ secrets.OCI_CLI_FINGERPRINT }}
+      OCI_CLI_KEY_CONTENT: ${{ secrets.OCI_CLI_KEY_CONTENT }}
+      TF_STATE_BUCKET: ${{ secrets.TF_STATE_BUCKET }}
+      OCI_NAMESPACE: ${{ secrets.OCI_NAMESPACE }}
+      TF_VAR_compartment_id: ${{ secrets.OCI_COMPARTMENT_ID }}
+      TF_VAR_tenancy_ocid: ${{ secrets.OCI_CLI_TENANCY }}
+      TF_VAR_bucket_name: ${{ secrets.TF_STATE_BUCKET }}
+      TF_VAR_ssh_public_keys: ${{ secrets.SSH_PUBLIC_KEYS }}
+      TF_VAR_alert_email: ${{ secrets.ALERT_EMAIL }}
+      TF_VAR_sender_email: ${{ secrets.SENDER_EMAIL }}
+      TF_VAR_adb_admin_password: ${{ secrets.ADB_ADMIN_PASSWORD }}
+      TF_VAR_mysql_admin_password: ${{ secrets.MYSQL_ADMIN_PASSWORD }}
+      BASTION_ALLOWED_CIDR: ${{ secrets.BASTION_ALLOWED_CIDR }}
+      TF_VAR_cpe_ip_address: ${{ secrets.CPE_IP_ADDRESS }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "~> 1.16"
+          terraform_wrapper: false
+      - name: Plan
+        run: bash docs/oci-solutions-architect/examples/ci/terraform.sh
+
+  apply:
+    name: Apply solution
+    if: github.event_name == 'workflow_dispatch' && inputs.action == 'apply'
+    runs-on: ubuntu-latest
+    environment: solutions-apply
+    env:
+      TERRAFORM_ACTION: apply
+      SOLUTION: ${{ inputs.solution }}
+      SOLUTIONS_APPLY_ENTRY: ${{ vars.SOLUTIONS_APPLY_ENTRY || 'github-actions' }}
+      OCI_CLI_TENANCY: ${{ secrets.OCI_CLI_TENANCY }}
+      OCI_CLI_USER: ${{ secrets.OCI_CLI_USER }}
+      OCI_CLI_FINGERPRINT: ${{ secrets.OCI_CLI_FINGERPRINT }}
+      OCI_CLI_KEY_CONTENT: ${{ secrets.OCI_CLI_KEY_CONTENT }}
+      TF_STATE_BUCKET: ${{ secrets.TF_STATE_BUCKET }}
+      OCI_NAMESPACE: ${{ secrets.OCI_NAMESPACE }}
+      TF_VAR_compartment_id: ${{ secrets.OCI_COMPARTMENT_ID }}
+      TF_VAR_tenancy_ocid: ${{ secrets.OCI_CLI_TENANCY }}
+      TF_VAR_bucket_name: ${{ secrets.TF_STATE_BUCKET }}
+      TF_VAR_ssh_public_keys: ${{ secrets.SSH_PUBLIC_KEYS }}
+      TF_VAR_alert_email: ${{ secrets.ALERT_EMAIL }}
+      TF_VAR_sender_email: ${{ secrets.SENDER_EMAIL }}
+      TF_VAR_adb_admin_password: ${{ secrets.ADB_ADMIN_PASSWORD }}
+      TF_VAR_mysql_admin_password: ${{ secrets.MYSQL_ADMIN_PASSWORD }}
+      BASTION_ALLOWED_CIDR: ${{ secrets.BASTION_ALLOWED_CIDR }}
+      TF_VAR_cpe_ip_address: ${{ secrets.CPE_IP_ADDRESS }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "~> 1.16"
+          terraform_wrapper: false
+      - name: Apply
+        run: bash docs/oci-solutions-architect/examples/ci/terraform.sh

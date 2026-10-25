@@ -45,8 +45,8 @@ module "compute" {
   subnet_id      = module.vcn.public_subnet_ids["public-subnet-1"]
 
   shape              = "VM.Standard.E2.1.Micro"
-  instance_count     = 1
-  ssh_public_keys    = file("~/.ssh/id_rsa.pub")
+  instance_count  = 1
+  ssh_public_keys = file("~/.ssh/id_rsa.pub")
 
   project     = "my-project"
   environment = "production"
@@ -64,19 +64,19 @@ module "compute_a1" {
   subnet_id      = module.vcn.public_subnet_ids["public-subnet-1"]
 
   shape          = "VM.Standard.A1.Flex"
-  ocpus          = 2
-  memory_in_gbs  = 12
-  instance_count = 1
+  ocpus           = 2
+  memory_in_gbs   = 12
+  instance_count  = 1
   ssh_public_keys = file("~/.ssh/id_rsa.pub")
 
   block_volumes = {
     data-volume = {
-      display_name        = "data-volume"
-      size_in_gbs         = 50
-      availability_domain = data.oci_identity_availability_domains.ads.availability_domains[0].name
-      instance_index      = 0
-      device              = "/dev/oracleoci/oraclevdb"
-      vpus_per_gb         = "10"
+      display_name         = "data-volume"
+      size_in_gbs          = 50
+      availability_domain  = data.oci_identity_availability_domains.ads.availability_domains[0].name
+      instance_index       = 0
+      device               = "/dev/oracleoci/oraclevdb"
+      vpus_per_gb          = "10"
       is_auto_tune_enabled = false
     }
   }
@@ -143,13 +143,13 @@ See the [examples](../examples/compute/) directory for complete examples.
 | Name | Version |
 | ---- | ------- |
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.14.2 |
-| <a name="requirement_oci"></a> [oci](#requirement\_oci) | ~> 8.28 |
+| <a name="requirement_oci"></a> [oci](#requirement\_oci) | ~> 9.11 |
 
 ## Providers
 
 | Name | Version |
 | ---- | ------- |
-| <a name="provider_oci"></a> [oci](#provider\_oci) | 8.29.0 |
+| <a name="provider_oci"></a> [oci](#provider\_oci) | 9.11.0 |
 
 ## Modules
 
@@ -169,7 +169,7 @@ No modules.
 
 | Name | Description | Type | Default | Required |
 | ---- | ----------- | ---- | ------- | :------: |
-| <a name="input_assign_public_ip"></a> [assign\_public\_ip](#input\_assign\_public\_ip) | Whether to assign a public IP address | `bool` | `true` | no |
+| <a name="input_assign_public_ip"></a> [assign\_public\_ip](#input\_assign\_public\_ip) | Whether to assign a public IP address. Default false for least privilege; set true for public-edge instances. | `bool` | `false` | no |
 | <a name="input_availability_config"></a> [availability\_config](#input\_availability\_config) | Optional availability\_config block for oci\_core\_instance | <pre>object({<br/>    is_live_migration_preferred = optional(bool, null)<br/>    recovery_action             = optional(string, null)<br/>  })</pre> | `null` | no |
 | <a name="input_availability_domain"></a> [availability\_domain](#input\_availability\_domain) | Availability domain for the instance. If not specified, will be distributed across ADs | `string` | `null` | no |
 | <a name="input_block_volumes"></a> [block\_volumes](#input\_block\_volumes) | Map of block volumes to create and attach | <pre>map(object({<br/>    display_name         = string<br/>    size_in_gbs          = number<br/>    availability_domain  = optional(string, null)<br/>    instance_index       = number<br/>    device               = optional(string, null)<br/>    vpus_per_gb          = optional(string, "10")<br/>    is_auto_tune_enabled = optional(bool, false)<br/>  }))</pre> | `{}` | no |

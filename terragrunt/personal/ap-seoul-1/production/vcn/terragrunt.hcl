@@ -60,10 +60,10 @@ inputs = {
       tcp_options = { min = 1521, max = 1522 }
     },
     {
-      protocol    = "1"
-      source      = "10.0.0.0/16"
-      source_type = "CIDR_BLOCK"
-      description = "Allow ICMP from VCN"
+      protocol     = "1"
+      source       = "10.0.0.0/16"
+      source_type  = "CIDR_BLOCK"
+      description  = "Allow ICMP from VCN"
       icmp_options = { type = 3, code = 4 }
     }
   ]

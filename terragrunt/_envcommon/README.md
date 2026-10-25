@@ -22,4 +22,4 @@ For published stacks, pin a git ref instead, e.g.
 
 ## `ad_index`
 
-Optional key in `env.hcl`. Exposed as `local.ad_index` for AZ-aware resources (compute, block-storage, MySQL).
+Optional key in `env.hcl`. Exposed as `local.ad_index` for AZ-aware resources (compute, block-volume, MySQL).

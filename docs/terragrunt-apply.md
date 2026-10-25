@@ -33,7 +33,7 @@ These secrets are used to generate `~/.oci/config` at runtime so the OCI Terrafo
 
 ### Remote state (Terraform `backend "oci"`)
 
-The workflow writes `~/.oci/config` with the API key above. **No separate Customer Secret Key** is required: the same profile is used for the Terraform provider and the native OCI state backend ([HashiCorp `backend "oci"`](https://developer.hashicorp.com/terraform/language/backend/oci)).
+The workflow writes `~/.oci/config` with the API key above. The same profile is used for the Terraform provider and `backend "oci"` ([HashiCorp `backend "oci"`](https://developer.hashicorp.com/terraform/language/backend/oci)).
 
 | Secret | Description | How to get it |
 |--------|-------------|---------------|
@@ -146,8 +146,8 @@ Actions → Run workflow → action: apply → modules: "vcn compute bastion"
 Modules are applied sequentially in the order specified. Use Terragrunt dependency order:
 1. `vcn` (first — everything depends on it)
 2. `notifications` (independent)
-3. `compute`, `bastion`, `load-balancer`, `mysql` (depend on vcn)
-4. `block-storage` (depends on compute)
+3. `compute`, `bastion`, `lb`, `mysql-heatwave` (depend on vcn)
+4. `block-volume` (depends on compute)
 5. `monitoring` (depends on notifications)
 
 ### Apply everything

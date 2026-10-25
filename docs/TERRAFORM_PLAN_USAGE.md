@@ -73,8 +73,8 @@ The script expects the following directory structure:
 ```
 terraform/
   <project-path>/
-    main.tf
-    variables.tf
+ main.tf
+ variables.tf
     terraform.tfvars (optional)
 ```
 
@@ -83,8 +83,8 @@ Example:
 terraform/
   demo/
     vpc/
-      main.tf
-      variables.tf
+ main.tf
+ variables.tf
       terraform.tfvars
 ```
 

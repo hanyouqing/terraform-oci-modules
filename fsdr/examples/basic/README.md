@@ -1,0 +1,1 @@
+# Full Stack DR basic example\n\nCreates a protection group. Provide an Object Storage bucket and namespace for logs.\n

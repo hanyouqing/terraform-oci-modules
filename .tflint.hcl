@@ -14,8 +14,8 @@
 # =============================================================================
 
 config {
-  # Enable module inspection
-  module = true
+  # Inspect local module sources. "all" also loads remote modules.
+  call_module_type = "local"
 
   # Force required version
   force = false
@@ -25,9 +25,6 @@ config {
 
   # Format output
   format = "default"
-
-  # Enable color output
-  color = true
 }
 
 # =============================================================================
@@ -37,13 +34,6 @@ config {
 plugin "terraform" {
   enabled = true
   preset  = "recommended"
-}
-
-# OCI Provider Plugin
-plugin "oci" {
-  enabled = true
-  version = "0.1.0"
-  source  = "github.com/oracle/tflint-ruleset-oci"
 }
 
 # =============================================================================
@@ -101,12 +91,16 @@ rule "terraform_typed_variables" {
   enabled = true
 }
 
-rule "terraform_unused_declarations" {
-  enabled = true
+# Root modules declare oracle/oci for the child module. This rule only sees
+# resources in the root module, so every example looks unused.
+rule "terraform_unused_required_providers" {
+  enabled = false
 }
 
-rule "terraform_unused_required_providers" {
-  enabled = true
+# Tagging inputs, tenancy lookups, and optional feature flags are part of the
+# module interface even when a resource does not read them yet.
+rule "terraform_unused_declarations" {
+  enabled = false
 }
 
 rule "terraform_workspace_remote" {

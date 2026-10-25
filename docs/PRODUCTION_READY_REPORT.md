@@ -22,7 +22,7 @@
 - ✅ Fixed duplicate terraform block definition issue
 
 ### 3. ✅ Provider Version Management
-- ✅ All modules uniformly use `~> 8.28`
+- ✅ All modules uniformly use `~> 9.11`
 - ✅ Terraform Core version requirement: `>= 1.14.2`
 - ✅ Version constraints are reasonable
 
@@ -66,7 +66,7 @@ Fixed issues:
 |--------|-------|--------|
 | autonomous-database | 4 | ✅ |
 | bastion | 4 | ✅ |
-| block-storage | 4 | ✅ |
+| block-volume | 4 | ✅ |
 | compute | 4 | ✅ |
 | email-delivery | 4 | ✅ |
 | load-balancer | 4 | ✅ |

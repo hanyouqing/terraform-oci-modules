@@ -1,0 +1,1 @@
+# Service Connector complete example\n\nPass a non-empty `connectors` map to create routes.\n

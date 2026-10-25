@@ -96,13 +96,13 @@ The following APM resources are **free** within Always Free tier limits:
 | Name | Version |
 | ---- | ------- |
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.14.2 |
-| <a name="requirement_oci"></a> [oci](#requirement\_oci) | ~> 8.28 |
+| <a name="requirement_oci"></a> [oci](#requirement\_oci) | ~> 9.11 |
 
 ## Providers
 
 | Name | Version |
 | ---- | ------- |
-| <a name="provider_oci"></a> [oci](#provider\_oci) | 8.29.0 |
+| <a name="provider_oci"></a> [oci](#provider\_oci) | 9.11.0 |
 
 ## Modules
 

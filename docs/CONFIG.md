@@ -31,19 +31,22 @@ make lint-init
 # Run tflint on all modules
 make lint
 
-# Run tflint on a specific module
+# List module commands, then lint one module or every module
+make lint-module
 make lint-module MODULE=vcn
+make lint-module MODULE=all
 
-# Or use tflint directly
-tflint --config .tflint.hcl --recursive
+# Or use tflint directly. The config path must be absolute: --recursive
+# resolves a relative --config from each module directory.
+tflint --config "$(pwd)/.tflint.hcl" --recursive
 ```
 
 ### Configuration Highlights
 
-- **Module inspection**: Enabled to check module structure
-- **OCI plugin**: Configured for Oracle Cloud Infrastructure provider
-- **Rule set**: Uses recommended preset with all standard rules enabled
-- **Format**: Default output format with colors enabled
+- **Module inspection**: `call_module_type = "local"` checks module calls inside this repo
+- **OCI plugin**: `github.com/oracle/tflint-ruleset-oci` has no published release, so this config uses the bundled Terraform ruleset only
+- **Rule set**: Recommended Terraform rules. `terraform_unused_required_providers` and `terraform_unused_declarations` stay off because examples declare `oracle/oci` for child modules, and several module inputs are part of the interface before a resource reads them
+- **Format**: Default output. Color follows the terminal; TFLint 0.54+ does not accept `color` in `.tflint.hcl`
 
 ### Customization
 

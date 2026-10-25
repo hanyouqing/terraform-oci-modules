@@ -21,7 +21,7 @@ terragrunt/
 │   ├── vcn.hcl
 │   ├── compute.hcl
 │   ├── bastion.hcl
-│   ├── block-storage.hcl
+│   ├── block-volume.hcl
 │   ├── object-storage.hcl
 │   ├── load-balancer.hcl
 │   ├── network-load-balancer.hcl
@@ -155,7 +155,7 @@ locals {
 
 ### 5. Remote State (Terraform `backend "oci"`)
 
-Remote state uses Oracle’s **recommended** native backend ([Using Object Storage for State Files](https://docs.oracle.com/en-us/iaas/Content/dev/terraform/object-storage-state.htm), [HashiCorp: `backend "oci"`](https://developer.hashicorp.com/terraform/language/backend/oci)). It requires **Terraform ≥ 1.12** (this repo’s modules use **≥ 1.14.2**). Authentication is the **same OCI API key profile** as the Terraform provider (`config_file_profile` in `account.hcl`, typically `~/.oci/config`). `root.hcl` sets `OCI_CLI_CONFIG_FILE` for Terraform so the backend and provider share one config file (per-account path `~/.oci/<account_name>/config` when `account_name` is not the placeholder; otherwise `~/.oci/config`).
+Remote state uses Terraform `backend "oci"` ([Using Object Storage for State Files](https://docs.oracle.com/en-us/iaas/Content/dev/terraform/object-storage-state.htm), [HashiCorp: `backend "oci"`](https://developer.hashicorp.com/terraform/language/backend/oci)). Locking is part of that backend. It requires **Terraform ≥ 1.12** (this repo’s modules use **≥ 1.14.2**). Authentication is the **same OCI API key profile** as the Terraform provider (`config_file_profile` in `account.hcl`, typically `~/.oci/config`). `root.hcl` sets `OCI_CLI_CONFIG_FILE` for Terraform so the backend and provider share one config file (per-account path `~/.oci/<account_name>/config` when `account_name` is not the placeholder; otherwise `~/.oci/config`).
 
 **Create the state bucket once** (name must match `local.state_bucket` in `root.hcl`: `<project>-tfstate`):
 
@@ -171,8 +171,6 @@ Grant your user IAM access to **OBJECT_READ / OBJECT_INSPECT / OBJECT_CREATE / O
 State object key layout: `<region>/<environment>/<module>/terraform.tfstate` — isolated per account, region, and environment.
 
 Run `terragrunt init` / `plan` after the bucket exists.
-
-**Migrating from the previous S3-compatible backend:** If you already had state in the same bucket and key, run `terragrunt init` and confirm **state migration** when Terraform asks. If the state object disappeared from the wrong backend config, restore it from bucket **versioning** or use `terraform state pull` with a temporary old backend block.
 
 ### 5a. Object Storage stack: importing the tfstate bucket (circular dependency)
 
@@ -200,7 +198,7 @@ Apply **`object-storage` before** other stacks that assume the bucket exists, or
 ### 6. Set Runtime Environment Variables
 
 ```bash
-# Required for AD-specific resources (compute, block-storage, MySQL, bastion)
+# Required for AD-specific resources (compute, block-volume, MySQL, bastion)
 export TF_VAR_availability_domain="oci-yourdomain-ad-1"
 
 # Compute
@@ -258,7 +256,7 @@ terraform {
 ## Module Dependency Graph
 
 ```
-vcn ──────────┬──→ compute ──→ block-storage
+vcn ──────────┬──→ compute ──→ block-volume
               ├──→ load-balancer
               ├──→ network-load-balancer
               ├──→ bastion
@@ -279,11 +277,11 @@ site-to-site-vpn
 | Module | Always Free Limit |
 |--------|------------------|
 | `compute` | 2× VM.Standard.E2.1.Micro **or** 4 OCPU + 24 GB VM.Standard.A1.Flex |
-| `block-storage` | 200 GB total (boot + data volumes) |
+| `block-volume` | 200 GB total (boot + data volumes) |
 | `object-storage` | 20 GB |
-| `autonomous-database` | 2× instances, 1 OCPU + 20 GB each |
-| `mysql` | 1× single-node, 50 GB data + 50 GB backup |
-| `load-balancer` | 1× flexible, 10 Mbps min/max bandwidth |
+| `adb` | 2× instances, 1 OCPU + 20 GB each |
+| `mysql-heatwave` | 1× single-node, 50 GB data + 50 GB backup |
+| `lb` | 1× flexible, 10 Mbps min/max bandwidth |
 | `vault` | DEFAULT type (software keys — unlimited) |
 | `bastion` | Free for all account types |
 | `monitoring` | 500 M ingestion points/month |

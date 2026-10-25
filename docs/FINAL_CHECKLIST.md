@@ -22,7 +22,7 @@ December 2024
 ## ✅ 2. Provider Version Management
 
 ### ✅ Version Consistency
-- [x] All modules use the same provider version: `~> 8.28`
+- [x] All modules use the same provider version: `~> 9.11`
 - [x] Terraform Core version requirement: `>= 1.14.2`
 - [x] Version constraint strategy is reasonable (allows patch and minor updates)
 
@@ -53,7 +53,7 @@ Each module's examples contain:
 - [x] **compute**: instance_count, shape, ocpus, memory validation
 - [x] **load-balancer**: shape, backend_set reference, listener reference, protocol validation
 - [x] **bastion**: session_type, port, TTL validation
-- [x] **mysql**: data_storage_size, backup_policy validation
+- [x] **mysql-heatwave**: data_storage_size, backup_policy validation
 - [x] **object-storage**: bucket_key reference, action, time_unit validation
 - [x] **vcn**: DRG dependency, flow_log_retention validation
 
@@ -148,13 +148,13 @@ Each module's examples contain:
 ### ✅ All 13 Modules
 1. [x] **autonomous-database** - ✅ Complete
 2. [x] **bastion** - ✅ Complete
-3. [x] **block-storage** - ✅ Complete
+3. [x] **block-volume** - ✅ Complete
 4. [x] **compute** - ✅ Complete
 5. [x] **email-delivery** - ✅ Complete
 6. [x] **load-balancer** - ✅ Complete
 7. [x] **logging** - ✅ Complete
 8. [x] **monitoring** - ✅ Complete
-9. [x] **mysql** - ✅ Complete
+9. [x] **mysql-heatwave** - ✅ Complete
 10. [x] **notifications** - ✅ Complete
 11. [x] **object-storage** - ✅ Complete
 12. [x] **vault** - ✅ Complete
@@ -166,7 +166,7 @@ Each module's examples contain:
 - **Modules**: 13
 - **Examples**: 26 (2 per module)
 - **README Files**: 40
-- **Provider Version**: Uniformly uses `~> 8.28`
+- **Provider Version**: Uniformly uses `~> 9.11`
 
 ## ✅ 13. Improvement Summary
 

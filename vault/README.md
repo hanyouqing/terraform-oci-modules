@@ -27,17 +27,17 @@ module "vault" {
 
   keys = {
     master-key = {
-      display_name   = "master-key"
-      algorithm      = "AES"
-      length         = 32
-      curve_id       = null
+      display_name    = "master-key"
+      algorithm       = "AES"
+      length          = 32
+      curve_id        = null
       protection_mode = "SOFTWARE"
     }
   }
 
   secrets = {
     my-secret = {
-      secret_name    = "my-secret"
+      secret_name = "my-secret"
       # Use a placeholder in docs; load real secret_content from Vault/CI, not plaintext in repo
       secret_content = base64encode("my-secret-value")
       content_type   = "BASE64"
@@ -107,13 +107,13 @@ See the [examples](../examples/vault/) directory for complete examples.
 | Name | Version |
 | ---- | ------- |
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.14.2 |
-| <a name="requirement_oci"></a> [oci](#requirement\_oci) | ~> 8.28 |
+| <a name="requirement_oci"></a> [oci](#requirement\_oci) | ~> 9.11 |
 
 ## Providers
 
 | Name | Version |
 | ---- | ------- |
-| <a name="provider_oci"></a> [oci](#provider\_oci) | 8.29.0 |
+| <a name="provider_oci"></a> [oci](#provider\_oci) | 9.11.0 |
 
 ## Modules
 

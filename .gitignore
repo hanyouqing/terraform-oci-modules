@@ -52,3 +52,4 @@ terraform.rc
 .tfsec.yml.local
 .terraform-docs.yml.local
 
+docs/*

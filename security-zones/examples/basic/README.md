@@ -1,0 +1,1 @@
+# Security Zones basic example\n\nPass an existing `security_zone_recipe_id` or a `security_policies` list from the target region.\n

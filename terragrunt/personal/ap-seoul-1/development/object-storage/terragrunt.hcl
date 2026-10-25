@@ -25,8 +25,8 @@ locals {
   ) ? local.namespace_raw : null
 
   # Map key for the state bucket = last path segment of get_terragrunt_dir() (e.g. .../object-storage -> object-storage).
-  _tg_path_segments = compact(split("/", replace(get_terragrunt_dir(), "\\", "/")))
-  tfstate_bucket_key = local._tg_path_segments[length(local._tg_path_segments) - 1]
+  _tg_path_segments   = compact(split("/", replace(get_terragrunt_dir(), "\\", "/")))
+  tfstate_bucket_key  = local._tg_path_segments[length(local._tg_path_segments) - 1]
   tfstate_bucket_name = "${local.project}-tfstate"
 
   # One-time import of an existing bucket: export TG_IMPORT_TFSTATE_BUCKET=true (needs namespace below).

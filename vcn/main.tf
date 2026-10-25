@@ -201,6 +201,15 @@ resource "oci_core_route_table" "private" {
   }
 
   dynamic "route_rules" {
+    for_each = var.create_drg && var.attach_drg_to_vcn ? var.private_drg_destination_cidrs : []
+    content {
+      network_entity_id = oci_core_drg.this[0].id
+      destination       = route_rules.value
+      destination_type  = "CIDR_BLOCK"
+    }
+  }
+
+  dynamic "route_rules" {
     for_each = var.create_service_gateway ? local.service_gateway_services_effective : []
     content {
       network_entity_id = oci_core_service_gateway.this[0].id

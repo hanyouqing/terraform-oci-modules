@@ -1,0 +1,31 @@
+
+variable "compartment_id" {
+  type        = string
+  description = "Compartment OCID for the virtual circuit."
+}
+
+variable "display_name" {
+  type        = string
+  description = "Display name of the virtual circuit."
+  default     = "fastconnect-basic"
+}
+
+variable "bandwidth_shape_name" {
+  type        = string
+  description = "Provider bandwidth shape."
+}
+
+variable "customer_bgp_asn" {
+  type        = number
+  description = "Customer BGP ASN."
+}
+
+variable "gateway_id" {
+  type        = string
+  description = "DRG OCID that terminates the private circuit."
+}
+
+variable "provider_service_id" {
+  type        = string
+  description = "FastConnect provider service OCID."
+}

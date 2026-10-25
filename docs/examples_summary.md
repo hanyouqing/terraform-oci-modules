@@ -1,5 +1,19 @@
 # Examples Summary
 
+## Solution architectures
+
+Cross-module OCI Solutions Architect labs live in `docs/oci-solutions-architect/examples/`. The role analysis and 12-week plan are in `docs/oci-solutions-architect/`.
+
+| Directory | What it deploys |
+| --- | --- |
+| `docs/oci-solutions-architect/examples/00-iac-lifecycle` | Private versioned state bucket and the delivery workflow |
+| `docs/oci-solutions-architect/examples/01-secure-landing-zone` | Optional compartments and policies, VCN, vault, bastion, logging, alarms |
+| `docs/oci-solutions-architect/examples/02-three-tier-application` | Load balancer, private compute, private Autonomous Database |
+| `docs/oci-solutions-architect/examples/03-hybrid-site-to-site` | DRG, IPSec static routes, on-premises return route |
+| `docs/oci-solutions-architect/examples/04-data-platform` | ATP, MySQL, NoSQL, block volume, archive lifecycle |
+| `docs/oci-solutions-architect/examples/05-observability` | Logging, alarms, APM, notifications, email sender |
+| `docs/oci-solutions-architect/examples/06-edge-certificates` | Internal CA, layer-7 and layer-4 listeners |
+
 ## Overview
 
 All 13 modules now have both `basic` and `complete` examples:

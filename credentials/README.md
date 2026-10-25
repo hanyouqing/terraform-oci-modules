@@ -84,13 +84,13 @@ module "credentials" {
 | Name | Version |
 | ---- | ------- |
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.14.2 |
-| <a name="requirement_oci"></a> [oci](#requirement\_oci) | ~> 8.28 |
+| <a name="requirement_oci"></a> [oci](#requirement\_oci) | ~> 9.11 |
 
 ## Providers
 
 | Name | Version |
 | ---- | ------- |
-| <a name="provider_oci"></a> [oci](#provider\_oci) | 8.29.0 |
+| <a name="provider_oci"></a> [oci](#provider\_oci) | 9.11.0 |
 
 ## Modules
 
@@ -117,7 +117,7 @@ No modules.
 | <a name="input_freeform_tags"></a> [freeform\_tags](#input\_freeform\_tags) | Freeform tags to apply to all resources (where supported) | `map(string)` | `{}` | no |
 | <a name="input_project"></a> [project](#input\_project) | Project name used for tagging and naming. | `string` | `"oci-modules"` | no |
 | <a name="input_smtp_credentials"></a> [smtp\_credentials](#input\_smtp\_credentials) | Map of SMTP credentials to create. Used for sending email via OCI Email Delivery SMTP interface. | <pre>map(object({<br/>    description = string<br/>  }))</pre> | `{}` | no |
-| <a name="input_user_id"></a> [user\_id](#input\_user\_id) | The OCID of the user to manage credentials for. | `string` | n/a | yes |
+| <a name="input_user_id"></a> [user\_id](#input\_user\_id) | OCID of the user to manage credentials for. Required when any credential map is non-empty; leave empty/null when creating no credentials. | `string` | `null` | no |
 
 ## Outputs
 

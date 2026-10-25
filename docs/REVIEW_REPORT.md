@@ -1,7 +1,7 @@
 # Terraform OCI Modules Review Report
 
 ## Review Date
-September 2026 (provider ~> 8.28 modernization)
+September 2026 (provider ~> 8.28 modernization). October 2026: provider constraint moved to `~> 9.11`.
 
 ## Review Scope
 Comprehensive review of all 13 modules to ensure:
@@ -14,12 +14,12 @@ Comprehensive review of all 13 modules to ensure:
 ## I. Provider Version Check
 
 ### ✅ Current Status
-- **All modules uniformly use**: `~> 8.28`
+- **All modules uniformly use**: `~> 9.11` (October 2026; September review was `~> 8.28`)
 - **Terraform Core version requirement**: `>= 1.14.2`
 - **Version constraint strategy**: Using `~>` allows patch and minor updates, avoiding breaking changes
 
 ### ✅ Assessment Results
-- **Version constraints are reasonable**: `~> 8.28` allows 8.28.x and newer 8.x patch/minor releases, but not 9.0.0
+- **Version constraints are reasonable**: `~> 9.11` means `>= 9.11.0` and `< 10.0.0`
 - **Good consistency**: All modules and examples use the same version constraints
 - **Recommendation**: Regularly check Terraform Registry to confirm if there are newer stable versions
 
@@ -65,7 +65,7 @@ Comprehensive review of all 13 modules to ensure:
 #### Recommendations
 - ✅ Current implementation is good, no major improvements needed
 
-### 3. ✅ block-storage Module
+### 3. ✅ block-volume Module
 
 #### Functionality Coverage
 - ✅ Supports Volume creation, backups, backup policies
@@ -298,10 +298,10 @@ Comprehensive review of all 13 modules to ensure:
 **Fix**: Added length checks to safely access array elements
 ```hcl
 value = {
-  for k, v in oci_database_autonomous_database.this : k => 
-    length(v.connection_strings) > 0 && length(v.connection_strings[0].profiles) > 0 
-    ? v.connection_strings[0].profiles[0].value 
-    : null
+  for k, v in oci_database_autonomous_database.this : k =>
+  length(v.connection_strings) > 0 && length(v.connection_strings[0].profiles) > 0
+  ? v.connection_strings[0].profiles[0].value
+  : null
 }
 ```
 
@@ -363,7 +363,7 @@ dynamic "route_rules" {
 |--------|-----------------|---------------|-------------|------------|----------|-------|
 | autonomous-database | ✅ | ✅ | ✅ | ✅ | ✅ | 5/5 |
 | bastion | ✅ | ✅ | ✅ | ✅ | ✅ | 5/5 |
-| block-storage | ✅ | ✅ | ✅ | ✅ | ✅ | 5/5 |
+| block-volume | ✅ | ✅ | ✅ | ✅ | ✅ | 5/5 |
 | compute | ✅ | ✅ | ✅ | ✅ | ✅ | 5/5 |
 | email-delivery | ✅ | ✅ | ✅ | ✅ | ✅ | 5/5 |
 | load-balancer | ✅ | ✅ | ✅ | ✅ | ✅ | 5/5 |

@@ -24,16 +24,16 @@ locals {
     length(local.oci_namespace_raw) > 0 &&
     lower(local.oci_namespace_raw) != "replace_me" &&
     local.oci_namespace_raw != "REPLACE_ME"
-  ) ? local.oci_namespace_raw : trimspace(run_cmd(
-    "oci",
-    "--profile",
-    local.config_file_profile,
-    "os",
-    "ns",
-    "get",
-    "--query",
-    "data",
-    "--raw-output",
+    ) ? local.oci_namespace_raw : trimspace(run_cmd(
+      "oci",
+      "--profile",
+      local.config_file_profile,
+      "os",
+      "ns",
+      "get",
+      "--query",
+      "data",
+      "--raw-output",
   ))
 
   # Region

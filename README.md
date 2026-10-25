@@ -15,7 +15,7 @@ For **Terragrunt** (remote state, generated provider, DRY stack configs), see [t
 - **Cost-Effective Defaults**: Use always-free resource sizes and counts as default values while allowing easy scaling for production workloads
 - **Production Ready**: Follow enterprise best practices for security, compliance, monitoring, and scalability with comprehensive error handling
 - **Multi-Environment Support**: Support development, staging, and production environments with environment-specific configurations and state management
-- **Support Native Terraform and Resource Manager**: Compatible with both Terraform CLI workflows and OCI Resource Manager for enterprise deployment scenarios
+- **Terraform CLI for this repository**: Modules require Terraform >= 1.14.2. CI uses 1.16.6. OCI Resource Manager’s supported Terraform line is 1.5.x (CLI 1.5.7), so these configurations are applied with the CLI. Version differences are in [docs/resource-manager-terraform-versions.md](docs/resource-manager-terraform-versions.md).
 - **Security First**: Implement least-privilege access, encryption at rest and in transit, and comprehensive audit logging
 - **Monitoring & Observability**: Built-in monitoring, alerting, and logging capabilities for infrastructure health and performance tracking
 - **Cost Management**: Automated cost optimization, resource tagging, and usage analytics for budget control and resource allocation
@@ -23,42 +23,74 @@ For **Terragrunt** (remote state, generated provider, DRY stack configs), see [t
 
 ## Prerequisites
 
-- [Terraform](https://www.terraform.io/downloads.html) >= 1.14.2
-- [OCI Provider for Terraform](https://registry.terraform.io/providers/oracle/oci/latest/docs) `~> 8.28` (see each module’s `versions.tf`)
+- [Terraform](https://www.terraform.io/downloads.html) >= 1.14.2 (modules). CI and `.terraform-version` track 1.16.6. OCI Resource Manager currently runs Terraform 1.5.x (CLI 1.5.7) and cannot apply these modules. See [Resource Manager and Terraform versions](docs/resource-manager-terraform-versions.md).
+- [OCI Provider for Terraform](https://registry.terraform.io/providers/oracle/oci/latest/docs) `~> 9.11` (9.11.0, published 2026-10-21; see each module’s `versions.tf`)
 - [OCI CLI](https://docs.oracle.com/en-us/iaas/Content/API/SDKDocs/cliinstall.htm) configured (verify with `oci iam region list --output table`)
 - [OCI credentials](#setting-up-oci-credentials-for-the-terraform-provider) for the Terraform provider — the [OCI CLI](#setting-up-credentials-with-the-oci-cli) (`oci setup config`) is the usual way to create `~/.oci/config`; alternatively use environment variables from `.env.sh` only
 - Oracle Cloud Infrastructure account with appropriate permissions (enable the Always Free tier if you use demo/Always Free defaults)
 - [Git](https://git-scm.com/) for version control
 
+## Demo videos
+
+Recording scripts for every module, every module example, and the seven solution stacks are in [docs/demo-videos](docs/demo-videos/README.md). Chinese and English are separate. Episodes marked plan-only must not be applied on camera.
+
 ## Modules
+
+Directory names prefer OCI abbreviations (`waf`, `oke`, `adb`, `lb`, `nlb`, `sch`, `fsdr`, `vcn`, `apm`). Full map: [docs/MODULE_DIRECTORY_NAMES.md](docs/MODULE_DIRECTORY_NAMES.md).
 
 ### Infrastructure
 
-- **VCN**: Complete Virtual Cloud Network setup with public, private, and database subnets, Internet Gateway, NAT Gateway, Service Gateway, route tables, security lists, and NSGs. See `vcn/examples/edge-public` for a minimal public-edge topology
-- **Compute**: Always Free compute instances (VM.Standard.E2.1.Micro and VM.Standard.A1.Flex) with boot volumes, block volumes, network configuration, and optional launch/instance options. See `compute/examples/edge-arm` for a 2 OCPU / 12 GB / 50 GB ARM profile (caller-supplied `user_data`)
-- **Block Storage**: Block volumes with backup policies and attachments
-- **Object Storage**: Object Storage buckets with lifecycle policies and pre-authenticated requests
-- **Load Balancer**: Flexible load balancer with backend sets, listeners, and SSL/TLS support
-- **Network Load Balancer**: Layer 4 (TCP/UDP) network load balancer with backend sets, listeners, and health checks
-- **Site-to-Site VPN**: IPSec VPN connections with CPE objects and redundant tunnels
+- **`vcn`** — Virtual Cloud Network (subnets, gateways, route tables, security lists, NSGs). See `vcn/examples/edge-public`
+- **`compute`** — Compute instances (Always Free Micro / A1.Flex). See `compute/examples/edge-arm`
+- **`block-volume`** — Block Volume with backup policies and attachments
+- **`object-storage`** — Object Storage buckets, lifecycle, pre-authenticated requests
+- **`lb`** — Flexible Load Balancer
+- **`nlb`** — Network Load Balancer
+- **`site-to-site-vpn`** — Site-to-Site VPN (IPSec)
+- **`oke`** — Container Engine for Kubernetes (OKE)
+- **`fastconnect`** — FastConnect private virtual circuit on an existing DRG
+- **`file-storage`** — File Storage (file system, mount target, export)
 
 ### Database
 
-- **Autonomous Database**: Oracle Autonomous Database (ATP/ADW) with Always Free tier support
-- **MySQL HeatWave**: MySQL HeatWave Database Service with single-node configuration
-- **NoSQL Database**: NoSQL Database tables with secondary indexes and Always Free tier support
+- **`adb`** — Autonomous Database (ATP / ADW / AJD / APEX workloads)
+- **`mysql-heatwave`** — MySQL HeatWave
+- **`nosql-database`** — NoSQL Database
+- **`cache`** — OCI Cache
+- **`postgresql`** — OCI Database with PostgreSQL
+- **`opensearch`** — OCI Search with OpenSearch
+- **`exadata`** — Exadata Database Service (infrastructure + optional VM cluster)
+- **`exadata-snapshot`** — Snapshot of an existing ExaDB-XS database
+
+### Provider 9.11 services
+
+These services were added or extended in OCI provider 9.11.0 (2026-10-21). They are not Always Free. See each module README before apply.
+
+- **`public-safety`** — Oracle Public Safety and Security
+- **`child-tenancy`** — Organizations child tenancy
+- **`golden-gate`** — GoldenGate connection (+ optional deployment)
+- **`generative-ai`** — Generative AI dedicated AI cluster
 
 ### Security & Management
 
-- **Vault**: Vault service with key management and secrets management
-- **Certificates**: Certificate Authorities and TLS certificates with Always Free tier support
-- **Bastion**: Bastion service for secure SSH access to private resources
-- **Monitoring**: Monitoring alarms and metrics
-- **Notifications**: Notification Service topics and subscriptions
-- **Email Delivery**: Email Delivery senders and suppressions
-- **Logging**: Log groups and logs for centralized logging
-- **APM**: Application Performance Monitoring domains and Synthetics monitors
-- **Credentials**: IAM credentials (API keys, auth tokens, customer secret keys, SMTP credentials)
+- **`vault`** — Vault (keys and secrets)
+- **`certificates`** — Certificates service
+- **`bastion`** — Bastion
+- **`monitoring`** — Monitoring
+- **`notifications`** — Notifications
+- **`email-delivery`** — Email Delivery
+- **`logging`** — Logging
+- **`apm`** — Application Performance Monitoring
+- **`credentials`** — IAM credentials (API keys, auth tokens, customer secret keys, SMTP)
+- **`cloud-guard`** — Cloud Guard
+- **`data-safe`** — Data Safe
+- **`waf`** — Web Application Firewall
+- **`security-zones`** — Security Zones
+- **`network-firewall`** — Network Firewall
+- **`functions`** — Functions
+- **`api-gateway`** — API Gateway
+- **`sch`** — Connector Hub
+- **`fsdr`** — Full Stack Disaster Recovery
 
 ## Always Free Resources (Demo Deployment Order)
 
@@ -71,13 +103,13 @@ Deploy in this order for a demo project. All resources must be created in your *
 | 3 | **Vault** | Unlimited software keys, 20 HSM key versions, 150 secrets | vault |
 | 4 | **Compute** (VM.Standard.E2.1.Micro) | 2 instances (1/8 OCPU, 1 GB RAM each) | compute |
 | 5 | **Compute** (VM.Standard.A1.Flex) | 4 OCPUs + 24 GB RAM total (Arm) | compute |
-| 6 | **Block Volume** | 200 GB total (boot + block), 5 backups | block-storage |
+| 6 | **Block Volume** | 200 GB total (boot + block), 5 backups | `block-volume` |
 | 7 | **Object Storage** | 20 GB | object-storage |
-| 8 | **Autonomous Database** | 2 instances (1 OCPU + 20 GB each) | autonomous-database |
-| 9 | **MySQL HeatWave** | 1 node, 50 GB data + 50 GB backup | mysql |
+| 8 | **Autonomous Database** | 2 instances (1 OCPU + 20 GB each) | `adb` |
+| 9 | **MySQL HeatWave** | 1 node, 50 GB data + 50 GB backup | `mysql-heatwave` |
 | 10 | **NoSQL Database** | 3 tables, 25 GB/table, 133M reads/writes/month | nosql-database |
-| 11 | **Load Balancer** (Flexible) | 1 instance, 10 Mbps | load-balancer |
-| 12 | **Network Load Balancer** | 1 instance | network-load-balancer |
+| 11 | **Load Balancer** (Flexible) | 1 instance, 10 Mbps | `lb` |
+| 12 | **Network Load Balancer** | 1 instance | `nlb` |
 | 13 | **Bastion** | Free for all accounts | bastion |
 | 14 | **Monitoring** | 500M ingestion + 1B retrieval points/month | monitoring |
 | 15 | **Logging** | 10 GB/month (VCN flow logs) | logging |
@@ -110,17 +142,11 @@ See [docs/CONFIG.md](docs/CONFIG.md) for detailed configuration guide.
 
 ## Terraform state backend (OCI Object Storage)
 
-Remote state avoids committing `.tfstate` and supports locking and team workflows. Oracle documents storing Terraform state in Object Storage in [Using Object Storage for State Files](https://docs.oracle.com/en-us/iaas/Content/dev/terraform/object-storage-state.htm).
-
-| Approach | Notes |
-| --- | --- |
-| **OCI native backend** | **Recommended** by Oracle. Requires **Terraform v1.12.0 or greater** (this repo’s modules require **>= 1.14.2**). See *Data Source Configuration (OCI Backend)* on the page above. |
-| **S3-compatible `backend "s3"`** | **Deprecated** for new work—use only if you cannot use the native backend. Uses a Customer Secret Key and an endpoint such as `https://<namespace>.compat.objectstorage.<region>.oraclecloud.com`. Full steps are on the same Oracle page. |
-| **HTTP backend** | Uses a pre-authenticated request (PAR) for the state object; Oracle prefers the native backend over HTTP for Object Storage. |
+Remote state uses Terraform `backend "oci"` on a private, versioned Object Storage bucket ([Using Object Storage for State Files](https://docs.oracle.com/en-us/iaas/Content/dev/terraform/object-storage-state.htm)). It requires **Terraform v1.12.0 or greater** (this repo’s modules require **>= 1.14.2**). Locking is part of this backend. See *Data Source Configuration (OCI Backend)* on the page above. Resource Manager’s Terraform 1.5.7 does not include this backend; the comparison is in [docs/resource-manager-terraform-versions.md](docs/resource-manager-terraform-versions.md).
 
 Backend settings live in the root `terraform` block; **variables and locals are not allowed** there—use literal values or partial configuration / `-backend-config` as documented by HashiCorp.
 
-**Terragrunt:** This repository’s [terragrunt/README.md](terragrunt/README.md) stack uses Terraform’s **native `backend "oci"`** (Object Storage, same OCI API key profile as the provider). Use that layout when you adopt Terragrunt here.
+**Terragrunt:** This repository’s [terragrunt/README.md](terragrunt/README.md) stack uses the same `backend "oci"` and the same OCI API key profile as the provider.
 
 ### Terragrunt: remote state bucket and the object-storage module (first run)
 
@@ -387,8 +413,8 @@ module "vcn" {
       dns_label           = "public1"
       availability_domain = data.oci_identity_availability_domains.ads.availability_domains[0].name
       security_list_ids   = null
-    }
-  }
+ }
+ }
 
   project     = "my-project"
   environment = "production"
@@ -537,7 +563,9 @@ Each module follows a consistent structure:
 
 ## Examples
 
-Each module includes example configurations. See the `examples/` directory (to be created) for complete working examples.
+Each module includes `examples/basic` and `examples/complete`. Cross-module solution architectures for OCI Solutions Architect delivery (landing zone, three-tier app, hybrid VPN, data platform, observability, edge) are in [docs/oci-solutions-architect/examples](docs/oci-solutions-architect/examples/README.md).
+
+The role analysis, 12-week learning plan, and interview guide are in [docs/oci-solutions-architect](docs/oci-solutions-architect/README.md).
 
 ## Contributing
 

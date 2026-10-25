@@ -244,6 +244,22 @@ variable "attach_drg_to_vcn" {
   }
 }
 
+variable "private_drg_destination_cidrs" {
+  type        = list(string)
+  description = "IPv4 CIDRs routed from every private subnet to the DRG. Use on-premises or peer prefixes. Requires create_drg and attach_drg_to_vcn. Empty leaves private route tables unchanged."
+  default     = []
+
+  validation {
+    condition     = alltrue([for c in var.private_drg_destination_cidrs : can(cidrnetmask(c))])
+    error_message = "Every private_drg_destination_cidrs entry must be a valid IPv4 CIDR."
+  }
+
+  validation {
+    condition     = length(var.private_drg_destination_cidrs) == 0 || (var.create_drg && var.attach_drg_to_vcn)
+    error_message = "private_drg_destination_cidrs requires create_drg and attach_drg_to_vcn."
+  }
+}
+
 variable "drg_route_tables" {
   type = map(object({
     display_name = string

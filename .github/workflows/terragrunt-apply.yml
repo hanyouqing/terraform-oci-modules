@@ -44,7 +44,7 @@ permissions:
 
 env:
   TERRAGRUNT_VERSION: "0.77.8"
-  TERRAFORM_VERSION: "~> 1.14"
+  TERRAFORM_VERSION: "~> 1.16"
   WORKING_DIR: "terragrunt/personal/ap-seoul-1/development"
 
   # OCI Provider auth (written to ~/.oci/config)
@@ -57,7 +57,7 @@ env:
   TF_VAR_compartment_id: ${{ secrets.OCI_COMPARTMENT_ID }}
   TG_OCI_NAMESPACE: ${{ secrets.OCI_NAMESPACE }}
 
-  # Remote state: Terraform backend "oci" uses the same ~/.oci/config as the provider (no Customer Secret Key).
+  # Remote state: Terraform backend "oci" uses the same ~/.oci/config as the provider.
 
   # Module-specific
   TF_VAR_availability_domain: ${{ secrets.OCI_AVAILABILITY_DOMAIN }}

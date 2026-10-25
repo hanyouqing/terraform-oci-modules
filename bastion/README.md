@@ -19,22 +19,22 @@ This module creates and manages Bastion service resources in Oracle Cloud Infras
 module "bastion" {
   source = "../bastion"
 
-  compartment_id    = var.compartment_id
-  target_subnet_id  = module.vcn.private_subnet_ids["private-subnet-1"]
-  bastion_type      = "STANDARD"
-  name              = "my-bastion"
+  compartment_id   = var.compartment_id
+  target_subnet_id = module.vcn.private_subnet_ids["private-subnet-1"]
+  bastion_type     = "STANDARD"
+  name             = "my-bastion"
 
   client_cidr_block_allow_list = ["203.0.113.10/32"]
 
   sessions = {
     session-1 = {
-      display_name                              = "session-1"
-      public_key_content                        = file("~/.ssh/id_rsa.pub")
-      session_type                              = "SSH"
-      target_resource_id                        = module.compute.instance_ids[0]
+      display_name                               = "session-1"
+      public_key_content                         = file("~/.ssh/id_rsa.pub")
+      session_type                               = "SSH"
+      target_resource_id                         = module.compute.instance_ids[0]
       target_resource_operating_system_user_name = "opc"
-      target_resource_port                      = 22
-      target_resource_private_ip_address        = module.compute.instance_private_ips[0]
+      target_resource_port                       = 22
+      target_resource_private_ip_address         = module.compute.instance_private_ips[0]
       session_ttl_in_seconds                     = 3600
     }
   }
@@ -89,13 +89,13 @@ See the [examples](../examples/bastion/) directory for complete examples.
 | Name | Version |
 | ---- | ------- |
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.14.2 |
-| <a name="requirement_oci"></a> [oci](#requirement\_oci) | ~> 8.28 |
+| <a name="requirement_oci"></a> [oci](#requirement\_oci) | ~> 9.11 |
 
 ## Providers
 
 | Name | Version |
 | ---- | ------- |
-| <a name="provider_oci"></a> [oci](#provider\_oci) | 8.29.0 |
+| <a name="provider_oci"></a> [oci](#provider\_oci) | 9.11.0 |
 
 ## Modules
 
