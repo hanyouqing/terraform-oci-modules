@@ -1,0 +1,46 @@
+title: "postgresql stack"
+description: "Creates postgresql with the basic example defaults. Upload this directory as an OCI Resource Manager stack on Terraform 1.5.x."
+schemaVersion: 1.1.0
+version: "1.0.0"
+locale: en
+variableGroups:
+  - title: "Identity"
+    variables:
+      - region
+      - compartment_ocid
+  - title: "Parameters"
+    variables:
+      - subnet_id
+      - admin_username
+      - admin_password_secret_id
+variables:
+  compartment_ocid:
+    type: oci:identity:compartment:id
+    title: "compartment ocid"
+    description: "Compartment OCID for the database system."
+    required: true
+  subnet_id:
+    type: string
+    title: "subnet id"
+    description: "Private subnet OCID for the database endpoint."
+    required: true
+  admin_username:
+    type: string
+    title: "admin username"
+    description: "Administrator username."
+    required: false
+    default: "appadmin"
+  admin_password_secret_id:
+    type: password
+    title: "admin password secret id"
+    description: "Vault secret OCID that holds the administrator password."
+    required: true
+  region:
+    type: oci:identity:region:name
+    title: "region"
+    description: "OCI region. Resource Manager fills this when the stack is created."
+    required: true
+outputs:
+  db_system_id:
+    type: ocid
+    title: "OCID of the PostgreSQL database system."

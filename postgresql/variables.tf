@@ -61,7 +61,7 @@ variable "instance_ocpu_count" {
   default     = null
 
   validation {
-    condition     = var.instance_ocpu_count == null || var.instance_ocpu_count >= 1
+    condition     = var.instance_ocpu_count == null ? true : var.instance_ocpu_count >= 1
     error_message = "instance_ocpu_count must be at least 1 when set."
   }
 }
@@ -72,7 +72,7 @@ variable "instance_memory_size_in_gbs" {
   default     = null
 
   validation {
-    condition     = var.instance_memory_size_in_gbs == null || var.instance_memory_size_in_gbs >= 1
+    condition     = var.instance_memory_size_in_gbs == null ? true : var.instance_memory_size_in_gbs >= 1
     error_message = "instance_memory_size_in_gbs must be at least 1 when set."
   }
 }
@@ -94,7 +94,7 @@ variable "config_id" {
   default     = null
 
   validation {
-    condition     = var.config_id == null || can(regex("^ocid1\\.[a-z0-9]+\\.oc1\\.", var.config_id))
+    condition     = var.config_id == null ? true : can(regex("^ocid1\\.[a-z0-9]+\\.oc1\\.", var.config_id))
     error_message = "config_id must be an OCID."
   }
 }
@@ -110,10 +110,7 @@ variable "upgrade_options" {
   description = "Post-upgrade operations applied only when db_version changes and allow_major_version_upgrade is true. RUN_POST_UPGRADE_VACUUM is one operation the provider accepts. An empty list skips verification and vacuum."
   default     = []
 
-  validation {
-    condition     = length(var.upgrade_options) == 0 || var.allow_major_version_upgrade
-    error_message = "upgrade_options requires allow_major_version_upgrade."
-  }
+
 }
 
 variable "subnet_id" {
@@ -151,7 +148,7 @@ variable "primary_db_endpoint_private_ip" {
   default     = null
 
   validation {
-    condition     = var.primary_db_endpoint_private_ip == null || can(cidrhost("${var.primary_db_endpoint_private_ip}/32", 0))
+    condition     = var.primary_db_endpoint_private_ip == null ? true : can(cidrhost("${var.primary_db_endpoint_private_ip}/32", 0))
     error_message = "primary_db_endpoint_private_ip must be an IPv4 address."
   }
 }
@@ -191,7 +188,7 @@ variable "kms_key_id" {
   default     = null
 
   validation {
-    condition     = var.kms_key_id == null || can(regex("^ocid1\\.key\\.oc1\\.", var.kms_key_id))
+    condition     = var.kms_key_id == null ? true : can(regex("^ocid1\\.key\\.oc1\\.", var.kms_key_id))
     error_message = "kms_key_id must be a Vault key OCID."
   }
 }
@@ -230,7 +227,7 @@ variable "admin_password_secret_id" {
   default     = null
 
   validation {
-    condition     = var.admin_password_secret_id == null || can(regex("^ocid1\\.vaultsecret\\.oc1\\.", var.admin_password_secret_id))
+    condition     = var.admin_password_secret_id == null ? true : can(regex("^ocid1\\.vaultsecret\\.oc1\\.", var.admin_password_secret_id))
     error_message = "admin_password_secret_id must be a Vault secret OCID."
   }
 }
@@ -283,5 +280,12 @@ check "flexible_shape_size" {
       (var.instance_ocpu_count != null && var.instance_memory_size_in_gbs != null)
     )
     error_message = "A flexible PostgreSQL shape requires instance_ocpu_count and instance_memory_size_in_gbs."
+  }
+}
+
+check "upgrade_options_related_inputs" {
+  assert {
+    condition     = length(var.upgrade_options) == 0 || var.allow_major_version_upgrade
+    error_message = "upgrade_options requires allow_major_version_upgrade."
   }
 }

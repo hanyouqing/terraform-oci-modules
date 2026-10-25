@@ -1,0 +1,83 @@
+variable "compartment_id" {
+  type        = string
+  description = "OCID of the compartment where the MySQL system will be created"
+
+  validation {
+    condition     = can(regex("^ocid1\\.compartment\\.oc1\\.", var.compartment_id)) || can(regex("^ocid1\\.tenancy\\.oc1\\.", var.compartment_id))
+    error_message = "compartment_id must be a valid OCI compartment or tenancy OCID."
+  }
+}
+
+variable "mysql_systems" {
+  type = map(object({
+    display_name            = string
+    availability_domain     = string
+    shape_name              = string
+    subnet_id               = string
+    admin_username          = string
+    admin_password          = string
+    mysql_version           = optional(string, "8.0.35")
+    configuration_id        = optional(string, null)
+    data_storage_size_in_gb = number
+    backup_policy = object({
+      is_enabled        = optional(bool, true)
+      retention_in_days = optional(number, 7)
+      window_start_time = optional(string, "02:00")
+    })
+  }))
+  description = "Map of MySQL systems to create. For Always Free, use shape_name='MySQL.Free' and data_storage_size_in_gb=50."
+  default     = {}
+  sensitive   = true
+
+  validation {
+    condition = alltrue([
+      for mysql in var.mysql_systems : can(regex("^ocid1\\.subnet\\.oc1\\.", mysql.subnet_id))
+    ])
+    error_message = "Each mysql_systems subnet_id must be a valid OCI subnet OCID."
+  }
+
+  validation {
+    condition = alltrue([
+      for mysql in var.mysql_systems : mysql.shape_name == "MySQL.Free" ? mysql.data_storage_size_in_gb == 50 : true
+    ])
+    error_message = "For Always Free Tier (shape_name='MySQL.Free'), data_storage_size_in_gb must be 50 GB."
+  }
+
+  validation {
+    condition = alltrue([
+      for mysql in var.mysql_systems : mysql.backup_policy.retention_in_days >= 1 && mysql.backup_policy.retention_in_days <= 35
+    ])
+    error_message = "backup_policy.retention_in_days must be between 1 and 35 days"
+  }
+
+  validation {
+    condition = alltrue([
+      for mysql in var.mysql_systems : length(mysql.admin_password) >= 8 && length(mysql.admin_password) <= 32
+    ])
+    error_message = "Each mysql_systems.admin_password must be 8-32 characters."
+  }
+}
+
+variable "project" {
+  type        = string
+  description = "Project name for tagging"
+  default     = "oci-modules"
+}
+
+variable "environment" {
+  type        = string
+  description = "Environment name for tagging"
+  default     = "development"
+}
+
+variable "freeform_tags" {
+  type        = map(string)
+  description = "Freeform tags to apply to all resources"
+  default     = {}
+}
+
+variable "defined_tags" {
+  type        = map(string)
+  description = "Defined tags to apply to all resources (oci_mysql_mysql_db_system expects map(string))"
+  default     = {}
+}

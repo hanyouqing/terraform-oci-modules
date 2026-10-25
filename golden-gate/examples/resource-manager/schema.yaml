@@ -1,0 +1,80 @@
+title: "golden gate stack"
+description: "Creates golden-gate with the basic example defaults. Upload this directory as an OCI Resource Manager stack on Terraform 1.5.x."
+schemaVersion: 1.1.0
+version: "1.0.0"
+locale: en
+variableGroups:
+  - title: "Identity"
+    variables:
+      - region
+      - compartment_ocid
+  - title: "Parameters"
+    variables:
+      - connection_type
+      - technology_type
+      - username
+      - host
+      - port
+      - database_name
+      - subnet_id
+      - password_secret_id
+variables:
+  compartment_ocid:
+    type: oci:identity:compartment:id
+    title: "compartment ocid"
+    description: "Compartment OCID for the connection."
+    required: true
+  connection_type:
+    type: string
+    title: "connection type"
+    description: "GoldenGate connection type."
+    required: false
+    default: "POSTGRESQL"
+  technology_type:
+    type: string
+    title: "technology type"
+    description: "GoldenGate technology type."
+    required: false
+    default: "POSTGRESQL_SERVER"
+  username:
+    type: string
+    title: "username"
+    description: "Database username."
+    required: false
+    default: "ggadmin"
+  host:
+    type: string
+    title: "host"
+    description: "Private hostname or IP of the database."
+    required: true
+  port:
+    type: number
+    title: "port"
+    description: "Database port."
+    required: false
+    default: 5432
+  database_name:
+    type: string
+    title: "database name"
+    description: "Database name."
+    required: false
+    default: "app"
+  subnet_id:
+    type: string
+    title: "subnet id"
+    description: "Subnet OCID for the private connection."
+    required: true
+  password_secret_id:
+    type: password
+    title: "password secret id"
+    description: "Vault secret OCID for the database password."
+    required: true
+  region:
+    type: oci:identity:region:name
+    title: "region"
+    description: "OCI region. Resource Manager fills this when the stack is created."
+    required: true
+outputs:
+  connection_id:
+    type: ocid
+    title: "OCID of the GoldenGate connection."

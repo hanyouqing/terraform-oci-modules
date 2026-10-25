@@ -1,0 +1,55 @@
+title: "file storage stack"
+description: "Creates file-storage with the basic example defaults. Upload this directory as an OCI Resource Manager stack on Terraform 1.5.x."
+schemaVersion: 1.1.0
+version: "1.0.0"
+locale: en
+variableGroups:
+  - title: "Identity"
+    variables:
+      - region
+      - compartment_ocid
+  - title: "Parameters"
+    variables:
+      - availability_domain
+      - display_name
+      - subnet_id
+      - export_source_cidr
+variables:
+  compartment_ocid:
+    type: oci:identity:compartment:id
+    title: "compartment ocid"
+    description: "Compartment OCID."
+    required: true
+  availability_domain:
+    type: string
+    title: "availability domain"
+    description: "Availability domain for the file system and mount target."
+    required: true
+  display_name:
+    type: string
+    title: "display name"
+    description: "File system display name."
+    required: false
+    default: "file-storage-basic"
+  subnet_id:
+    type: string
+    title: "subnet id"
+    description: "Private subnet OCID for the mount target."
+    required: true
+  export_source_cidr:
+    type: string
+    title: "export source cidr"
+    description: "Client CIDR allowed to mount the export."
+    required: true
+  region:
+    type: oci:identity:region:name
+    title: "region"
+    description: "OCI region. Resource Manager fills this when the stack is created."
+    required: true
+outputs:
+  file_system_id:
+    type: ocid
+    title: "OCID of the file system."
+  mount_target_id:
+    type: ocid
+    title: "OCID of the mount target."

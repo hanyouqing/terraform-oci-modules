@@ -1,0 +1,26 @@
+resource "oci_email_sender" "this" {
+  for_each = var.senders
+
+  compartment_id = var.compartment_id
+  email_address  = each.value.email_address
+
+  freeform_tags = merge(
+    var.freeform_tags,
+    {
+      "ManagedBy"   = "terraform"
+      "Module"      = "github.com/hanyouqing/terraform-oci-modules/email-delivery"
+      "Project"     = var.project
+      "Environment" = var.environment
+    }
+  )
+
+  defined_tags = var.defined_tags
+}
+
+resource "oci_email_suppression" "this" {
+  for_each = var.suppressions
+
+  # oci_email_suppression does not support freeform_tags/defined_tags
+  compartment_id = var.compartment_id
+  email_address  = each.value.email_address
+}

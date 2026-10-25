@@ -147,7 +147,7 @@ variable "certificates" {
 
   validation {
     condition = alltrue([
-      for cert in var.certificates : cert.issuer_certificate_authority_id == null || can(regex("^ocid1\\.certificateauthority\\.oc1\\.", cert.issuer_certificate_authority_id))
+      for cert in var.certificates : cert.issuer_certificate_authority_id == null ? true : can(regex("^ocid1\\.certificateauthority\\.oc1\\.", cert.issuer_certificate_authority_id))
     ])
     error_message = "issuer_certificate_authority_id must be a valid OCI certificate authority OCID when set."
   }

@@ -120,12 +120,16 @@ The following Certificates resources are **free** within Always Free tier limits
 - [Basic](examples/basic/) — Single root CA (Always Free)
 - [Complete](examples/complete/) — Root CA + subordinate CA + certificates with SANs
 
+## Resource Manager
+
+`examples/resource-manager` is a stack for OCI Resource Manager on Terraform 1.5.x. Zip that directory (do not include `.terraform`) and upload it as a stack. Choose Terraform 1.5.x. Resource Manager fills the tenancy and region. Set the compartment and the remaining required fields, then plan and apply.
+
 <!-- BEGIN_TF_DOCS -->
 ## Requirements
 
 | Name | Version |
 | ---- | ------- |
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.14.2 |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.5.0, < 1.6.0 |
 | <a name="requirement_oci"></a> [oci](#requirement\_oci) | ~> 9.11 |
 
 ## Providers

@@ -4,7 +4,7 @@
 .DEFAULT_GOAL := help
 
 # Variables
-TERRAFORM_VERSION ?= 1.16.6
+TERRAFORM_VERSION ?= 1.5.7
 TF_VERSION_FILE := .terraform-version
 # Absolute-path CLI config (filesystem_mirror does not expand ~). Created by validate-prep under .terraform/.
 # Not exported globally: fmt/lint do not need it, and a literal ~ in plugin_cache_dir warns on every terraform command.

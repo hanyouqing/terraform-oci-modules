@@ -48,7 +48,7 @@ variable "association" {
   default     = null
 
   validation {
-    condition     = var.association == null || contains(["PRIMARY", "STANDBY"], var.association.role)
+    condition     = var.association == null ? true : contains(["PRIMARY", "STANDBY"], var.association.role)
     error_message = "association.role must be PRIMARY or STANDBY."
   }
 }

@@ -1,0 +1,53 @@
+title: "nlb stack"
+description: "Creates nlb with the basic example defaults. Upload this directory as an OCI Resource Manager stack on Terraform 1.5.x."
+schemaVersion: 1.1.0
+version: "1.0.0"
+locale: en
+variableGroups:
+  - title: "Identity"
+    variables:
+      - region
+      - compartment_ocid
+  - title: "Parameters"
+    variables:
+      - subnet_id
+      - project
+      - environment
+variables:
+  compartment_ocid:
+    type: oci:identity:compartment:id
+    title: "compartment ocid"
+    description: "The OCID of the compartment to create the Network Load Balancer in."
+    required: true
+  subnet_id:
+    type: string
+    title: "subnet id"
+    description: "The OCID of the subnet to place the Network Load Balancer in."
+    required: true
+  project:
+    type: string
+    title: "project"
+    description: "Project name used for tagging and naming."
+    required: false
+    default: "oci-modules"
+  environment:
+    type: string
+    title: "environment"
+    description: "Environment name."
+    required: false
+    default: "development"
+  region:
+    type: oci:identity:region:name
+    title: "region"
+    description: "OCI region. Resource Manager fills this when the stack is created."
+    required: true
+outputs:
+  network_load_balancer_id:
+    type: ocid
+    title: "The OCID of the Network Load Balancer."
+  network_load_balancer_ip_address:
+    type: string
+    title: "The primary IP address of the Network Load Balancer."
+  reminders:
+    type: string
+    title: "Helpful reminders and next steps."

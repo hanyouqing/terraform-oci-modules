@@ -1,0 +1,49 @@
+title: "public safety stack"
+description: "Creates public-safety with the basic example defaults. Upload this directory as an OCI Resource Manager stack on Terraform 1.5.x."
+schemaVersion: 1.1.0
+version: "1.0.0"
+locale: en
+variableGroups:
+  - title: "Identity"
+    variables:
+      - region
+      - compartment_ocid
+  - title: "Parameters"
+    variables:
+      - identity_domain_url
+      - admin_identity_domain_user_id
+      - display_name
+variables:
+  compartment_ocid:
+    type: oci:identity:compartment:id
+    title: "compartment ocid"
+    description: "Compartment OCID for the Public Safety instance."
+    required: true
+  identity_domain_url:
+    type: string
+    title: "identity domain url"
+    description: "HTTPS URL of the identity domain bound to the instance."
+    required: true
+  admin_identity_domain_user_id:
+    type: string
+    title: "admin identity domain user id"
+    description: "OCID of the identity-domain administrator."
+    required: true
+  display_name:
+    type: string
+    title: "display name"
+    description: "Display name of the instance."
+    required: false
+    default: "public-safety-basic"
+  region:
+    type: oci:identity:region:name
+    title: "region"
+    description: "OCI region. Resource Manager fills this when the stack is created."
+    required: true
+outputs:
+  instance_id:
+    type: ocid
+    title: "OCID of the Public Safety instance."
+  service_endpoint:
+    type: string
+    title: "API endpoint of the Public Safety instance."

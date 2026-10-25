@@ -1,0 +1,64 @@
+title: "cache stack"
+description: "Creates cache with the basic example defaults. Upload this directory as an OCI Resource Manager stack on Terraform 1.5.x."
+schemaVersion: 1.1.0
+version: "1.0.0"
+locale: en
+variableGroups:
+  - title: "Identity"
+    variables:
+      - region
+      - compartment_ocid
+  - title: "Parameters"
+    variables:
+      - display_name
+      - subnet_id
+      - software_version
+      - node_count
+      - node_memory_in_gbs
+variables:
+  compartment_ocid:
+    type: oci:identity:compartment:id
+    title: "compartment ocid"
+    description: "Compartment OCID for the OCI Cache cluster."
+    required: true
+  display_name:
+    type: string
+    title: "display name"
+    description: "Display name of the cluster."
+    required: false
+    default: "cache-basic"
+  subnet_id:
+    type: string
+    title: "subnet id"
+    description: "Private subnet OCID for the cluster endpoint."
+    required: true
+  software_version:
+    type: string
+    title: "software version"
+    description: "OCI Cache engine version. VALKEY_8_1 is the version Oracle recommends for new clusters."
+    required: false
+    default: "VALKEY_8_1"
+  node_count:
+    type: number
+    title: "node count"
+    description: "Node count. 1 has no replica."
+    required: false
+    default: 1
+  node_memory_in_gbs:
+    type: number
+    title: "node memory in gbs"
+    description: "Memory in gigabytes for each node."
+    required: false
+    default: 2
+  region:
+    type: oci:identity:region:name
+    title: "region"
+    description: "OCI region. Resource Manager fills this when the stack is created."
+    required: true
+outputs:
+  cluster_id:
+    type: ocid
+    title: "OCID of the OCI Cache cluster."
+  primary_fqdn:
+    type: string
+    title: "Primary endpoint FQDN."

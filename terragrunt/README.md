@@ -7,7 +7,7 @@ Production-ready [Terragrunt](https://terragrunt.gruntwork.io/) wrapper for all 
 | Tool | Minimum Version |
 |------|----------------|
 | [Terragrunt](https://terragrunt.gruntwork.io/docs/getting-started/install/) | `>= 0.55` |
-| [Terraform](https://developer.hashicorp.com/terraform/downloads) | `>= 1.14.2` |
+| [Terraform](https://developer.hashicorp.com/terraform/downloads) | `1.5.7` on branch `tf-v1.5`. `backend "oci"` needs Terraform >= 1.12, so remote state for these stacks stays on `main`. |
 | OCI CLI (for `oci setup config`) | `>= 3.x` |
 
 ## Directory Structure

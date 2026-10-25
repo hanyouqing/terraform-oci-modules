@@ -1,0 +1,24 @@
+data "oci_identity_availability_domains" "ads" {
+  compartment_id = var.tenancy_ocid
+}
+
+module "compute" {
+  source = "./modules/compute"
+
+  compartment_id = var.compartment_ocid
+  tenancy_ocid   = var.tenancy_ocid
+  subnet_id      = var.subnet_id
+
+  shape          = "VM.Standard.E2.1.Micro"
+  instance_count = 1
+  display_name   = "always-free-instance"
+
+  assign_public_ip = true
+  ssh_public_keys  = var.ssh_public_keys
+
+  enable_monitoring       = true
+  enable_management_agent = false
+
+  project     = "always-free"
+  environment = "development"
+}

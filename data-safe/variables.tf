@@ -73,7 +73,7 @@ variable "defined_tags" {
 
 check "private_endpoint_has_compartment" {
   assert {
-    condition     = var.private_endpoint == null || var.compartment_id != null
+    condition     = var.private_endpoint == null ? true : var.compartment_id != null
     error_message = "Set compartment_id when private_endpoint is set."
   }
 }

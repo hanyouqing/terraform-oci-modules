@@ -62,7 +62,7 @@ variable "port" {
   default     = null
 
   validation {
-    condition     = var.port == null || (var.port >= 1 && var.port <= 65535)
+    condition     = var.port == null ? true : (var.port >= 1 && var.port <= 65535)
     error_message = "port must be between 1 and 65535."
   }
 }
@@ -85,7 +85,7 @@ variable "subnet_id" {
   default     = null
 
   validation {
-    condition     = var.subnet_id == null || can(regex("^ocid1\\.subnet\\.oc1\\.", var.subnet_id))
+    condition     = var.subnet_id == null ? true : can(regex("^ocid1\\.subnet\\.oc1\\.", var.subnet_id))
     error_message = "subnet_id must be a subnet OCID."
   }
 }
@@ -109,7 +109,7 @@ variable "vault_id" {
   default     = null
 
   validation {
-    condition     = var.vault_id == null || can(regex("^ocid1\\.vault\\.oc1\\.", var.vault_id))
+    condition     = var.vault_id == null ? true : can(regex("^ocid1\\.vault\\.oc1\\.", var.vault_id))
     error_message = "vault_id must be a Vault OCID."
   }
 }
@@ -261,7 +261,7 @@ check "secret_ids_are_vault_secrets" {
         var.rest_auth_secret_key_secret_id,
         var.key_store_secret_id,
         var.trust_store_secret_id,
-      ] : secret_id == null || can(regex("^ocid1\\.vaultsecret\\.oc1\\.", secret_id))
+      ] : secret_id == null ? true : can(regex("^ocid1\\.vaultsecret\\.oc1\\.", secret_id))
     ])
     error_message = "Connection secrets must be Vault secret OCIDs."
   }
@@ -269,7 +269,7 @@ check "secret_ids_are_vault_secrets" {
 
 check "deployment_uses_vault_password" {
   assert {
-    condition = var.deployment == null || (
+    condition = var.deployment == null ? true : (
       can(regex("^ocid1\\.vaultsecret\\.oc1\\.", var.deployment.password_secret_id)) &&
       contains(["LICENSE_INCLUDED", "BRING_YOUR_OWN_LICENSE"], var.deployment.license_model) &&
       var.deployment.cpu_core_count >= 1 &&

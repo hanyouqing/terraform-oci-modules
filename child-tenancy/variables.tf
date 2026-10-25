@@ -55,7 +55,7 @@ variable "policy_name" {
   default     = null
 
   validation {
-    condition     = var.policy_name == null || can(regex("^[A-Za-z_]+$", var.policy_name))
+    condition     = var.policy_name == null ? true : can(regex("^[A-Za-z_]+$", var.policy_name))
     error_message = "policy_name must contain only letters and underscores."
   }
 }

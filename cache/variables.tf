@@ -75,7 +75,7 @@ variable "shard_count" {
   default     = null
 
   validation {
-    condition = var.shard_count == null || (
+    condition = var.shard_count == null ? true : (
       var.shard_count == floor(var.shard_count) &&
       var.shard_count >= 3 &&
       var.shard_count <= 99 &&
@@ -104,7 +104,7 @@ variable "oci_cache_config_set_id" {
   default     = null
 
   validation {
-    condition     = var.oci_cache_config_set_id == null || can(regex("^ocid1\\.ocicacheconfigset\\.oc1\\.", var.oci_cache_config_set_id))
+    condition     = var.oci_cache_config_set_id == null ? true : can(regex("^ocid1\\.ocicacheconfigset\\.oc1\\.", var.oci_cache_config_set_id))
     error_message = "oci_cache_config_set_id must be an OCI Cache config set OCID."
   }
 }
@@ -115,7 +115,7 @@ variable "primary_cluster_id" {
   default     = null
 
   validation {
-    condition     = var.primary_cluster_id == null || can(regex("^ocid1\\.rediscluster\\.oc1\\.", var.primary_cluster_id))
+    condition     = var.primary_cluster_id == null ? true : can(regex("^ocid1\\.rediscluster\\.oc1\\.", var.primary_cluster_id))
     error_message = "primary_cluster_id must be an OCI Cache cluster OCID."
   }
 }
@@ -170,7 +170,7 @@ variable "defined_tags" {
 check "shard_count_matches_mode" {
   assert {
     condition = (
-      var.cluster_mode == "SHARDED" && var.shard_count != null && var.node_count * var.shard_count <= 100
+      var.cluster_mode == "SHARDED" && var.shard_count != null ? var.node_count * var.shard_count <= 100 : false
       ) || (
       var.cluster_mode == "NONSHARDED" && var.shard_count == null
     )
@@ -180,7 +180,7 @@ check "shard_count_matches_mode" {
 
 check "secondary_cluster_constraints" {
   assert {
-    condition = var.primary_cluster_id == null || (
+    condition = var.primary_cluster_id == null ? true : (
       var.cluster_mode == "NONSHARDED" &&
       var.node_memory_in_gbs >= 8 &&
       var.oci_cache_config_set_id != null

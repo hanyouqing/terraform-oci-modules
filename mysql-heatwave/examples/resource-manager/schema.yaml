@@ -1,0 +1,48 @@
+title: "mysql heatwave stack"
+description: "Creates mysql-heatwave with the basic example defaults. Upload this directory as an OCI Resource Manager stack on Terraform 1.5.x."
+schemaVersion: 1.1.0
+version: "1.0.0"
+locale: en
+variableGroups:
+  - title: "Identity"
+    variables:
+      - region
+      - tenancy_ocid
+      - compartment_ocid
+  - title: "Parameters"
+    variables:
+      - subnet_id
+      - admin_password
+variables:
+  compartment_ocid:
+    type: oci:identity:compartment:id
+    title: "compartment ocid"
+    description: "OCID of the compartment"
+    required: true
+  tenancy_ocid:
+    type: string
+    title: "tenancy ocid"
+    description: "OCID of the tenancy"
+    required: true
+  subnet_id:
+    type: string
+    title: "subnet id"
+    description: "OCID of the subnet"
+    required: true
+  admin_password:
+    type: password
+    title: "admin password"
+    description: "Admin password"
+    required: true
+  region:
+    type: oci:identity:region:name
+    title: "region"
+    description: "OCI region. Resource Manager fills this when the stack is created."
+    required: true
+outputs:
+  mysql_system_ids:
+    type: csv
+    title: "MySQL system IDs"
+  mysql_endpoints:
+    type: string
+    title: "MySQL endpoints"

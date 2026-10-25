@@ -1,0 +1,34 @@
+---
+description: OCI Resource Manager Terraform 1.5.7 line for the tf-v1.5 branch
+alwaysApply: true
+---
+
+# tf-v1.5 与 Resource Manager
+
+`tf-v1.5` 长期跟踪 OCI Resource Manager 能运行的 Terraform **1.5.x（CLI 1.5.7）**。`main` 跟踪当前 Terraform。不要把本分支整支合并进 `main`。修复要按分支分别移植。
+
+## 模块约束
+
+- `required_version` 保持 `>= 1.5.0, < 1.6.0`。CI 与 `.terraform-version` 使用 `1.5.7`。
+- 可以写 1.5 已有的 `check`、字面量 `import`、`optional()`、`strcontains()`。
+- 不要写 1.6 及以后才有的语法：`validation` 引用其它变量、`import` 的表达式或 `for_each`、`removed`、provider 函数、`templatestring()`、`ephemeral`、`backend "oci"`。
+- 跨变量断言用 `check` 块，不要写进 `validation`。
+- `&&` 和 `||` 在 1.5.7 上两边都会计算。空值守卫写成 `var.x == null ? true : (其余表达式)`，不要写成 `var.x == null || floor(var.x)`。`!= null &&` 后面如果会读取该值，同样改成三元表达式。
+
+## Resource Manager 栈
+
+每个模块保留 `examples/resource-manager`。用户压缩该目录（不要带 `.terraform`），在 Resource Manager 选择 Terraform 1.5.x 上传。控制台改参数后即可 Plan / Apply。
+
+- 模块源码放在该目录的 `modules/`，`source` 用本地路径。
+- `provider "oci"` 只设置 `region`。不要写 `backend`。
+- 变量名使用 Resource Manager 会预填的 `tenancy_ocid`、`compartment_ocid`、`region`。
+- 根目录放 `schema.yaml`（`schemaVersion: 1.1.0`），类型与 Terraform 变量一致。
+
+改模块或 `examples/basic` 之后运行：
+
+```bash
+python3 scripts/tf15_resource_manager.py sync
+terraform fmt -recursive
+```
+
+用 Terraform 1.5.7 做 `terraform validate`。不要用 1.6 及以上验证本分支。

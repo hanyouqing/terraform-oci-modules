@@ -1,0 +1,34 @@
+title: "cloud guard stack"
+description: "Creates cloud-guard with the basic example defaults. Upload this directory as an OCI Resource Manager stack on Terraform 1.5.x."
+schemaVersion: 1.1.0
+version: "1.0.0"
+locale: en
+variableGroups:
+  - title: "Identity"
+    variables:
+      - region
+      - tenancy_ocid
+  - title: "Parameters"
+    variables:
+      - reporting_region
+variables:
+  tenancy_ocid:
+    type: string
+    title: "tenancy ocid"
+    description: "Tenancy OCID."
+    required: true
+  reporting_region:
+    type: string
+    title: "reporting region"
+    description: "Home region that stores findings."
+    required: false
+    default: "ap-seoul-1"
+  region:
+    type: oci:identity:region:name
+    title: "region"
+    description: "OCI region. Resource Manager fills this when the stack is created."
+    required: true
+outputs:
+  status:
+    type: string
+    title: "Cloud Guard status."

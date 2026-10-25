@@ -15,7 +15,7 @@ For **Terragrunt** (remote state, generated provider, DRY stack configs), see [t
 - **Cost-Effective Defaults**: Use always-free resource sizes and counts as default values while allowing easy scaling for production workloads
 - **Production Ready**: Follow enterprise best practices for security, compliance, monitoring, and scalability with comprehensive error handling
 - **Multi-Environment Support**: Support development, staging, and production environments with environment-specific configurations and state management
-- **Terraform CLI for this repository**: Modules require Terraform >= 1.14.2. CI uses 1.16.6. OCI Resource Manager’s supported Terraform line is 1.5.x (CLI 1.5.7), so these configurations are applied with the CLI. Version differences are in [docs/resource-manager-terraform-versions.md](docs/resource-manager-terraform-versions.md).
+- **This branch (`tf-v1.5`)**: Modules require Terraform `>= 1.5.0, < 1.6.0`. CI and `.terraform-version` use **1.5.7**, the CLI OCI Resource Manager runs. Each module’s `examples/resource-manager` directory is a stack you can zip and upload. The `main` branch keeps the current Terraform line. Version differences are in [docs/resource-manager-terraform-versions.md](docs/resource-manager-terraform-versions.md).
 - **Security First**: Implement least-privilege access, encryption at rest and in transit, and comprehensive audit logging
 - **Monitoring & Observability**: Built-in monitoring, alerting, and logging capabilities for infrastructure health and performance tracking
 - **Cost Management**: Automated cost optimization, resource tagging, and usage analytics for budget control and resource allocation
@@ -23,7 +23,7 @@ For **Terragrunt** (remote state, generated provider, DRY stack configs), see [t
 
 ## Prerequisites
 
-- [Terraform](https://www.terraform.io/downloads.html) >= 1.14.2 (modules). CI and `.terraform-version` track 1.16.6. OCI Resource Manager currently runs Terraform 1.5.x (CLI 1.5.7) and cannot apply these modules. See [Resource Manager and Terraform versions](docs/resource-manager-terraform-versions.md).
+- [Terraform](https://www.terraform.io/downloads.html) **1.5.7** on this branch (`>= 1.5.0, < 1.6.0`). That is the CLI OCI Resource Manager provides for Terraform 1.5.x. See [Resource Manager and Terraform versions](docs/resource-manager-terraform-versions.md).
 - [OCI Provider for Terraform](https://registry.terraform.io/providers/oracle/oci/latest/docs) `~> 9.11` (9.11.0, published 2026-10-21; see each module’s `versions.tf`)
 - [OCI CLI](https://docs.oracle.com/en-us/iaas/Content/API/SDKDocs/cliinstall.htm) configured (verify with `oci iam region list --output table`)
 - [OCI credentials](#setting-up-oci-credentials-for-the-terraform-provider) for the Terraform provider — the [OCI CLI](#setting-up-credentials-with-the-oci-cli) (`oci setup config`) is the usual way to create `~/.oci/config`; alternatively use environment variables from `.env.sh` only
@@ -142,7 +142,7 @@ See [docs/CONFIG.md](docs/CONFIG.md) for detailed configuration guide.
 
 ## Terraform state backend (OCI Object Storage)
 
-Remote state uses Terraform `backend "oci"` on a private, versioned Object Storage bucket ([Using Object Storage for State Files](https://docs.oracle.com/en-us/iaas/Content/dev/terraform/object-storage-state.htm)). It requires **Terraform v1.12.0 or greater** (this repo’s modules require **>= 1.14.2**). Locking is part of this backend. See *Data Source Configuration (OCI Backend)* on the page above. Resource Manager’s Terraform 1.5.7 does not include this backend; the comparison is in [docs/resource-manager-terraform-versions.md](docs/resource-manager-terraform-versions.md).
+Remote state uses Terraform `backend "oci"` on a private, versioned Object Storage bucket ([Using Object Storage for State Files](https://docs.oracle.com/en-us/iaas/Content/dev/terraform/object-storage-state.htm)). That backend needs **Terraform v1.12.0 or greater**. This branch stays on **1.5.7** for Resource Manager, so its stacks do not declare `backend "oci"`. The `main` branch requires **>= 1.14.2** and can use the backend. Locking is part of the backend. See *Data Source Configuration (OCI Backend)* on the page above, and [docs/resource-manager-terraform-versions.md](docs/resource-manager-terraform-versions.md).
 
 Backend settings live in the root `terraform` block; **variables and locals are not allowed** there—use literal values or partial configuration / `-backend-config` as documented by HashiCorp.
 

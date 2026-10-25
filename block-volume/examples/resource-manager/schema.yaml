@@ -1,0 +1,34 @@
+title: "block volume stack"
+description: "Creates block-volume with the basic example defaults. Upload this directory as an OCI Resource Manager stack on Terraform 1.5.x."
+schemaVersion: 1.1.0
+version: "1.0.0"
+locale: en
+variableGroups:
+  - title: "Identity"
+    variables:
+      - region
+      - tenancy_ocid
+      - compartment_ocid
+variables:
+  compartment_ocid:
+    type: oci:identity:compartment:id
+    title: "compartment ocid"
+    description: "OCID of the compartment"
+    required: true
+  tenancy_ocid:
+    type: string
+    title: "tenancy ocid"
+    description: "OCID of the tenancy"
+    required: true
+  region:
+    type: oci:identity:region:name
+    title: "region"
+    description: "OCI region. Resource Manager fills this when the stack is created."
+    required: true
+outputs:
+  volume_ids:
+    type: csv
+    title: "Volume IDs"
+  total_storage_gb:
+    type: string
+    title: "Total storage in GB"

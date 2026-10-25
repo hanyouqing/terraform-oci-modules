@@ -1,0 +1,58 @@
+title: "fastconnect stack"
+description: "Creates fastconnect with the basic example defaults. Upload this directory as an OCI Resource Manager stack on Terraform 1.5.x."
+schemaVersion: 1.1.0
+version: "1.0.0"
+locale: en
+variableGroups:
+  - title: "Identity"
+    variables:
+      - region
+      - compartment_ocid
+  - title: "Parameters"
+    variables:
+      - display_name
+      - bandwidth_shape_name
+      - customer_bgp_asn
+      - gateway_id
+      - provider_service_id
+variables:
+  compartment_ocid:
+    type: oci:identity:compartment:id
+    title: "compartment ocid"
+    description: "Compartment OCID for the virtual circuit."
+    required: true
+  display_name:
+    type: string
+    title: "display name"
+    description: "Display name of the virtual circuit."
+    required: false
+    default: "fastconnect-basic"
+  bandwidth_shape_name:
+    type: string
+    title: "bandwidth shape name"
+    description: "Provider bandwidth shape."
+    required: true
+  customer_bgp_asn:
+    type: number
+    title: "customer bgp asn"
+    description: "Customer BGP ASN."
+    required: true
+  gateway_id:
+    type: string
+    title: "gateway id"
+    description: "DRG OCID that terminates the private circuit."
+    required: true
+  provider_service_id:
+    type: string
+    title: "provider service id"
+    description: "FastConnect provider service OCID."
+    required: true
+  region:
+    type: oci:identity:region:name
+    title: "region"
+    description: "OCI region. Resource Manager fills this when the stack is created."
+    required: true
+outputs:
+  virtual_circuit_id:
+    type: ocid
+    title: "OCID of the virtual circuit."

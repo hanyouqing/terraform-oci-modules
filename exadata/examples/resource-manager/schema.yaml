@@ -1,0 +1,60 @@
+title: "exadata stack"
+description: "Creates exadata with the basic example defaults. Upload this directory as an OCI Resource Manager stack on Terraform 1.5.x."
+schemaVersion: 1.1.0
+version: "1.0.0"
+locale: en
+variableGroups:
+  - title: "Identity"
+    variables:
+      - region
+      - compartment_ocid
+  - title: "Parameters"
+    variables:
+      - availability_domain
+      - display_name
+      - shape
+      - compute_count
+      - storage_count
+variables:
+  compartment_ocid:
+    type: oci:identity:compartment:id
+    title: "compartment ocid"
+    description: "Compartment OCID for the infrastructure."
+    required: true
+  availability_domain:
+    type: string
+    title: "availability domain"
+    description: "Availability domain for the infrastructure."
+    required: true
+  display_name:
+    type: string
+    title: "display name"
+    description: "Display name."
+    required: false
+    default: "exadata-basic"
+  shape:
+    type: string
+    title: "shape"
+    description: "Exadata shape available in the region."
+    required: true
+  compute_count:
+    type: number
+    title: "compute count"
+    description: "Compute server count."
+    required: false
+    default: 2
+  storage_count:
+    type: number
+    title: "storage count"
+    description: "Storage server count."
+    required: false
+    default: 3
+  region:
+    type: oci:identity:region:name
+    title: "region"
+    description: "OCI region. Resource Manager fills this when the stack is created."
+    required: true
+outputs:
+  infrastructure_id:
+    type: ocid
+    title: "OCID of the Cloud Exadata infrastructure."
