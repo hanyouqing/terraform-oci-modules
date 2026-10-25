@@ -107,7 +107,7 @@ The following NoSQL Database resources are **free** within Always Free tier limi
 
 | Name | Version |
 | ---- | ------- |
-| <a name="provider_oci"></a> [oci](#provider\_oci) | 9.11.0 |
+| <a name="provider_oci"></a> [oci](#provider\_oci) | ~> 9.11 |
 
 ## Modules
 

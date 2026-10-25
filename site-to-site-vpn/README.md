@@ -125,7 +125,7 @@ The following Site-to-Site VPN resources are **free** within Always Free tier li
 
 | Name | Version |
 | ---- | ------- |
-| <a name="provider_oci"></a> [oci](#provider\_oci) | 9.11.0 |
+| <a name="provider_oci"></a> [oci](#provider\_oci) | ~> 9.11 |
 
 ## Modules
 

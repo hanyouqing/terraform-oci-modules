@@ -95,7 +95,7 @@ jobs:
           for dir in */; do
             dir="${dir%/}"
             [ -f "$dir/main.tf" ] || continue
-            (cd "$dir" && terraform-docs markdown --output-file README.md --output-mode inject --sort-by name .)
+            (cd "$dir" && terraform-docs markdown --lockfile=false --output-file README.md --output-mode inject --sort-by name .)
           done
           if ! git diff --quiet; then
             echo "::error::Documentation is out of date. Run 'make docs' and commit the changes."

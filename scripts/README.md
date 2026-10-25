@@ -125,6 +125,22 @@ A wrapper script that adds `-e` flag support to Terraform commands.
 - Creates workspace if it doesn't exist
 - Passes all other arguments to Terraform
 
+## oci-clean.sh
+
+Empties an OCI compartment so `oci iam compartment delete` can succeed. A compartment stays **Compartment Not Empty** while it still has resources in any subscribed region, child compartments, IAM policies, or keys/vaults/certificates that are inside a deletion waiting period.
+
+Default is a dry-run. `--apply` deletes resources and child compartments. `--delete-compartment` also deletes the compartment you named. The tenancy root is refused.
+
+```bash
+./scripts/oci-clean.sh --compartment-id ocid1.compartment.oc1..example
+./scripts/oci-clean.sh --compartment-id ocid1.compartment.oc1..example --apply
+./scripts/oci-clean.sh --compartment-id ocid1.compartment.oc1..example --apply --delete-compartment --yes
+make oci-clean COMPARTMENT=ocid1.compartment.oc1..example
+make oci-clean COMPARTMENT=ocid1.compartment.oc1..example APPLY=1 DELETE_COMPARTMENT=1 YES=1
+```
+
+Requires the OCI CLI (`oci setup config` or `eval "$(./scripts/oci-use.sh <account>)"`) and `jq`. KMS keys cannot disappear immediately; schedule deletion, wait until the waiting period ends, then run the script again before deleting the compartment.
+
 ## Makefile Integration
 
 The Makefile includes workspace management targets:

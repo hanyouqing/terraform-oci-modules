@@ -32,7 +32,7 @@ module "generative_ai" {
 
 | Name | Version |
 | ---- | ------- |
-| <a name="provider_oci"></a> [oci](#provider\_oci) | 9.11.0 |
+| <a name="provider_oci"></a> [oci](#provider\_oci) | ~> 9.11 |
 
 ## Modules
 

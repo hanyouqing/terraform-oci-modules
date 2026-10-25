@@ -1,4 +1,4 @@
-.PHONY: help fmt fmt-check validate validate-prep validate-modules validate-examples validate-module lint lint-init lint-module security docs docs-module clean init plan apply list-modules list-examples install-tools oci-credentials-list
+.PHONY: help fmt fmt-check validate validate-prep validate-modules validate-examples validate-module lint lint-init lint-module security docs docs-module clean init plan apply list-modules list-examples install-tools oci-credentials-list oci-clean
 
 # Default target
 .DEFAULT_GOAL := help
@@ -34,6 +34,17 @@ help: ## Show this help message
 
 oci-credentials-list: ## List account names under credentials/; switch with eval and scripts/oci-use.sh (see README)
 	@bash -c 'source scripts/oci-use.sh && oci_use_list'
+
+oci-clean: ## Dry-run resources blocking a compartment (COMPARTMENT=ocid APPLY=1 DELETE_COMPARTMENT=1 YES=1)
+	@if [ -z "$(COMPARTMENT)" ]; then \
+		echo "Usage: make oci-clean COMPARTMENT=ocid1.compartment.oc1..example [APPLY=1] [DELETE_COMPARTMENT=1] [YES=1]"; \
+		echo "Dry-run unless APPLY=1. APPLY=1 also deletes child compartments. DELETE_COMPARTMENT=1 deletes the named compartment."; \
+		exit 1; \
+	fi
+	./scripts/oci-clean.sh --compartment-id "$(COMPARTMENT)" \
+		$(if $(filter 1 true yes,$(APPLY)),--apply,) \
+		$(if $(filter 1 true yes,$(DELETE_COMPARTMENT)),--delete-compartment,) \
+		$(if $(filter 1 true yes,$(YES)),--yes,)
 
 fmt: ## Format all Terraform and Terragrunt HCL files
 	@echo "Formatting all Terraform files..."
@@ -266,7 +277,7 @@ docs: ## Generate documentation for all modules (lists each */ with main.tf)
 	printf '%s\n' "$$modules" | sed 's/^/  - /'; \
 	for dir in $$modules; do \
 		echo "Generating docs for $$dir/..."; \
-		(cd "$$dir" && terraform-docs markdown --output-file README.md --output-mode inject --sort-by name .) || true; \
+		(cd "$$dir" && terraform-docs markdown --lockfile=false --output-file README.md --output-mode inject --sort-by name .) || true; \
 	done
 
 docs-module: ## Generate docs for one module, or all (MODULE=vcn | MODULE=all); omit MODULE to list
@@ -296,7 +307,7 @@ docs-module: ## Generate docs for one module, or all (MODULE=vcn | MODULE=all); 
 			exit 1; \
 		fi; \
 		echo "Generating docs for $(MODULE)/..."; \
-		(cd "$(MODULE)" && terraform-docs markdown --output-file README.md --output-mode inject --sort-by name .); \
+		(cd "$(MODULE)" && terraform-docs markdown --lockfile=false --output-file README.md --output-mode inject --sort-by name .); \
 	fi
 
 init: ## Initialize Terraform in current directory
