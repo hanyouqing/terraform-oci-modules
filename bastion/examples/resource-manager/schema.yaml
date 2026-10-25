@@ -1,0 +1,47 @@
+title: "bastion stack"
+description: "Creates bastion with the basic example defaults. Upload this directory as an OCI Resource Manager stack on Terraform 1.5.x."
+schemaVersion: 1.1.0
+version: "1.0.0"
+locale: en
+variableGroups:
+  - title: "Identity"
+    variables:
+      - region
+      - compartment_ocid
+  - title: "Parameters"
+    variables:
+      - target_subnet_id
+      - bastion_client_cidr_block_allow_list
+      - ssh_public_key
+variables:
+  compartment_ocid:
+    type: oci:identity:compartment:id
+    title: "compartment ocid"
+    description: "OCID of the compartment"
+    required: true
+  target_subnet_id:
+    type: string
+    title: "target subnet id"
+    description: "OCID of the target subnet"
+    required: true
+  bastion_client_cidr_block_allow_list:
+    type: array
+    title: "bastion client cidr block allow list"
+    description: "List of CIDR blocks allowed to connect to the bastion (required; use your admin IP/32)"
+    required: true
+    items:
+      type: string
+  ssh_public_key:
+    type: string
+    title: "ssh public key"
+    description: "SSH public key for the bastion session"
+    required: true
+  region:
+    type: oci:identity:region:name
+    title: "region"
+    description: "OCI region. Resource Manager fills this when the stack is created."
+    required: true
+outputs:
+  bastion_id:
+    type: ocid
+    title: "Bastion ID"

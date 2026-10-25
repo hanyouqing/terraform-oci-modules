@@ -111,12 +111,7 @@ variable "backends" {
   description = "Map of backends to create"
   default     = {}
 
-  validation {
-    condition = alltrue([
-      for backend in var.backends : contains(keys(var.backend_sets), backend.backendset_name)
-    ])
-    error_message = "All backends must reference an existing backend_set name"
-  }
+
 
   validation {
     condition = alltrue([
@@ -155,12 +150,7 @@ variable "listeners" {
   description = "Map of listeners to create. connection_configuration.idle_timeout_in_seconds defaults to 60 (1-300)"
   default     = {}
 
-  validation {
-    condition = alltrue([
-      for listener in var.listeners : contains(keys(var.backend_sets), listener.default_backend_set_name)
-    ])
-    error_message = "All listeners must reference an existing backend_set name"
-  }
+
 
   validation {
     condition = alltrue([
@@ -209,4 +199,22 @@ variable "defined_tags" {
   type        = map(string)
   description = "Defined tags to apply to all resources (load balancer expects map(string))"
   default     = {}
+}
+
+check "backends_related_inputs" {
+  assert {
+    condition = alltrue([
+      for backend in var.backends : contains(keys(var.backend_sets), backend.backendset_name)
+    ])
+    error_message = "All backends must reference an existing backend_set name"
+  }
+}
+
+check "listeners_related_inputs" {
+  assert {
+    condition = alltrue([
+      for listener in var.listeners : contains(keys(var.backend_sets), listener.default_backend_set_name)
+    ])
+    error_message = "All listeners must reference an existing backend_set name"
+  }
 }

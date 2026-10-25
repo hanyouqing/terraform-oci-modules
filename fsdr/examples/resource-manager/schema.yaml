@@ -1,0 +1,46 @@
+title: "fsdr stack"
+description: "Creates fsdr with the basic example defaults. Upload this directory as an OCI Resource Manager stack on Terraform 1.5.x."
+schemaVersion: 1.1.0
+version: "1.0.0"
+locale: en
+variableGroups:
+  - title: "Identity"
+    variables:
+      - region
+      - compartment_ocid
+  - title: "Parameters"
+    variables:
+      - display_name
+      - log_bucket
+      - log_namespace
+variables:
+  compartment_ocid:
+    type: oci:identity:compartment:id
+    title: "compartment ocid"
+    description: "Compartment OCID."
+    required: true
+  display_name:
+    type: string
+    title: "display name"
+    description: "DR protection group display name."
+    required: false
+    default: "fsdr-demo"
+  log_bucket:
+    type: string
+    title: "log bucket"
+    description: "Object Storage bucket for DR logs."
+    required: true
+  log_namespace:
+    type: string
+    title: "log namespace"
+    description: "Object Storage namespace for DR logs."
+    required: true
+  region:
+    type: oci:identity:region:name
+    title: "region"
+    description: "OCI region. Resource Manager fills this when the stack is created."
+    required: true
+outputs:
+  dr_protection_group_id:
+    type: ocid
+    title: "OCID of the DR protection group."

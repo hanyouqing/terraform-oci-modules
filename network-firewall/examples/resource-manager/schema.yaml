@@ -1,0 +1,55 @@
+title: "network firewall stack"
+description: "Creates network-firewall with the basic example defaults. Upload this directory as an OCI Resource Manager stack on Terraform 1.5.x."
+schemaVersion: 1.1.0
+version: "1.0.0"
+locale: en
+variableGroups:
+  - title: "Identity"
+    variables:
+      - region
+      - compartment_ocid
+  - title: "Parameters"
+    variables:
+      - display_name
+      - subnet_id
+      - availability_domain
+      - nsg_ids
+variables:
+  compartment_ocid:
+    type: oci:identity:compartment:id
+    title: "compartment ocid"
+    description: "Compartment OCID."
+    required: true
+  display_name:
+    type: string
+    title: "display name"
+    description: "Firewall display name."
+    required: false
+    default: "network-firewall-demo"
+  subnet_id:
+    type: string
+    title: "subnet id"
+    description: "Subnet OCID for the firewall."
+    required: true
+  availability_domain:
+    type: string
+    title: "availability domain"
+    description: "Availability Domain. Null lets the service choose when supported."
+    required: false
+  nsg_ids:
+    type: array
+    title: "nsg ids"
+    description: "NSG OCIDs."
+    required: false
+    default: []
+    items:
+      type: string
+  region:
+    type: oci:identity:region:name
+    title: "region"
+    description: "OCI region. Resource Manager fills this when the stack is created."
+    required: true
+outputs:
+  network_firewall_id:
+    type: ocid
+    title: "OCID of the Network Firewall."

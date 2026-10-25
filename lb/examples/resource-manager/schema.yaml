@@ -1,0 +1,38 @@
+title: "lb stack"
+description: "Creates lb with the basic example defaults. Upload this directory as an OCI Resource Manager stack on Terraform 1.5.x."
+schemaVersion: 1.1.0
+version: "1.0.0"
+locale: en
+variableGroups:
+  - title: "Identity"
+    variables:
+      - region
+      - compartment_ocid
+  - title: "Parameters"
+    variables:
+      - subnet_ids
+variables:
+  compartment_ocid:
+    type: oci:identity:compartment:id
+    title: "compartment ocid"
+    description: "OCID of the compartment"
+    required: true
+  subnet_ids:
+    type: array
+    title: "subnet ids"
+    description: "Subnet IDs for the load balancer"
+    required: true
+    items:
+      type: string
+  region:
+    type: oci:identity:region:name
+    title: "region"
+    description: "OCI region. Resource Manager fills this when the stack is created."
+    required: true
+outputs:
+  load_balancer_id:
+    type: ocid
+    title: "Load balancer ID"
+  load_balancer_ip_address:
+    type: string
+    title: "Load balancer IP address"

@@ -1,0 +1,51 @@
+title: "compute stack"
+description: "Creates compute with the basic example defaults. Upload this directory as an OCI Resource Manager stack on Terraform 1.5.x."
+schemaVersion: 1.1.0
+version: "1.0.0"
+locale: en
+variableGroups:
+  - title: "Identity"
+    variables:
+      - region
+      - tenancy_ocid
+      - compartment_ocid
+  - title: "Parameters"
+    variables:
+      - subnet_id
+      - ssh_public_keys
+variables:
+  compartment_ocid:
+    type: oci:identity:compartment:id
+    title: "compartment ocid"
+    description: "OCID of the compartment"
+    required: true
+  tenancy_ocid:
+    type: string
+    title: "tenancy ocid"
+    description: "OCID of the tenancy"
+    required: true
+  subnet_id:
+    type: string
+    title: "subnet id"
+    description: "OCID of the subnet"
+    required: true
+  ssh_public_keys:
+    type: string
+    title: "ssh public keys"
+    description: "SSH public key"
+    required: true
+  region:
+    type: oci:identity:region:name
+    title: "region"
+    description: "OCI region. Resource Manager fills this when the stack is created."
+    required: true
+outputs:
+  instance_ids:
+    type: csv
+    title: "Instance IDs"
+  instance_public_ips:
+    type: string
+    title: "Instance public IPs"
+  instance_private_ips:
+    type: string
+    title: "Instance private IPs"

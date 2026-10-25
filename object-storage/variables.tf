@@ -82,12 +82,7 @@ variable "lifecycle_policies" {
   description = "Map of lifecycle policies to create"
   default     = {}
 
-  validation {
-    condition = alltrue([
-      for policy in var.lifecycle_policies : contains(keys(var.buckets), policy.bucket_key)
-    ])
-    error_message = "All lifecycle_policies must reference an existing bucket_key"
-  }
+
 
   validation {
     condition = alltrue([
@@ -115,12 +110,7 @@ variable "preauth_requests" {
   description = "Map of pre-authenticated requests to create"
   default     = {}
 
-  validation {
-    condition = alltrue([
-      for req in var.preauth_requests : contains(keys(var.buckets), req.bucket_key)
-    ])
-    error_message = "All preauth_requests must reference an existing bucket_key"
-  }
+
 
   validation {
     condition = alltrue([
@@ -152,4 +142,22 @@ variable "defined_tags" {
   type        = map(string)
   description = "Defined tags to apply to all resources"
   default     = {}
+}
+
+check "lifecycle_policies_related_inputs" {
+  assert {
+    condition = alltrue([
+      for policy in var.lifecycle_policies : contains(keys(var.buckets), policy.bucket_key)
+    ])
+    error_message = "All lifecycle_policies must reference an existing bucket_key"
+  }
+}
+
+check "preauth_requests_related_inputs" {
+  assert {
+    condition = alltrue([
+      for req in var.preauth_requests : contains(keys(var.buckets), req.bucket_key)
+    ])
+    error_message = "All preauth_requests must reference an existing bucket_key"
+  }
 }

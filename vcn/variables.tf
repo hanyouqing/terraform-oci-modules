@@ -238,10 +238,7 @@ variable "attach_drg_to_vcn" {
   description = "Whether to attach DRG to VCN"
   default     = false
 
-  validation {
-    condition     = var.create_drg || !var.attach_drg_to_vcn
-    error_message = "attach_drg_to_vcn can only be true when create_drg is true"
-  }
+
 }
 
 variable "private_drg_destination_cidrs" {
@@ -254,10 +251,7 @@ variable "private_drg_destination_cidrs" {
     error_message = "Every private_drg_destination_cidrs entry must be a valid IPv4 CIDR."
   }
 
-  validation {
-    condition     = length(var.private_drg_destination_cidrs) == 0 || (var.create_drg && var.attach_drg_to_vcn)
-    error_message = "private_drg_destination_cidrs requires create_drg and attach_drg_to_vcn."
-  }
+
 }
 
 variable "drg_route_tables" {
@@ -267,10 +261,7 @@ variable "drg_route_tables" {
   description = "Map of DRG route tables to create"
   default     = {}
 
-  validation {
-    condition     = var.create_drg || length(var.drg_route_tables) == 0
-    error_message = "drg_route_tables can only be used when create_drg is true"
-  }
+
 }
 
 variable "drg_route_distributions" {
@@ -281,10 +272,7 @@ variable "drg_route_distributions" {
   description = "Map of DRG route distributions to create"
   default     = {}
 
-  validation {
-    condition     = var.create_drg || length(var.drg_route_distributions) == 0
-    error_message = "drg_route_distributions can only be used when create_drg is true"
-  }
+
 
   validation {
     condition = alltrue([
@@ -416,5 +404,33 @@ variable "vcn_flow_log_retention_duration" {
   validation {
     condition     = var.vcn_flow_log_retention_duration >= 1 && var.vcn_flow_log_retention_duration <= 365
     error_message = "vcn_flow_log_retention_duration must be between 1 and 365 days"
+  }
+}
+
+check "attach_drg_to_vcn_related_inputs" {
+  assert {
+    condition     = var.create_drg || !var.attach_drg_to_vcn
+    error_message = "attach_drg_to_vcn can only be true when create_drg is true"
+  }
+}
+
+check "private_drg_destination_cidrs_related_inputs" {
+  assert {
+    condition     = length(var.private_drg_destination_cidrs) == 0 || (var.create_drg && var.attach_drg_to_vcn)
+    error_message = "private_drg_destination_cidrs requires create_drg and attach_drg_to_vcn."
+  }
+}
+
+check "drg_route_tables_related_inputs" {
+  assert {
+    condition     = var.create_drg || length(var.drg_route_tables) == 0
+    error_message = "drg_route_tables can only be used when create_drg is true"
+  }
+}
+
+check "drg_route_distributions_related_inputs" {
+  assert {
+    condition     = var.create_drg || length(var.drg_route_distributions) == 0
+    error_message = "drg_route_distributions can only be used when create_drg is true"
   }
 }

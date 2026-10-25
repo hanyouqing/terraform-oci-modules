@@ -24,7 +24,7 @@ variable "load_balancer_id" {
   default     = null
 
   validation {
-    condition     = var.load_balancer_id == null || can(regex("^ocid1\\.loadbalancer\\.oc1\\.", var.load_balancer_id))
+    condition     = var.load_balancer_id == null ? true : can(regex("^ocid1\\.loadbalancer\\.oc1\\.", var.load_balancer_id))
     error_message = "load_balancer_id must be a load balancer OCID."
   }
 }
@@ -81,7 +81,7 @@ variable "defined_tags" {
 
 check "firewall_has_a_control" {
   assert {
-    condition = var.load_balancer_id == null || (
+    condition = var.load_balancer_id == null ? true : (
       length(var.protection_capabilities) > 0 || var.rate_limit != null
     )
     error_message = "Set protection_capabilities or rate_limit before attaching the firewall to a load balancer."
@@ -90,7 +90,7 @@ check "firewall_has_a_control" {
 
 check "rate_limit_is_positive" {
   assert {
-    condition = var.rate_limit == null || (
+    condition = var.rate_limit == null ? true : (
       var.rate_limit.period_in_seconds >= 1 && var.rate_limit.requests_limit >= 1
     )
     error_message = "rate_limit.period_in_seconds and rate_limit.requests_limit must be at least 1."

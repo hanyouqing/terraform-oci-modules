@@ -1,0 +1,36 @@
+title: "adb stack"
+description: "Creates adb with the basic example defaults. Upload this directory as an OCI Resource Manager stack on Terraform 1.5.x."
+schemaVersion: 1.1.0
+version: "1.0.0"
+locale: en
+variableGroups:
+  - title: "Identity"
+    variables:
+      - region
+      - compartment_ocid
+  - title: "Parameters"
+    variables:
+      - admin_password
+variables:
+  compartment_ocid:
+    type: oci:identity:compartment:id
+    title: "compartment ocid"
+    description: "OCID of the compartment"
+    required: true
+  admin_password:
+    type: password
+    title: "admin password"
+    description: "Admin password for the database"
+    required: true
+  region:
+    type: oci:identity:region:name
+    title: "region"
+    description: "OCI region. Resource Manager fills this when the stack is created."
+    required: true
+outputs:
+  database_ids:
+    type: csv
+    title: "Database IDs"
+  database_connection_strings:
+    type: string
+    title: "Database connection strings"

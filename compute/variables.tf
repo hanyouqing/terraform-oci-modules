@@ -264,12 +264,7 @@ variable "block_volumes" {
   description = "Map of block volumes to create and attach"
   default     = {}
 
-  validation {
-    condition = var.instance_count == 0 ? length(var.block_volumes) == 0 : alltrue([
-      for v in var.block_volumes : v.instance_index >= 0 && v.instance_index < var.instance_count
-    ])
-    error_message = "instance_index must be between 0 and instance_count - 1. If instance_count is 0, block_volumes must be empty."
-  }
+
 
   validation {
     condition = alltrue([
@@ -301,4 +296,13 @@ variable "defined_tags" {
   type        = map(string)
   description = "Defined tags to apply to all resources (oci_core_instance expects map(string))"
   default     = {}
+}
+
+check "block_volumes_related_inputs" {
+  assert {
+    condition = var.instance_count == 0 ? length(var.block_volumes) == 0 : alltrue([
+      for v in var.block_volumes : v.instance_index >= 0 && v.instance_index < var.instance_count
+    ])
+    error_message = "instance_index must be between 0 and instance_count - 1. If instance_count is 0, block_volumes must be empty."
+  }
 }

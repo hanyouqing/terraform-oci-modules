@@ -79,14 +79,14 @@ variable "ipsec_connections" {
 
   validation {
     condition = alltrue([
-      for conn in var.ipsec_connections : conn.cpe_id == null || can(regex("^ocid1\\.cpe\\.oc1\\.", conn.cpe_id))
+      for conn in var.ipsec_connections : conn.cpe_id == null ? true : can(regex("^ocid1\\.cpe\\.oc1\\.", conn.cpe_id))
     ])
     error_message = "cpe_id must be a valid OCI CPE OCID when set."
   }
 
   validation {
     condition = alltrue([
-      for conn in var.ipsec_connections : conn.cpe_local_identifier_type == null || contains(["IP_ADDRESS", "HOSTNAME"], conn.cpe_local_identifier_type)
+      for conn in var.ipsec_connections : conn.cpe_local_identifier_type == null ? true : contains(["IP_ADDRESS", "HOSTNAME"], conn.cpe_local_identifier_type)
     ])
     error_message = "cpe_local_identifier_type must be 'IP_ADDRESS' or 'HOSTNAME' when specified."
   }

@@ -44,7 +44,7 @@ variable "vcn_compartment_id" {
   default     = null
 
   validation {
-    condition     = var.vcn_compartment_id == null || can(regex("^ocid1\\.(compartment|tenancy)\\.oc1\\.", var.vcn_compartment_id))
+    condition     = var.vcn_compartment_id == null ? true : can(regex("^ocid1\\.(compartment|tenancy)\\.oc1\\.", var.vcn_compartment_id))
     error_message = "vcn_compartment_id must be a compartment or tenancy OCID."
   }
 }
@@ -65,7 +65,7 @@ variable "subnet_compartment_id" {
   default     = null
 
   validation {
-    condition     = var.subnet_compartment_id == null || can(regex("^ocid1\\.(compartment|tenancy)\\.oc1\\.", var.subnet_compartment_id))
+    condition     = var.subnet_compartment_id == null ? true : can(regex("^ocid1\\.(compartment|tenancy)\\.oc1\\.", var.subnet_compartment_id))
     error_message = "subnet_compartment_id must be a compartment or tenancy OCID."
   }
 }
@@ -241,7 +241,7 @@ variable "remote_reindex_sources" {
   validation {
     condition = alltrue([
       for source in var.remote_reindex_sources :
-      source.endpoint_resolution_ip == null || can(cidrhost("${source.endpoint_resolution_ip}/32", 0))
+      source.endpoint_resolution_ip == null ? true : can(cidrhost("${source.endpoint_resolution_ip}/32", 0))
     ])
     error_message = "endpoint_resolution_ip must be an IPv4 address when set."
   }

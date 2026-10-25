@@ -1,0 +1,107 @@
+variable "compartment_id" {
+  type        = string
+  description = "OCID of the compartment where the vault will be created"
+
+  validation {
+    condition     = can(regex("^ocid1\\.compartment\\.oc1\\.", var.compartment_id)) || can(regex("^ocid1\\.tenancy\\.oc1\\.", var.compartment_id))
+    error_message = "compartment_id must be a valid OCI compartment or tenancy OCID."
+  }
+}
+
+variable "vault_display_name" {
+  type        = string
+  description = "Display name for the vault"
+  default     = "vault"
+
+  validation {
+    condition     = length(var.vault_display_name) >= 1 && length(var.vault_display_name) <= 255
+    error_message = "vault_display_name must be between 1 and 255 characters."
+  }
+}
+
+variable "vault_type" {
+  type        = string
+  description = "Type of vault: VIRTUAL_PRIVATE or DEFAULT"
+  default     = "DEFAULT"
+
+  validation {
+    condition     = contains(["VIRTUAL_PRIVATE", "DEFAULT"], var.vault_type)
+    error_message = "vault_type must be VIRTUAL_PRIVATE or DEFAULT"
+  }
+}
+
+variable "keys" {
+  type = map(object({
+    display_name    = string
+    algorithm       = string
+    length          = optional(number, null)
+    curve_id        = optional(string, null)
+    protection_mode = string
+  }))
+  description = "Map of keys to create"
+  default     = {}
+
+  validation {
+    condition = alltrue([
+      for k in var.keys : contains(["AES", "RSA", "ECDSA"], k.algorithm)
+    ])
+    error_message = "keys algorithm must be one of: AES, RSA, ECDSA."
+  }
+
+  validation {
+    condition = alltrue([
+      for k in var.keys : contains(["HSM", "SOFTWARE"], k.protection_mode)
+    ])
+    error_message = "keys protection_mode must be HSM or SOFTWARE."
+  }
+}
+
+variable "secrets" {
+  type = map(object({
+    secret_name    = string
+    secret_content = string
+    content_type   = string
+    key_id         = string
+  }))
+  description = "Map of secrets to create (secret_name maps to oci_vault_secret.secret_name)"
+  default     = {}
+  sensitive   = true
+
+  validation {
+    condition = alltrue([
+      for s in var.secrets : contains(["BASE64"], s.content_type)
+    ])
+    error_message = "secrets content_type must be BASE64."
+  }
+
+  validation {
+    condition = alltrue([
+      for s in var.secrets : s.key_id == "" || can(regex("^ocid1\\.key\\.oc1\\.", s.key_id))
+    ])
+    error_message = "secrets key_id must be a valid OCI Key OCID."
+  }
+}
+
+variable "project" {
+  type        = string
+  description = "Project name for tagging"
+  default     = "oci-modules"
+}
+
+variable "environment" {
+  type        = string
+  description = "Environment name for tagging"
+  default     = "development"
+}
+
+variable "freeform_tags" {
+  type        = map(string)
+  description = "Freeform tags to apply to all resources"
+  default     = {}
+}
+
+variable "defined_tags" {
+  type        = map(string)
+  description = "Defined tags to apply to all resources (KMS/vault resources expect map(string))"
+  default     = {}
+}

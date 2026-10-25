@@ -1,0 +1,55 @@
+title: "opensearch stack"
+description: "Creates opensearch with the basic example defaults. Upload this directory as an OCI Resource Manager stack on Terraform 1.5.x."
+schemaVersion: 1.1.0
+version: "1.0.0"
+locale: en
+variableGroups:
+  - title: "Identity"
+    variables:
+      - region
+      - compartment_ocid
+  - title: "Parameters"
+    variables:
+      - vcn_id
+      - subnet_id
+      - security_master_user_name
+      - security_master_user_password_hash
+variables:
+  compartment_ocid:
+    type: oci:identity:compartment:id
+    title: "compartment ocid"
+    description: "Compartment OCID for the cluster."
+    required: true
+  vcn_id:
+    type: string
+    title: "vcn id"
+    description: "VCN OCID for the cluster."
+    required: true
+  subnet_id:
+    type: string
+    title: "subnet id"
+    description: "Subnet OCID for the cluster."
+    required: true
+  security_master_user_name:
+    type: string
+    title: "security master user name"
+    description: "OpenSearch master user name."
+    required: false
+    default: "osadmin"
+  security_master_user_password_hash:
+    type: password
+    title: "security master user password hash"
+    description: "OpenSearch password hash of the master user."
+    required: true
+  region:
+    type: oci:identity:region:name
+    title: "region"
+    description: "OCI region. Resource Manager fills this when the stack is created."
+    required: true
+outputs:
+  cluster_id:
+    type: ocid
+    title: "OCID of the OpenSearch cluster."
+  fqdn:
+    type: string
+    title: "API hostname of the OpenSearch cluster."

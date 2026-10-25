@@ -1,0 +1,21 @@
+module "nosql_database" {
+  source = "./modules/nosql-database"
+
+  compartment_id = var.compartment_ocid
+
+  tables = {
+    users = {
+      name          = "users"
+      ddl_statement = "CREATE TABLE users (id INTEGER, name STRING, email STRING, created_at TIMESTAMP(0), PRIMARY KEY (id))"
+
+      # Always Free defaults
+      max_read_units     = 50
+      max_write_units    = 50
+      max_storage_in_gbs = 25
+      capacity_mode      = "PROVISIONED"
+    }
+  }
+
+  project     = "always-free"
+  environment = "development"
+}

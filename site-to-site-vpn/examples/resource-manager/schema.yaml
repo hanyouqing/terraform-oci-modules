@@ -1,0 +1,45 @@
+title: "site to site vpn stack"
+description: "Creates site-to-site-vpn with the basic example defaults. Upload this directory as an OCI Resource Manager stack on Terraform 1.5.x."
+schemaVersion: 1.1.0
+version: "1.0.0"
+locale: en
+variableGroups:
+  - title: "Identity"
+    variables:
+      - region
+      - compartment_ocid
+  - title: "Parameters"
+    variables:
+      - drg_id
+      - cpe_ip_address
+variables:
+  compartment_ocid:
+    type: oci:identity:compartment:id
+    title: "compartment ocid"
+    description: "OCID of the compartment"
+    required: true
+  drg_id:
+    type: string
+    title: "drg id"
+    description: "OCID of the Dynamic Routing Gateway"
+    required: true
+  cpe_ip_address:
+    type: string
+    title: "cpe ip address"
+    description: "Public IP address of the on-premises VPN device"
+    required: true
+  region:
+    type: oci:identity:region:name
+    title: "region"
+    description: "OCI region. Resource Manager fills this when the stack is created."
+    required: true
+outputs:
+  cpe_ids:
+    type: csv
+    title: "CPE IDs"
+  ipsec_connection_ids:
+    type: csv
+    title: "IPSec connection IDs"
+  tunnel_vpn_ips:
+    type: string
+    title: "Oracle VPN endpoint IPs (configure these on your CPE device)"

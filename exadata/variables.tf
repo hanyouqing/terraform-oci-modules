@@ -107,7 +107,7 @@ variable "defined_tags" {
 
 check "vm_cluster_license" {
   assert {
-    condition     = var.vm_cluster == null || contains(["LICENSE_INCLUDED", "BRING_YOUR_OWN_LICENSE"], var.vm_cluster.license_model)
+    condition     = var.vm_cluster == null ? true : contains(["LICENSE_INCLUDED", "BRING_YOUR_OWN_LICENSE"], var.vm_cluster.license_model)
     error_message = "vm_cluster.license_model must be LICENSE_INCLUDED or BRING_YOUR_OWN_LICENSE."
   }
 }

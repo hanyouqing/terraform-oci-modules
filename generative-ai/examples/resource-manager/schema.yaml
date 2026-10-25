@@ -1,0 +1,40 @@
+title: "generative ai stack"
+description: "Creates generative-ai with the basic example defaults. Upload this directory as an OCI Resource Manager stack on Terraform 1.5.x."
+schemaVersion: 1.1.0
+version: "1.0.0"
+locale: en
+variableGroups:
+  - title: "Identity"
+    variables:
+      - region
+      - compartment_ocid
+  - title: "Parameters"
+    variables:
+      - unit_count
+      - unit_shape
+variables:
+  compartment_ocid:
+    type: oci:identity:compartment:id
+    title: "compartment ocid"
+    description: "Compartment OCID for the dedicated AI cluster."
+    required: true
+  unit_count:
+    type: number
+    title: "unit count"
+    description: "Number of capacity units."
+    required: false
+    default: 1
+  unit_shape:
+    type: string
+    title: "unit shape"
+    description: "Unit shape available for HOSTING in the target region."
+    required: true
+  region:
+    type: oci:identity:region:name
+    title: "region"
+    description: "OCI region. Resource Manager fills this when the stack is created."
+    required: true
+outputs:
+  dedicated_ai_cluster_id:
+    type: ocid
+    title: "OCID of the dedicated AI cluster."

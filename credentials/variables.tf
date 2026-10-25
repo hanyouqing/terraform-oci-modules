@@ -8,7 +8,7 @@ variable "user_id" {
   default     = null
 
   validation {
-    condition     = var.user_id == null || var.user_id == "" || can(regex("^ocid1\\.user\\.", var.user_id))
+    condition     = var.user_id == null ? true : var.user_id == "" || can(regex("^ocid1\\.user\\.", var.user_id))
     error_message = "The user_id must be empty/null or a valid OCI user OCID (ocid1.user...)."
   }
 }

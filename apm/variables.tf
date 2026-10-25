@@ -92,7 +92,7 @@ variable "synthetics_monitors" {
 
   validation {
     condition = alltrue([
-      for m in var.synthetics_monitors : m.apm_domain_id == null || can(regex("^ocid1\\.apmdomain\\.oc1\\.", m.apm_domain_id))
+      for m in var.synthetics_monitors : m.apm_domain_id == null ? true : can(regex("^ocid1\\.apmdomain\\.oc1\\.", m.apm_domain_id))
     ])
     error_message = "apm_domain_id must be a valid OCI APM domain OCID when set."
   }

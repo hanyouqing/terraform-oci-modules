@@ -1,0 +1,27 @@
+title: "exadata snapshot stack"
+description: "Creates exadata-snapshot with the basic example defaults. Upload this directory as an OCI Resource Manager stack on Terraform 1.5.x."
+schemaVersion: 1.1.0
+version: "1.0.0"
+locale: en
+variableGroups:
+  - title: "Identity"
+    variables:
+      - region
+  - title: "Parameters"
+    variables:
+      - database_id
+variables:
+  database_id:
+    type: string
+    title: "database id"
+    description: "OCID of the Exadata database to snapshot."
+    required: true
+  region:
+    type: oci:identity:region:name
+    title: "region"
+    description: "OCI region. Resource Manager fills this when the stack is created."
+    required: true
+outputs:
+  snapshot_ids:
+    type: csv
+    title: "OCIDs of the database snapshots."

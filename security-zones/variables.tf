@@ -30,7 +30,7 @@ variable "security_zone_recipe_id" {
   default     = null
 
   validation {
-    condition     = var.security_zone_recipe_id == null || can(regex("^ocid1\\.securityzonessecurityrecipe\\.oc1\\.", var.security_zone_recipe_id)) || can(regex("^ocid1\\.", var.security_zone_recipe_id))
+    condition     = var.security_zone_recipe_id == null ? true : can(regex("^ocid1\\.securityzonessecurityrecipe\\.oc1\\.", var.security_zone_recipe_id)) || can(regex("^ocid1\\.", var.security_zone_recipe_id))
     error_message = "security_zone_recipe_id must be a recipe OCID when set."
   }
 }

@@ -56,7 +56,7 @@ variable "capacity_reservation_id" {
   default     = null
 
   validation {
-    condition     = var.capacity_reservation_id == null || can(regex("^ocid1\\.[a-z0-9]+\\.oc1\\.", var.capacity_reservation_id))
+    condition     = var.capacity_reservation_id == null ? true : can(regex("^ocid1\\.[a-z0-9]+\\.oc1\\.", var.capacity_reservation_id))
     error_message = "capacity_reservation_id must be an OCID."
   }
 }

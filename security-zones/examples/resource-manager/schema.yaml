@@ -1,0 +1,49 @@
+title: "security zones stack"
+description: "Creates security-zones with the basic example defaults. Upload this directory as an OCI Resource Manager stack on Terraform 1.5.x."
+schemaVersion: 1.1.0
+version: "1.0.0"
+locale: en
+variableGroups:
+  - title: "Identity"
+    variables:
+      - region
+      - compartment_ocid
+  - title: "Parameters"
+    variables:
+      - display_name
+      - security_zone_recipe_id
+      - security_policies
+variables:
+  compartment_ocid:
+    type: oci:identity:compartment:id
+    title: "compartment ocid"
+    description: "Compartment OCID for the Security Zone."
+    required: true
+  display_name:
+    type: string
+    title: "display name"
+    description: "Display name of the Security Zone."
+    required: false
+    default: "security-zone-demo"
+  security_zone_recipe_id:
+    type: string
+    title: "security zone recipe id"
+    description: "Existing recipe OCID. Null creates a recipe from security_policies."
+    required: false
+  security_policies:
+    type: array
+    title: "security policies"
+    description: "Policy OCIDs when creating a recipe."
+    required: false
+    default: []
+    items:
+      type: string
+  region:
+    type: oci:identity:region:name
+    title: "region"
+    description: "OCI region. Resource Manager fills this when the stack is created."
+    required: true
+outputs:
+  security_zone_id:
+    type: ocid
+    title: "OCID of the Security Zone."

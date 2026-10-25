@@ -1,0 +1,54 @@
+title: "api gateway stack"
+description: "Creates api-gateway with the basic example defaults. Upload this directory as an OCI Resource Manager stack on Terraform 1.5.x."
+schemaVersion: 1.1.0
+version: "1.0.0"
+locale: en
+variableGroups:
+  - title: "Identity"
+    variables:
+      - region
+      - compartment_ocid
+  - title: "Parameters"
+    variables:
+      - display_name
+      - subnet_id
+      - endpoint_type
+      - allow_public_endpoint
+variables:
+  compartment_ocid:
+    type: oci:identity:compartment:id
+    title: "compartment ocid"
+    description: "Compartment OCID."
+    required: true
+  display_name:
+    type: string
+    title: "display name"
+    description: "Gateway display name."
+    required: false
+    default: "api-gateway-demo"
+  subnet_id:
+    type: string
+    title: "subnet id"
+    description: "Subnet OCID for the gateway."
+    required: true
+  endpoint_type:
+    type: string
+    title: "endpoint type"
+    description: "PRIVATE or PUBLIC."
+    required: false
+    default: "PRIVATE"
+  allow_public_endpoint:
+    type: boolean
+    title: "allow public endpoint"
+    description: "Required when endpoint_type is PUBLIC."
+    required: false
+    default: false
+  region:
+    type: oci:identity:region:name
+    title: "region"
+    description: "OCI region. Resource Manager fills this when the stack is created."
+    required: true
+outputs:
+  gateway_id:
+    type: ocid
+    title: "OCID of the API Gateway."

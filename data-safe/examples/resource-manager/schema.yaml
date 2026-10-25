@@ -1,0 +1,25 @@
+title: "data safe stack"
+description: "Creates data-safe with the basic example defaults. Upload this directory as an OCI Resource Manager stack on Terraform 1.5.x."
+schemaVersion: 1.1.0
+version: "1.0.0"
+locale: en
+variableGroups:
+  - title: "Identity"
+    variables:
+      - region
+      - tenancy_ocid
+variables:
+  tenancy_ocid:
+    type: string
+    title: "tenancy ocid"
+    description: "Tenancy OCID."
+    required: true
+  region:
+    type: oci:identity:region:name
+    title: "region"
+    description: "OCI region. Resource Manager fills this when the stack is created."
+    required: true
+outputs:
+  is_enabled:
+    type: string
+    title: "Whether Data Safe is enabled."

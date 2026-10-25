@@ -1,0 +1,49 @@
+title: "functions stack"
+description: "Creates functions with the basic example defaults. Upload this directory as an OCI Resource Manager stack on Terraform 1.5.x."
+schemaVersion: 1.1.0
+version: "1.0.0"
+locale: en
+variableGroups:
+  - title: "Identity"
+    variables:
+      - region
+      - compartment_ocid
+  - title: "Parameters"
+    variables:
+      - display_name
+      - subnet_ids
+      - shape
+variables:
+  compartment_ocid:
+    type: oci:identity:compartment:id
+    title: "compartment ocid"
+    description: "Compartment OCID."
+    required: true
+  display_name:
+    type: string
+    title: "display name"
+    description: "Application display name."
+    required: false
+    default: "functions-demo"
+  subnet_ids:
+    type: array
+    title: "subnet ids"
+    description: "Subnet OCIDs for the application."
+    required: true
+    items:
+      type: string
+  shape:
+    type: string
+    title: "shape"
+    description: "GENERIC_X86 or GENERIC_ARM."
+    required: false
+    default: "GENERIC_X86"
+  region:
+    type: oci:identity:region:name
+    title: "region"
+    description: "OCI region. Resource Manager fills this when the stack is created."
+    required: true
+outputs:
+  application_id:
+    type: ocid
+    title: "OCID of the Functions application."

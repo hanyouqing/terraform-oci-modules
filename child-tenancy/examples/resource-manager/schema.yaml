@@ -1,0 +1,45 @@
+title: "child tenancy stack"
+description: "Creates child-tenancy with the basic example defaults. Upload this directory as an OCI Resource Manager stack on Terraform 1.5.x."
+schemaVersion: 1.1.0
+version: "1.0.0"
+locale: en
+variableGroups:
+  - title: "Identity"
+    variables:
+      - region
+  - title: "Parameters"
+    variables:
+      - tenancy_id
+      - tenancy_name
+      - home_region
+      - admin_email
+variables:
+  tenancy_id:
+    type: string
+    title: "tenancy id"
+    description: "OCID of the parent tenancy."
+    required: true
+  tenancy_name:
+    type: string
+    title: "tenancy name"
+    description: "Cloud account name of the child tenancy."
+    required: true
+  home_region:
+    type: string
+    title: "home region"
+    description: "Home region subscribed by the parent tenancy."
+    required: true
+  admin_email:
+    type: string
+    title: "admin email"
+    description: "Administrator email for the child tenancy."
+    required: true
+  region:
+    type: oci:identity:region:name
+    title: "region"
+    description: "OCI region. Resource Manager fills this when the stack is created."
+    required: true
+outputs:
+  child_tenancy_id:
+    type: ocid
+    title: "OCID returned for the child tenancy."
