@@ -1,6 +1,6 @@
 # Terragrunt Apply — GitHub Actions CD Pipeline
 
-This document describes how to set up the `Terragrunt Apply (Development)` workflow that automatically plans and applies infrastructure changes to the `personal/ap-seoul-1/development` environment.
+This document describes how to set up the `Terragrunt Apply (Development)` workflow that automatically plans and applies infrastructure changes to the `personal/ap-seoul-1/development` environment. It runs on `main` with Terraform >= 1.14.2 and `backend "oci"`. OCI Resource Manager stacks stay on the long-lived branch `tf-v1.5` (Terraform 1.5.7) and do not use this workflow. See the root [OCI Resource Manager](../README.md#oci-resource-manager) section.
 
 ## Workflow Behavior
 
@@ -37,7 +37,7 @@ The workflow writes `~/.oci/config` with the API key above. The same profile is 
 
 | Secret | Description | How to get it |
 |--------|-------------|---------------|
-| `OCI_NAMESPACE` | Object Storage namespace (for Terragrunt `TG_OCI_NAMESPACE` / namespace resolution) | Run `oci os ns get --query 'data' --raw-output` |
+| `OCI_NAMESPACE` | Object Storage namespace. The workflow passes it as `TF_VAR_namespace` and `TG_OCI_NAMESPACE`. If it is empty, Terragrunt runs `oci os ns get`, so the job installs the OCI CLI. | Run `oci os ns get --query 'data' --raw-output` |
 
 ### Account & Infrastructure
 

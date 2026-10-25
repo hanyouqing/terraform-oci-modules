@@ -55,6 +55,7 @@ env:
   # Account & module variables
   TF_VAR_tenancy_ocid: ${{ secrets.OCI_CLI_TENANCY }}
   TF_VAR_compartment_id: ${{ secrets.OCI_COMPARTMENT_ID }}
+  TF_VAR_namespace: ${{ secrets.OCI_NAMESPACE }}
   TG_OCI_NAMESPACE: ${{ secrets.OCI_NAMESPACE }}
 
   # Remote state: Terraform backend "oci" uses the same ~/.oci/config as the provider.
@@ -93,6 +94,12 @@ jobs:
             -o /usr/local/bin/terragrunt
           chmod +x /usr/local/bin/terragrunt
           terragrunt --version
+
+      - name: Install OCI CLI
+        run: |
+          curl -sSL https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh -o /tmp/oci-cli-install.sh
+          bash /tmp/oci-cli-install.sh --accept-all-defaults --exec-dir /usr/local/bin --install-dir /opt/oci-cli
+          oci --version
 
       - name: Configure OCI credentials
         run: |
@@ -187,6 +194,12 @@ jobs:
           curl -sSL "https://github.com/gruntwork-io/terragrunt/releases/download/v${TERRAGRUNT_VERSION}/terragrunt_linux_amd64" \
             -o /usr/local/bin/terragrunt
           chmod +x /usr/local/bin/terragrunt
+
+      - name: Install OCI CLI
+        run: |
+          curl -sSL https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh -o /tmp/oci-cli-install.sh
+          bash /tmp/oci-cli-install.sh --accept-all-defaults --exec-dir /usr/local/bin --install-dir /opt/oci-cli
+          oci --version
 
       - name: Configure OCI credentials
         run: |

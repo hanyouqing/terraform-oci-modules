@@ -10,6 +10,7 @@ locals {
   tenancy_ocid   = get_env("TF_VAR_tenancy_ocid", "ocid1.tenancy.oc1..REPLACE_ME")
   compartment_id = get_env("TF_VAR_compartment_id", "ocid1.compartment.oc1..REPLACE_ME")
   # Object Storage namespace from `oci os ns get --query data --raw-output` — not your username.
-  namespace           = get_env("TF_VAR_namespace", "REPLACE_ME")
+  # CI sets TG_OCI_NAMESPACE from the OCI_NAMESPACE secret. TF_VAR_namespace wins when both are set.
+  namespace           = get_env("TF_VAR_namespace", get_env("TG_OCI_NAMESPACE", "REPLACE_ME"))
   config_file_profile = get_env("OCI_CLI_PROFILE", "DEFAULT")
 }
