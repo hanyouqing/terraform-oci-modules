@@ -23,6 +23,7 @@ on:
   push:
     branches: [main]
     paths:
+      - ".github/workflows/terragrunt-apply.yml"
       - "terragrunt/personal/ap-seoul-1/development/**"
       - "terragrunt/_envcommon/**"
       - "terragrunt/root.hcl"
@@ -32,6 +33,7 @@ on:
   pull_request:
     branches: [main]
     paths:
+      - ".github/workflows/terragrunt-apply.yml"
       - "terragrunt/personal/ap-seoul-1/development/**"
       - "terragrunt/_envcommon/**"
       - "terragrunt/root.hcl"
@@ -83,12 +85,24 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Check OCI credentials
+        id: creds
+        run: |
+          if [ -z "${OCI_CLI_TENANCY}" ] || [ -z "${OCI_CLI_USER}" ] || [ -z "${OCI_CLI_FINGERPRINT}" ]; then
+            echo "present=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::OCI API credentials are not set. Skipping Terragrunt plan."
+          else
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          fi
+
       - uses: hashicorp/setup-terraform@v3
+        if: steps.creds.outputs.present == 'true'
         with:
           terraform_version: ${{ env.TERRAFORM_VERSION }}
           terraform_wrapper: false
 
       - name: Install Terragrunt
+        if: steps.creds.outputs.present == 'true'
         run: |
           curl -sSL "https://github.com/gruntwork-io/terragrunt/releases/download/v${TERRAGRUNT_VERSION}/terragrunt_linux_amd64" \
             -o /usr/local/bin/terragrunt
@@ -96,12 +110,14 @@ jobs:
           terragrunt --version
 
       - name: Install OCI CLI
+        if: steps.creds.outputs.present == 'true'
         run: |
           curl -sSL https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh -o /tmp/oci-cli-install.sh
           bash /tmp/oci-cli-install.sh --accept-all-defaults --exec-dir /usr/local/bin --install-dir /opt/oci-cli
           oci --version
 
       - name: Configure OCI credentials
+        if: steps.creds.outputs.present == 'true'
         run: |
           mkdir -p ~/.oci
           echo "${{ secrets.OCI_CLI_KEY_CONTENT }}" | base64 -d > ~/.oci/oci_api_key.pem
@@ -117,6 +133,7 @@ jobs:
           chmod 600 ~/.oci/config
 
       - name: Terragrunt Init
+        if: steps.creds.outputs.present == 'true'
         working-directory: ${{ env.WORKING_DIR }}
         run: |
           if [ -n "${{ inputs.modules }}" ]; then
@@ -131,6 +148,7 @@ jobs:
 
       - name: Terragrunt Plan
         id: plan
+        if: steps.creds.outputs.present == 'true'
         working-directory: ${{ env.WORKING_DIR }}
         run: |
           set +e
@@ -149,7 +167,7 @@ jobs:
           if [ $exitcode -eq 1 ]; then exit 1; fi
 
       - name: Post plan to PR
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request' && steps.creds.outputs.present == 'true'
         uses: actions/github-script@v7
         with:
           script: |
