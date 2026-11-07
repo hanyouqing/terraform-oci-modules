@@ -1,0 +1,14 @@
+---
+description: Keep main on current Terraform and leave OCI Resource Manager on tf-v1.5
+alwaysApply: true
+---
+
+# main 与 tf-v1.5
+
+`main` 跟踪当前 Terraform：模块 `required_version` 为 `>= 1.14.2`，CI 与 `.terraform-version` 使用 **1.16.6**。`backend "oci"` 只留在 `main`。
+
+`tf-v1.5` 是 OCI Resource Manager 的长期分支。Resource Manager 只能跑 Terraform **1.5.x（CLI 1.5.7）**。该分支的约束是 `>= 1.5.0, < 1.6.0`。每个模块有可直接压缩上传的 `examples/resource-manager`（不要带 `.terraform`）。`provider "oci"` 只设置 `region`；`tenancy_ocid`、`compartment_ocid`、`region` 由 Resource Manager 预填。栈里不写 `backend`。
+
+不要把 `tf-v1.5` 整支合并进 `main`。不要在 `main` 上把版本降到 1.5，也不要在 `main` 上新增 Resource Manager 栈。修复按分支分别移植。
+
+在 `tf-v1.5` 上改模块或 `examples/basic` 之后运行 `python3 scripts/tf15_resource_manager.py sync`，再用 Terraform 1.5.7 做 `terraform fmt` 和 `terraform validate`。1.5.7 的 `&&` / `||` 两边都会计算，空值守卫用三元表达式。说明见 `docs/resource-manager-terraform-versions.md` 与根 README 的 OCI Resource Manager 一节。

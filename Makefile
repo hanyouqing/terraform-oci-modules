@@ -35,15 +35,18 @@ help: ## Show this help message
 oci-credentials-list: ## List account names under credentials/; switch with eval and scripts/oci-use.sh (see README)
 	@bash -c 'source scripts/oci-use.sh && oci_use_list'
 
-oci-clean: ## Dry-run resources blocking a compartment (COMPARTMENT=ocid APPLY=1 DELETE_COMPARTMENT=1 YES=1)
+oci-clean: ## Preview a compartment cleanup (COMPARTMENT=ocid APPLY=1 deletes it)
 	@if [ -z "$(COMPARTMENT)" ]; then \
-		echo "Usage: make oci-clean COMPARTMENT=ocid1.compartment.oc1..example [APPLY=1] [DELETE_COMPARTMENT=1] [YES=1]"; \
-		echo "Dry-run unless APPLY=1. APPLY=1 also deletes child compartments. DELETE_COMPARTMENT=1 deletes the named compartment."; \
+		echo "Usage: make oci-clean COMPARTMENT=ocid1.compartment.oc1..example [PROFILE=DEFAULT] [AUTH=api_key] [CONFIG_FILE=~/.oci/config] [APPLY=1] [YES=1]"; \
+		echo "Auth matches the oci CLI: --profile, --auth, --config-file (or OCI_CLI_PROFILE / OCI_CLI_AUTH / OCI_CLI_CONFIG_FILE)."; \
+		echo "Preview unless APPLY=1. APPLY=1 deletes dependencies one by one, then deletes the compartment."; \
 		exit 1; \
 	fi
 	./scripts/oci-clean.sh --compartment-id "$(COMPARTMENT)" \
-		$(if $(filter 1 true yes,$(APPLY)),--apply,) \
-		$(if $(filter 1 true yes,$(DELETE_COMPARTMENT)),--delete-compartment,) \
+		$(if $(PROFILE),--profile "$(PROFILE)",) \
+		$(if $(AUTH),--auth "$(AUTH)",) \
+		$(if $(CONFIG_FILE),--config-file "$(CONFIG_FILE)",) \
+		$(if $(filter 1 true yes,$(APPLY)),,--dry-run) \
 		$(if $(filter 1 true yes,$(YES)),--yes,)
 
 fmt: ## Format all Terraform and Terragrunt HCL files

@@ -5,54 +5,65 @@
 # compartments, IAM policies, or keys/vaults inside a deletion waiting period.
 # Resources are regional: this script checks every subscribed region.
 #
-# Authentication is the OCI CLI itself (https://docs.oracle.com/iaas/Content/API/SDKDocs/cliconfigure.htm):
-#   ~/.oci/config from `oci setup config`, plus the same global options as `oci`:
-#   --config-file, --profile, --auth, and OCI_CLI_CONFIG_FILE / OCI_CLI_PROFILE / OCI_CLI_AUTH.
-#   --auth: api_key (default), security_token, instance_principal, resource_principal, instance_obo_user.
+# Authentication is the OCI CLI itself (https://docs.oracle.com/iaas/Content/API/SDKDocs/cliconfigure.htm).
+# Run `oci setup config` so ~/.oci/config exists. The API key pair is created locally
+# (~/.oci/oci_api_key.pem and ~/.oci/oci_api_key_public.pem). Upload the public key to
+# the user in config (Console → profile → User settings → API keys → Add API key).
+# Flags match `oci` and override OCI_CLI_CONFIG_FILE / OCI_CLI_PROFILE / OCI_CLI_AUTH:
+#   --config-file PATH
+#   --profile NAME
+#   --auth api_key|security_token|instance_principal|resource_principal|instance_obo_user|oke_workload_identity
+# This script does not read Terraform OCI_* variables or scripts/oci-use.sh.
 #
-# Dry-run (default):
-#   ./scripts/oci-clean.sh --profile DEFAULT --auth api_key \
-#     --compartment-id ocid1.compartment.oc1..example
+# Confirm the same credentials before cleaning:
+#   oci iam region list --profile DEFAULT --auth api_key
 #
-# Delete resources and child compartments:
+# Delete (default). Lists every dependency, deletes them one by one, deletes child
+# compartments, then deletes the compartment you named. --yes skips the name prompt.
+# --region may be repeated; omit it to scan every subscribed region:
 #   ./scripts/oci-clean.sh --profile DEFAULT --auth api_key \
-#     --compartment-id ocid1.compartment.oc1..example --apply
+#     --compartment-id ocid1.compartment.oc1..example \
+#     --region ap-seoul-1 --yes
 #
-# Also delete the compartment itself:
+# Preview the same deletes without calling them:
 #   ./scripts/oci-clean.sh --profile DEFAULT --auth api_key \
-#     --compartment-id ocid1.compartment.oc1..example --apply --delete-compartment --yes
+#     --compartment-id ocid1.compartment.oc1..example \
+#     --region ap-seoul-1 --dry-run
+#
+# Delete resources but leave the named compartment:
+#   ./scripts/oci-clean.sh --profile DEFAULT --auth api_key \
+#     --compartment-id ocid1.compartment.oc1..example --keep-compartment --yes
+#
+# Makefile previews unless APPLY=1. APPLY=1 deletes dependencies and the compartment:
+#   make oci-clean COMPARTMENT=ocid1.compartment.oc1..example PROFILE=DEFAULT AUTH=api_key
+#   make oci-clean COMPARTMENT=ocid1.compartment.oc1..example PROFILE=DEFAULT AUTH=api_key APPLY=1 YES=1
+#
+# DNS zones are deleted with --scope GLOBAL, then PRIVATE for each DNS view.
+# A 404 from the DNS API means the zone is already gone (Resource Search can lag).
+# ConsoleResourceCollection blocks compartment delete (CompartmentNotEmpty from
+# resource-collection-service). There is no public OCI CLI delete; remove it in the
+# Console (Search → Advanced resource query → Resource collections), then re-run.
+# OrmJob records are listed and skipped. KMS keys, vaults, and certificates stay
+# until their waiting period ends.
 #
 # Requires: oci, jq. Refuses the tenancy root compartment.
 # shellcheck shell=bash
 
 set -euo pipefail
 
-APPLY=0
-DELETE_COMPARTMENT=0
+APPLY=1
+DELETE_COMPARTMENT=1
 YES=0
 MAX_PASSES=5
 COMPARTMENT_ID=""
 REGION_ARGS=""
+# Same sources as the oci CLI: flags override OCI_CLI_PROFILE / OCI_CLI_AUTH / OCI_CLI_CONFIG_FILE.
+PROFILE="${OCI_CLI_PROFILE:-}"
+AUTH="${OCI_CLI_AUTH:-}"
+CONFIG_FILE="${OCI_CLI_CONFIG_FILE:-}"
 
 usage() {
-  cat <<'EOF'
-Empty an OCI compartment so it can be deleted.
-
-Authentication matches the oci CLI. Create ~/.oci/config with `oci setup config`,
-then pass the same global options (or export OCI_CLI_CONFIG_FILE, OCI_CLI_PROFILE, OCI_CLI_AUTH):
-
-  --config-file PATH
-  --profile NAME
-  --auth api_key|security_token|instance_principal|resource_principal|instance_obo_user
-
-  ./scripts/oci-clean.sh --profile DEFAULT --auth api_key \
-    --compartment-id ocid1.compartment.oc1..example
-  ./scripts/oci-clean.sh --profile DEFAULT --auth api_key \
-    --compartment-id ocid1.compartment.oc1..example --apply --delete-compartment --yes
-
-Check the same credentials first:
-  oci iam region list --profile DEFAULT --auth api_key
-EOF
+  sed -n '2,47p' "$0" | sed 's/^# \{0,1\}//'
 }
 
 while [[ $# -gt 0 ]]; do
@@ -65,8 +76,22 @@ while [[ $# -gt 0 ]]; do
       REGION_ARGS="${REGION_ARGS} ${2:-}"
       shift 2
       ;;
-    --apply) APPLY=1; shift ;;
+    --profile)
+      PROFILE="${2:-}"
+      shift 2
+      ;;
+    --auth)
+      AUTH="${2:-}"
+      shift 2
+      ;;
+    --config-file)
+      CONFIG_FILE="${2:-}"
+      shift 2
+      ;;
+    --apply) APPLY=1; DELETE_COMPARTMENT=1; shift ;;
+    --dry-run) APPLY=0; shift ;;
     --delete-compartment) DELETE_COMPARTMENT=1; shift ;;
+    --keep-compartment) DELETE_COMPARTMENT=0; shift ;;
     --yes) YES=1; shift ;;
     --max-passes)
       MAX_PASSES="${2:-}"
@@ -93,10 +118,33 @@ if ! [[ "$MAX_PASSES" =~ ^[1-9][0-9]*$ ]]; then
   echo "--max-passes must be a positive integer." >&2
   exit 2
 fi
+case "$AUTH" in
+  ""|api_key|security_token|instance_principal|resource_principal|instance_obo_user|oke_workload_identity) ;;
+  *)
+    echo "--auth must be api_key, security_token, instance_principal, resource_principal, instance_obo_user, or oke_workload_identity." >&2
+    exit 2
+    ;;
+esac
+if [[ -n "$CONFIG_FILE" && ! -f "$CONFIG_FILE" ]]; then
+  echo "OCI config file not found: $CONFIG_FILE" >&2
+  exit 1
+fi
 command -v oci >/dev/null 2>&1 || { echo "oci CLI not found. Install it and run 'oci setup config'." >&2; exit 1; }
 command -v jq >/dev/null 2>&1 || { echo "jq is required." >&2; exit 1; }
 
-export OCI_CLI_SUPPRESS_FILE_PERMISSIONS_WARNING=True
+# Global options, in the same position the oci CLI expects (before the service).
+OCI_GLOBAL=()
+[[ -n "$CONFIG_FILE" ]] && OCI_GLOBAL+=(--config-file "$CONFIG_FILE")
+[[ -n "$PROFILE" ]] && OCI_GLOBAL+=(--profile "$PROFILE")
+[[ -n "$AUTH" ]] && OCI_GLOBAL+=(--auth "$AUTH")
+
+run_oci() {
+  if [[ ${#OCI_GLOBAL[@]} -eq 0 ]]; then
+    oci "$@"
+  else
+    oci "${OCI_GLOBAL[@]}" "$@"
+  fi
+}
 
 TMPDIR_CLEAN=$(mktemp -d "${TMPDIR:-/tmp}/oci-clean.XXXXXX")
 trap 'rm -rf "$TMPDIR_CLEAN"' EXIT
@@ -108,16 +156,46 @@ TARGET_NAME=""
 
 log() { printf '%s\n' "$*"; }
 
-oci_try() {
-  if [[ "$APPLY" -eq 1 ]]; then
-    log "+ oci $*"
-    if ! oci "$@"; then
-      log "FAILED: oci $*" >&2
-      return 1
-    fi
-  else
-    log "dry-run: oci $*"
+format_oci() {
+  local out="oci" arg
+  if [[ ${#OCI_GLOBAL[@]} -gt 0 ]]; then
+    for arg in "${OCI_GLOBAL[@]}"; do
+      printf -v out '%s %q' "$out" "$arg"
+    done
   fi
+  for arg in "$@"; do
+    printf -v out '%s %q' "$out" "$arg"
+  done
+  printf '%s\n' "$out"
+}
+
+# OCI_STATUS is ok, gone (404 / already deleted), or fail.
+OCI_STATUS=fail
+oci_status() {
+  OCI_STATUS=fail
+  if [[ "$APPLY" -eq 0 ]]; then
+    log "dry-run: $(format_oci "$@")"
+    OCI_STATUS=ok
+    return 0
+  fi
+  log "+ $(format_oci "$@")"
+  if run_oci "$@" >"$TMPDIR_CLEAN/oci.out" 2>"$TMPDIR_CLEAN/oci.err"; then
+    OCI_STATUS=ok
+    return 0
+  fi
+  if grep -Eq 'NotAuthorizedOrNotFound|"status": 404' "$TMPDIR_CLEAN/oci.err"; then
+    log "already gone: $(format_oci "$@")"
+    OCI_STATUS=gone
+    return 0
+  fi
+  log "FAILED: $(format_oci "$@")" >&2
+  cat "$TMPDIR_CLEAN/oci.err" >&2
+  OCI_STATUS=fail
+  return 1
+}
+
+oci_try() {
+  oci_status "$@"
 }
 
 deletion_time() {
@@ -131,8 +209,10 @@ deletion_time() {
 priority_for() {
   case "$1" in
     VolumeAttachment|BootVolumeAttachment|VnicAttachment|BastionSession|Export) echo 10 ;;
-    Policy|Quota|TagDefault|Budget|EventRule|Rule|ServiceConnector|OrmStack|Stack) echo 15 ;;
-    Instance|InstancePool|DbSystem|MysqlDbSystem|AutonomousDatabase|PostgresqlDbSystem|NosqlTable|NodePool|ContainerInstance|FunctionsFunction|Deployment|ApiDeployment|LoadBalancer|NetworkLoadBalancer|NetworkFirewall|Alarm|OnsSubscription|Subscription|Sender|EmailSender|Certificate|Secret|VaultSecret|Log|CloudVmCluster|VirtualCircuit|DrProtectionGroup|GenerativeAiEndpoint|DedicatedAiCluster|DataSafeTargetDatabase|SecurityZone|CloudGuardTarget) echo 20 ;;
+    Policy|Quota|TagDefault|Budget|EventRule|Rule|ServiceConnector|OrmStack|Stack|OrmConfigSourceProvider) echo 15 ;;
+    CustomerDnsZone|DnsZone) echo 25 ;;
+    DnsView) echo 28 ;;
+    Instance|InstancePool|DbSystem|MysqlDbSystem|AutonomousDatabase|PostgresqlDbSystem|NosqlTable|NodePool|ContainerInstance|FunctionsFunction|Deployment|ApiDeployment|LoadBalancer|NetworkLoadBalancer|NetworkFirewall|Alarm|OnsSubscription|Subscription|Sender|EmailSender|Certificate|Secret|VaultSecret|Log|Bucket|CloudVmCluster|VirtualCircuit|DrProtectionGroup|GenerativeAiEndpoint|DedicatedAiCluster|DataSafeTargetDatabase|SecurityZone|CloudGuardTarget) echo 20 ;;
     Cluster|FunctionsApplication|ApiGateway|Gateway|Bastion|LogGroup|OnsTopic|NotificationTopic|MountTarget|FileSystem|AnalyticsInstance|IntegrationInstance|GoldenGateDeployment|ApmDomain|RedisCluster|OciCacheCluster|OpensearchCluster|WebAppFirewall|WafPolicy|NetworkFirewallPolicy|DataSafePrivateEndpoint|SecurityRecipe|CrossConnect) echo 30 ;;
     Subnet|Vlan) echo 40 ;;
     NatGateway|InternetGateway|ServiceGateway|LocalPeeringGateway|DrgAttachment|RemotePeeringConnection|IPSecConnection|Cpe|RouteTable|SecurityList|NetworkSecurityGroup|DhcpOptions|PublicIp|Ipv6|Vtap|CaptureFilter|CrossConnectGroup) echo 50 ;;
@@ -176,19 +256,34 @@ add_resource() {
 }
 
 json_or_empty() {
-  oci "$@" --output json 2>"$TMPDIR_CLEAN/oci.err" || {
-    log "warn: oci $* failed: $(tr '\n' ' ' < "$TMPDIR_CLEAN/oci.err")" >&2
+  run_oci "$@" --output json 2>"$TMPDIR_CLEAN/oci.err" || {
+    log "warn: $(format_oci "$@") failed: $(tr '\n' ' ' < "$TMPDIR_CLEAN/oci.err")" >&2
     echo '{"data":[]}'
     return 0
   }
 }
 
+# structured-search has no --all. Echo one JSON object per hit, following opc-next-page.
+search_hits() {
+  local region="$1" query="$2" page="" json
+  while true; do
+    if [[ -n "$page" ]]; then
+      json=$(json_or_empty --region "$region" search resource structured-search \
+        --query-text "$query" --limit 1000 --page "$page") || true
+    else
+      json=$(json_or_empty --region "$region" search resource structured-search \
+        --query-text "$query" --limit 1000) || true
+    fi
+    echo "$json" | jq -c '.data.items[]? // empty' 2>/dev/null
+    page=$(echo "$json" | jq -r '.["opc-next-page"] // empty' 2>/dev/null || true)
+    [[ -z "$page" || "$page" == "null" ]] && break
+  done
+}
+
 collect_search() {
-  local region="$1" cid="$2" json type id name state pri
-  json=$(json_or_empty --region "$region" search resource structured-search \
-    --query-text "query all resources where compartmentId = '${cid}'" \
-    --limit 1000 --all) || true
-  echo "$json" | jq -c '.data.items[]? // .data[]? // empty' 2>/dev/null | while IFS= read -r row; do
+  local region="$1" cid="$2" type id name state pri row
+  search_hits "$region" "query all resources where compartmentId = '${cid}'" | while IFS= read -r row; do
+    [[ -z "$row" ]] && continue
     type=$(echo "$row" | jq -r '.["resource-type"] // empty')
     id=$(echo "$row" | jq -r '.identifier // empty')
     name=$(echo "$row" | jq -r '.["display-name"] // empty')
@@ -240,7 +335,8 @@ collect_buckets() {
     name=$(echo "$row" | jq -r '.name // empty')
     [[ -z "$name" ]] && continue
     # Bucket OCID is not required; delete uses the name. Use name as the id key.
-    add_resource 20 "$region" Bucket "$name" "$name" "ACTIVE"
+    # Search skips Bucket, so this list is the only collector. Priority comes from priority_for.
+    add_resource "$(priority_for Bucket)" "$region" Bucket "$name" "$name" "ACTIVE"
   done
 }
 
@@ -304,6 +400,78 @@ empty_bucket() {
   done
   oci_try --region "$region" os bucket delete \
     --namespace-name "$OS_NAMESPACE" --bucket-name "$name" --force || true
+}
+
+dns_view_ids() {
+  local region="$1" json row id
+  # Same paged search as collect_search. A view often lives in the tenancy, not in the
+  # compartment that holds the zone, so this query is not filtered by compartmentId.
+  search_hits "$region" "query dnsview resources" | while IFS= read -r row; do
+    [[ -z "$row" ]] && continue
+    id=$(echo "$row" | jq -r '.identifier // empty')
+    [[ -n "$id" && "$id" != null ]] && printf '%s\n' "$id"
+  done
+  # dns view list accepts --all. structured-search does not.
+  json=$(json_or_empty --region "$region" dns view list --compartment-id "$TENANCY_ID" --scope PRIVATE --all)
+  echo "$json" | jq -r '.data[]?.id // empty'
+  if [[ -n "${CURRENT_CID:-}" && "$CURRENT_CID" != "$TENANCY_ID" ]]; then
+    json=$(json_or_empty --region "$region" dns view list --compartment-id "$CURRENT_CID" --scope PRIVATE --all)
+    echo "$json" | jq -r '.data[]?.id // empty'
+  fi
+}
+
+collect_dns_zones() {
+  local region="$1" cid="$2" json view id name state
+  json=$(json_or_empty --region "$region" dns zone list --compartment-id "$cid" --scope GLOBAL --all)
+  echo "$json" | jq -c '.data[]? // empty' | while IFS= read -r row; do
+    [[ -z "$row" ]] && continue
+    id=$(echo "$row" | jq -r '.id // empty')
+    name=$(echo "$row" | jq -r '.name // empty')
+    state=$(echo "$row" | jq -r '.["lifecycle-state"] // empty')
+    add_resource 25 "$region" CustomerDnsZone "$id" "$name" "$state"
+  done
+  while IFS= read -r view; do
+    [[ -z "$view" ]] && continue
+    json=$(json_or_empty --region "$region" dns zone list --compartment-id "$cid" --scope PRIVATE --view-id "$view" --all)
+    echo "$json" | jq -c '.data[]? // empty' | while IFS= read -r row; do
+      [[ -z "$row" ]] && continue
+      id=$(echo "$row" | jq -r '.id // empty')
+      name=$(echo "$row" | jq -r '.name // empty')
+      state=$(echo "$row" | jq -r '.["lifecycle-state"] // empty')
+      add_resource 25 "$region" CustomerDnsZone "$id" "$name" "$state"
+    done
+  done < <(dns_view_ids "$region" | awk 'NF && !seen[$0]++')
+}
+
+delete_dns_zone() {
+  local region="$1" id="$2" name="$3" view
+  if [[ "$APPLY" -eq 0 ]]; then
+    oci_status --region "$region" dns zone delete --zone-name-or-id "$id" --scope GLOBAL --force || true
+    if [[ -n "$name" && "$name" != "$id" ]]; then
+      oci_status --region "$region" dns zone delete --zone-name-or-id "$name" --scope GLOBAL \
+        --compartment-id "$CURRENT_CID" --force || true
+    fi
+    while IFS= read -r view; do
+      [[ -z "$view" ]] && continue
+      oci_status --region "$region" dns zone delete --zone-name-or-id "${name:-$id}" --scope PRIVATE \
+        --view-id "$view" --compartment-id "$CURRENT_CID" --force || true
+    done < <(dns_view_ids "$region" | awk 'NF && !seen[$0]++')
+    return 0
+  fi
+  oci_status --region "$region" dns zone delete --zone-name-or-id "$id" --scope GLOBAL --force || true
+  [[ "$OCI_STATUS" == ok ]] && return 0
+  if [[ -n "$name" && "$name" != "$id" ]]; then
+    oci_status --region "$region" dns zone delete --zone-name-or-id "$name" --scope GLOBAL \
+      --compartment-id "$CURRENT_CID" --force || true
+    [[ "$OCI_STATUS" == ok ]] && return 0
+  fi
+  while IFS= read -r view; do
+    [[ -z "$view" ]] && continue
+    oci_status --region "$region" dns zone delete --zone-name-or-id "${name:-$id}" --scope PRIVATE \
+      --view-id "$view" --compartment-id "$CURRENT_CID" --force || true
+    [[ "$OCI_STATUS" == ok ]] && return 0
+  done < <(dns_view_ids "$region" | awk 'NF && !seen[$0]++')
+  log "dns zone ${name:-$id} is not in the DNS API. Resource Search can stay stale after the zone is gone."
 }
 
 delete_one() {
@@ -492,6 +660,20 @@ delete_one() {
       oci_try --region "$region" cloud-guard security-recipe delete --security-recipe-id "$id" --force || true ;;
     CloudGuardTarget)
       oci_try --region "$region" cloud-guard target delete --target-id "$id" --force || true ;;
+    CustomerDnsZone|DnsZone)
+      delete_dns_zone "$region" "$id" "$name" ;;
+    DnsView)
+      oci_try --region "$region" dns view delete --view-id "$id" --scope PRIVATE --force || true ;;
+    OrmConfigSourceProvider)
+      oci_try --region "$region" resource-manager configuration-source-provider delete \
+        --configuration-source-provider-id "$id" --force || true ;;
+    OrmJob)
+      log "skip ${type} ${id} (${name}): this record does not block compartment delete" ;;
+    ConsoleResourceCollection)
+      log "unsupported ${type} ${id} (${name}) in ${region}: delete in Console → Search → Resource collections"
+      printf '%s\t%s\t%s\t%s\n' "$region" "$type" "$id" "$name" >> "$TMPDIR_CLEAN/unsupported.tsv"
+      COMPARTMENT_DELETE_FAILED=1
+      ;;
     *)
       log "unsupported ${type} ${id} (${name}) in ${region}"
       printf '%s\t%s\t%s\t%s\n' "$region" "$type" "$id" "$name" >> "$TMPDIR_CLEAN/unsupported.tsv"
@@ -518,6 +700,7 @@ collect_compartment() {
     [[ -z "$region" ]] && continue
     log "  search $region"
     collect_search "$region" "$cid"
+    collect_dns_zones "$region" "$cid"
     collect_buckets "$region" "$cid"
     collect_logs "$region" "$cid"
     collect_kms "$region" "$cid"
@@ -553,9 +736,12 @@ list_children() {
     | jq -r '.data[]? | select(.["lifecycle-state"]=="ACTIVE" or .["lifecycle-state"]=="INACTIVE") | .id'
 }
 
+COMPARTMENT_DELETE_FAILED=0
 delete_compartment_ocid() {
   local cid="$1"
-  oci_try iam compartment delete --region "$HOME_REGION" --compartment-id "$cid" --force || true
+  # Wait until the work request succeeds so a child is gone before its parent is deleted.
+  oci_try iam compartment delete --region "$HOME_REGION" --compartment-id "$cid" \
+    --force --wait-for-state SUCCEEDED || COMPARTMENT_DELETE_FAILED=1
 }
 
 clean_tree() {
@@ -569,29 +755,25 @@ clean_tree() {
     clean_tree "$child" $((depth + 1))
   done < <(list_children "$cid")
 
-  name=$(oci iam compartment get --region "$HOME_REGION" --compartment-id "$cid" --query 'data.name' --raw-output 2>/dev/null || echo "$cid")
+  name=$(run_oci iam compartment get --region "$HOME_REGION" --compartment-id "$cid" --query 'data.name' --raw-output 2>/dev/null || echo "$cid")
   log ""
   log "=== compartment ${name} (${cid}) ==="
   empty_compartment_resources "$cid"
 
-  if [[ "$cid" == "$COMPARTMENT_ID" ]]; then
-    if [[ "$DELETE_COMPARTMENT" -eq 1 ]]; then
-      delete_compartment_ocid "$cid"
-    fi
-  else
-    log "child compartment ${name} blocks the parent until it is deleted"
-    if [[ "$APPLY" -eq 1 ]]; then
-      delete_compartment_ocid "$cid"
-    else
-      log "dry-run: oci iam compartment delete --region $HOME_REGION --compartment-id $cid --force"
-    fi
+  if [[ "$cid" == "$COMPARTMENT_ID" && "$DELETE_COMPARTMENT" -eq 0 ]]; then
+    log "keeping compartment ${name}"
+    return 0
   fi
+  if [[ "$cid" != "$COMPARTMENT_ID" ]]; then
+    log "child compartment ${name} is deleted before the parent"
+  fi
+  delete_compartment_ocid "$cid"
 }
 
 resolve_tenancy() {
   local cur="$1" parent
   while true; do
-    parent=$(oci iam compartment get --compartment-id "$cur" --query 'data."compartment-id"' --raw-output 2>/dev/null || true)
+    parent=$(run_oci iam compartment get --compartment-id "$cur" --query 'data."compartment-id"' --raw-output 2>/dev/null || true)
     if [[ -z "$parent" || "$parent" == "null" ]]; then
       TENANCY_ID="$cur"
       return 0
@@ -602,7 +784,12 @@ resolve_tenancy() {
 
 main() {
   local parent info
-  info=$(oci iam compartment get --compartment-id "$COMPARTMENT_ID" --output json)
+  if ! run_oci iam region list --output json >/dev/null; then
+    echo "OCI CLI authentication failed. Use the same options as oci, for example:" >&2
+    echo "  oci iam region list --profile ${PROFILE:-DEFAULT} --auth ${AUTH:-api_key}" >&2
+    exit 1
+  fi
+  info=$(run_oci iam compartment get --compartment-id "$COMPARTMENT_ID" --output json)
   parent=$(echo "$info" | jq -r '.data["compartment-id"] // empty')
   TARGET_NAME=$(echo "$info" | jq -r '.data.name')
   if [[ -z "$parent" || "$parent" == "null" ]]; then
@@ -616,20 +803,25 @@ main() {
     echo "Could not resolve the home region for tenancy $TENANCY_ID." >&2
     exit 1
   fi
-  OS_NAMESPACE=$(oci os ns get --query data --raw-output 2>/dev/null || true)
+  OS_NAMESPACE=$(run_oci os ns get --query data --raw-output 2>/dev/null || true)
 
   log "compartment: $TARGET_NAME"
   log "id:          $COMPARTMENT_ID"
   log "parent:      $parent"
   log "tenancy:     $TENANCY_ID"
   log "home region: $HOME_REGION"
+  log "config file: ${CONFIG_FILE:-<oci default, usually ~/.oci/config>}"
+  log "profile:     ${PROFILE:-<oci default, usually DEFAULT>}"
+  log "auth:        ${AUTH:-<oci default, api_key>}"
   if [[ "$APPLY" -eq 1 ]]; then
-    log "mode:        apply (resources and child compartments will be deleted)"
+    log "mode:        delete dependencies one by one, then delete compartments"
   else
-    log "mode:        dry-run (pass --apply to delete)"
+    log "mode:        dry-run (omit --dry-run to delete)"
   fi
   if [[ "$DELETE_COMPARTMENT" -eq 1 ]]; then
-    log "also delete the named compartment after it is empty"
+    log "named compartment: deleted after its dependencies"
+  else
+    log "named compartment: kept (--keep-compartment)"
   fi
 
   if [[ "$APPLY" -eq 1 && "$YES" -eq 0 ]]; then
@@ -663,10 +855,27 @@ main() {
     log "=== no delete command for these resource types ==="
     sort -u "$TMPDIR_CLEAN/unsupported.tsv"
     log "These still cause Compartment Not Empty. Delete them in the console, then re-run."
+    if grep -q $'\tConsoleResourceCollection\t' "$TMPDIR_CLEAN/unsupported.tsv"; then
+      log "ConsoleResourceCollection: Console → Search → Advanced resource query → Resource collections → open the collection → Delete."
+    fi
   fi
-  if [[ "$APPLY" -eq 1 && "$DELETE_COMPARTMENT" -eq 0 ]]; then
-    log ""
-    log "Resources were deleted. Re-run with --delete-compartment after waiting resources are gone."
+  if [[ "$APPLY" -eq 1 && "$DELETE_COMPARTMENT" -eq 1 ]]; then
+    local state
+    state=$(run_oci iam compartment get --region "$HOME_REGION" --compartment-id "$COMPARTMENT_ID" \
+      --query 'data."lifecycle-state"' --raw-output 2>"$TMPDIR_CLEAN/oci.err" || true)
+    if grep -Eq 'NotAuthorizedOrNotFound|"status": 404' "$TMPDIR_CLEAN/oci.err"; then
+      state=DELETED
+    fi
+    log "compartment state: ${state:-unknown}"
+    case "$state" in
+      DELETING|DELETED) ;;
+      *)
+        echo "Compartment $TARGET_NAME is still ${state:-unknown}." >&2
+        exit 1
+        ;;
+    esac
+  elif [[ "$COMPARTMENT_DELETE_FAILED" -eq 1 ]]; then
+    exit 1
   fi
 }
 

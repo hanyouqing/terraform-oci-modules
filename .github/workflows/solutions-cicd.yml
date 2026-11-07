@@ -53,6 +53,10 @@ jobs:
       - name: Format and validate
         run: |
           root="docs/oci-solutions-architect/examples"
+          if [ ! -d "$root" ]; then
+            echo "No $root in this checkout (often gitignored). Skipping solution validate."
+            exit 0
+          fi
           terraform fmt -check -recursive "$root"
           for dir in "$root"/*/; do
             [ -f "${dir}main.tf" ] || continue

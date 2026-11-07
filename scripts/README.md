@@ -129,17 +129,21 @@ A wrapper script that adds `-e` flag support to Terraform commands.
 
 Empties an OCI compartment so `oci iam compartment delete` can succeed. A compartment stays **Compartment Not Empty** while it still has resources in any subscribed region, child compartments, IAM policies, or keys/vaults/certificates that are inside a deletion waiting period.
 
-Default is a dry-run. `--apply` deletes resources and child compartments. `--delete-compartment` also deletes the compartment you named. The tenancy root is refused.
+Passing `--compartment-id` deletes dependencies one by one, then deletes that compartment and its child compartments. `--dry-run` only prints the deletes. `--keep-compartment` deletes resources and leaves the named compartment. The tenancy root is refused. `make oci-clean` previews unless `APPLY=1`.
+
+Authentication is the OCI CLI, not the Terraform `OCI_*` variables from `oci-use.sh`. Run `oci setup config` so `~/.oci/config` exists, then use the same global options as `oci` (`--config-file`, `--profile`, `--auth`). Unset flags fall back to `OCI_CLI_CONFIG_FILE`, `OCI_CLI_PROFILE`, and `OCI_CLI_AUTH`. `--auth` is `api_key` (default), `security_token`, `instance_principal`, `resource_principal`, `instance_obo_user`, or `oke_workload_identity`.
 
 ```bash
-./scripts/oci-clean.sh --compartment-id ocid1.compartment.oc1..example
-./scripts/oci-clean.sh --compartment-id ocid1.compartment.oc1..example --apply
-./scripts/oci-clean.sh --compartment-id ocid1.compartment.oc1..example --apply --delete-compartment --yes
-make oci-clean COMPARTMENT=ocid1.compartment.oc1..example
-make oci-clean COMPARTMENT=ocid1.compartment.oc1..example APPLY=1 DELETE_COMPARTMENT=1 YES=1
+oci iam region list --profile DEFAULT --auth api_key
+./scripts/oci-clean.sh --profile DEFAULT --auth api_key \
+  --compartment-id ocid1.compartment.oc1..example --region ap-seoul-1 --dry-run
+./scripts/oci-clean.sh --profile DEFAULT --auth api_key \
+  --compartment-id ocid1.compartment.oc1..example --region ap-seoul-1 --yes
+make oci-clean COMPARTMENT=ocid1.compartment.oc1..example PROFILE=DEFAULT AUTH=api_key
+make oci-clean COMPARTMENT=ocid1.compartment.oc1..example PROFILE=DEFAULT AUTH=api_key APPLY=1 YES=1
 ```
 
-Requires the OCI CLI (`oci setup config` or `eval "$(./scripts/oci-use.sh <account>)"`) and `jq`. KMS keys cannot disappear immediately; schedule deletion, wait until the waiting period ends, then run the script again before deleting the compartment.
+Requires `oci` and `jq`. KMS keys cannot disappear immediately; schedule deletion, wait until the waiting period ends, then run the script again before deleting the compartment. A `ConsoleResourceCollection` also blocks delete; remove it in the Console under Search → Resource collections, then re-run.
 
 ## Makefile Integration
 
