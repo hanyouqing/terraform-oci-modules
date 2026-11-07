@@ -266,7 +266,7 @@ docs: ## Generate documentation for all modules (lists each */ with main.tf)
 	printf '%s\n' "$$modules" | sed 's/^/  - /'; \
 	for dir in $$modules; do \
 		echo "Generating docs for $$dir/..."; \
-		(cd "$$dir" && terraform-docs markdown --output-file README.md --output-mode inject --sort-by name .) || true; \
+		(cd "$$dir" && terraform-docs markdown --lockfile=false --output-file README.md --output-mode inject --sort-by name .) || true; \
 	done
 
 docs-module: ## Generate docs for one module, or all (MODULE=vcn | MODULE=all); omit MODULE to list
@@ -296,7 +296,7 @@ docs-module: ## Generate docs for one module, or all (MODULE=vcn | MODULE=all); 
 			exit 1; \
 		fi; \
 		echo "Generating docs for $(MODULE)/..."; \
-		(cd "$(MODULE)" && terraform-docs markdown --output-file README.md --output-mode inject --sort-by name .); \
+		(cd "$(MODULE)" && terraform-docs markdown --lockfile=false --output-file README.md --output-mode inject --sort-by name .); \
 	fi
 
 init: ## Initialize Terraform in current directory

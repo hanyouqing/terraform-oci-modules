@@ -106,7 +106,7 @@ The following APM resources are **free** within Always Free tier limits:
 
 | Name | Version |
 | ---- | ------- |
-| <a name="provider_oci"></a> [oci](#provider\_oci) | 9.11.0 |
+| <a name="provider_oci"></a> [oci](#provider\_oci) | ~> 9.11 |
 
 ## Modules
 
