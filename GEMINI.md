@@ -97,9 +97,9 @@ module-name/
 
 ## 7. Versioning
 
-- **Terraform**: on `main`, modules declare `>= 1.14.2`. CI, Makefile, and `.terraform-version` track the latest stable line (`~> 1.16`, currently 1.16.6).
+- **Terraform**: on `main`, modules declare `>= 1.14.2`. CI, Makefile, and `.terraform-version` track the latest stable line (`~> 1.17`, currently 1.17.2).
 - **Resource Manager**: OCI Resource Manager runs Terraform 1.5.7 only. That line is the long-lived branch `tf-v1.5` (`required_version` `>= 1.5.0, < 1.6.0`, zip-ready `examples/resource-manager` per module). Do not merge `tf-v1.5` into `main`. Port fixes separately. Do not downgrade `main` to 1.5, and do not add Resource Manager stacks on `main`. `backend "oci"` stays on `main`.
-- **OCI Provider**: Pin to `~> 9.11` in every module and example `required_providers` block.
+- **OCI Provider**: Pin to `~> 9.13` in every module and example `required_providers` block.
 
 ## 8. Specific Module Instructions
 
