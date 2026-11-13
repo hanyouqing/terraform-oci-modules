@@ -1,10 +1,10 @@
 # OCI Resource Manager 与 Terraform 版本
 
-核对日期：2026-10-25。仓库有两条长期维护的线，不要整支合并。
+核对日期：2026-11-13。仓库有两条长期维护的线，不要整支合并。
 
 | 分支 | Terraform | 用途 |
 | --- | --- | --- |
-| `main`（本分支） | 模块 `>= 1.14.2`，CI 与 `.terraform-version` 为 **1.16.6** | Terraform CLI。远程状态使用 `backend "oci"`（需要 Terraform >= 1.12） |
+| `main`（本分支） | 模块 `>= 1.14.2`，CI 与 `.terraform-version` 为 **1.17.2** | Terraform CLI。远程状态使用 `backend "oci"`（需要 Terraform >= 1.12） |
 | [`tf-v1.5`](https://github.com/hanyouqing/terraform-oci-modules/tree/tf-v1.5) | `>= 1.5.0, < 1.6.0`，CI 与 `.terraform-version` 为 **1.5.7** | OCI Resource Manager。每个模块的 `examples/resource-manager` 压缩后即可上传 |
 
 Resource Manager 当前能跑的 Terraform 停在 **1.5.x（CLI 1.5.7）**。没有 1.6 及以后的运行时。`main` 的配置不能作为 Resource Manager 栈上传。修复要按分支分别移植。
@@ -46,10 +46,10 @@ terraform fmt -recursive
 | 位置 | 版本 | 来源 |
 | --- | --- | --- |
 | `main` 的模块 `required_version` | >= 1.14.2 | 各模块 `versions.tf` |
-| `main` 的 CI、`.terraform-version` | 1.16.6 | 仓库根 README 的 Prerequisites |
+| `main` 的 CI、`.terraform-version` | 1.17.2 | 仓库根 README 的 Prerequisites |
 | `tf-v1.5` 的模块 `required_version` | >= 1.5.0, < 1.6.0 | 该分支的 `versions.tf` |
 | `tf-v1.5` 的 CI、`.terraform-version` | 1.5.7 | 该分支的 README |
-| HashiCorp 发布目录里的最新稳定版 | 1.17.0 | [releases.hashicorp.com/terraform](https://releases.hashicorp.com/terraform/)，2026-10-24 查看 |
+| HashiCorp 发布目录里的最新稳定版 | 1.17.2 | [releases.hashicorp.com/terraform](https://releases.hashicorp.com/terraform/)，2026-11-13 查看 |
 
 1.6 及以后的语言只出现在 `main`。`tf-v1.5` 不能使用它们。下面按“1.5 已有的能力”和“1.6 到 1.14 新增、Resource Manager 跑不到的能力”分开写。1.15 到 1.17 的条目只作差异索引。
 
@@ -102,20 +102,20 @@ terraform fmt -recursive
 
 ## 1.15 到 1.17
 
-`main` 的 CI 使用 1.16.6。下表只列发布说明里已经写明的标题。Resource Manager 不能运行这些版本。
+`main` 的 CI 使用 1.17.2。下表只列发布说明里已经写明的标题。Resource Manager 不能运行这些版本。
 
 | 版本 | 发布说明中的新增能力 | 来源 |
 | --- | --- | --- |
 | 1.15 | `terraform validate` 检查 `backend` 块。新增 `convert()` | [v1.15.0](https://github.com/hashicorp/terraform/releases/tag/v1.15.0) |
 | 1.16 | provider 的 planned private data。`terraform_data` 的 `store` 块可跨 plan 与 apply 保存 ephemeral 值。`import` 块可以写在模块内。action 增加 `on_failure` | [v1.16.0](https://github.com/hashicorp/terraform/releases/tag/v1.16.0)（2026-08-26） |
-| 1.17 | 以发布目录中的 1.17.0 为准 | [1.17.0](https://releases.hashicorp.com/terraform/1.17.0/) |
+| 1.17 | provider 需求可用变量和 locals。新增 `-minimal-refresh`。Terraform Policy 正式可用 | [v1.17.0](https://github.com/hashicorp/terraform/releases/tag/v1.17.0)（2026-10-21；CI 钉 1.17.2） |
 
 ## 对本仓库的直接后果
 
 | 能力 | `main` | `tf-v1.5` / Resource Manager 1.5.7 |
 | --- | --- | --- |
 | `required_version` | `>= 1.14.2` | `>= 1.5.0, < 1.6.0` |
-| CI | 1.16.6 | 1.5.7 |
+| CI | 1.17.2 | 1.5.7 |
 | `backend "oci"` | 使用 | 不写。状态由 Resource Manager 保存 |
 | `examples/resource-manager` | 不在本分支 | 每个模块一份，压缩后上传 |
 | 合并 | 不要并入 `tf-v1.5` | 修复按分支移植 |

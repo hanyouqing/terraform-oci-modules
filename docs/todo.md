@@ -1,6 +1,6 @@
 # Status
 
-- [x] Provider bump to `~> 9.11` across modules and examples
+- [x] Provider bump to `~> 9.13` across modules and examples
 - [x] Phase 1: vcn / compute / object-storage (+ edge/tfstate examples, Terragrunt alignment)
 - [x] Phase 2: remaining modules quality pass
 - [x] Production pre-release review (pass 1–2): network hardening, sensitive outputs, private defaults

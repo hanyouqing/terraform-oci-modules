@@ -5,7 +5,7 @@ alwaysApply: true
 
 # main 与 tf-v1.5
 
-`main` 跟踪当前 Terraform：模块 `required_version` 为 `>= 1.14.2`，CI 与 `.terraform-version` 使用 **1.16.6**。`backend "oci"` 只留在 `main`。
+`main` 跟踪当前 Terraform：模块 `required_version` 为 `>= 1.14.2`，CI 与 `.terraform-version` 使用 **1.17.2**。`backend "oci"` 只留在 `main`。
 
 `tf-v1.5` 是 OCI Resource Manager 的长期分支。Resource Manager 只能跑 Terraform **1.5.x（CLI 1.5.7）**。该分支的约束是 `>= 1.5.0, < 1.6.0`。每个模块有可直接压缩上传的 `examples/resource-manager`（不要带 `.terraform`）。`provider "oci"` 只设置 `region`；`tenancy_ocid`、`compartment_ocid`、`region` 由 Resource Manager 预填。栈里不写 `backend`。
 

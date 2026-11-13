@@ -15,7 +15,7 @@ For **Terragrunt** (remote state, generated provider, DRY stack configs), see [t
 - **Cost-Effective Defaults**: Use always-free resource sizes and counts as default values while allowing easy scaling for production workloads
 - **Production Ready**: Follow enterprise best practices for security, compliance, monitoring, and scalability with comprehensive error handling
 - **Multi-Environment Support**: Support development, staging, and production environments with environment-specific configurations and state management
-- **Two Terraform lines**: `main` requires Terraform >= 1.14.2 (CI 1.16.6) and is applied with the CLI. OCI Resource Manager only runs Terraform 1.5.7, on the long-lived branch `tf-v1.5`. See [OCI Resource Manager](#oci-resource-manager).
+- **Two Terraform lines**: `main` requires Terraform >= 1.14.2 (CI 1.17.2) and is applied with the CLI. OCI Resource Manager only runs Terraform 1.5.7, on the long-lived branch `tf-v1.5`. See [OCI Resource Manager](#oci-resource-manager).
 - **Security First**: Implement least-privilege access, encryption at rest and in transit, and comprehensive audit logging
 - **Monitoring & Observability**: Built-in monitoring, alerting, and logging capabilities for infrastructure health and performance tracking
 - **Cost Management**: Automated cost optimization, resource tagging, and usage analytics for budget control and resource allocation
@@ -23,8 +23,8 @@ For **Terragrunt** (remote state, generated provider, DRY stack configs), see [t
 
 ## Prerequisites
 
-- [Terraform](https://www.terraform.io/downloads.html) >= 1.14.2 on this branch (`main`). CI and `.terraform-version` track 1.16.6. Resource Manager stacks are on branch `tf-v1.5` (Terraform 1.5.7). See [OCI Resource Manager](#oci-resource-manager).
-- [OCI Provider for Terraform](https://registry.terraform.io/providers/oracle/oci/latest/docs) `~> 9.11` (latest registry release 9.12.1 as of 2026-11-07; see each module’s `versions.tf`)
+- [Terraform](https://www.terraform.io/downloads.html) >= 1.14.2 on this branch (`main`). CI and `.terraform-version` track 1.17.2. Resource Manager stacks are on branch `tf-v1.5` (Terraform 1.5.7). See [OCI Resource Manager](#oci-resource-manager).
+- [OCI Provider for Terraform](https://registry.terraform.io/providers/oracle/oci/latest/docs) `~> 9.13` (latest registry release 9.13.0 as of 2026-11-13; see each module’s `versions.tf`)
 - [OCI CLI](https://docs.oracle.com/en-us/iaas/Content/API/SDKDocs/cliinstall.htm) configured (verify with `oci iam region list --output table`)
 - [OCI credentials](#setting-up-oci-credentials-for-the-terraform-provider) for the Terraform provider — the [OCI CLI](#setting-up-credentials-with-the-oci-cli) (`oci setup config`) is the usual way to create `~/.oci/config`; alternatively use environment variables from `.env.sh` only
 - Oracle Cloud Infrastructure account with appropriate permissions (enable the Always Free tier if you use demo/Always Free defaults)
@@ -34,7 +34,7 @@ For **Terragrunt** (remote state, generated provider, DRY stack configs), see [t
 
 OCI Resource Manager runs Terraform **1.5.x** only. The CLI it provides is **1.5.7**. There is no 1.6 or later runtime, so this branch cannot be uploaded as a Resource Manager stack.
 
-`main` stays on current Terraform: modules require **>= 1.14.2**, and CI uses **1.16.6**. Apply it with the Terraform CLI. Remote state uses `backend "oci"`, which needs Terraform >= 1.12.
+`main` stays on current Terraform: modules require **>= 1.14.2**, and CI uses **1.17.2**. Apply it with the Terraform CLI. Remote state uses `backend "oci"`, which needs Terraform >= 1.12.
 
 The long-lived Resource Manager branch is [`tf-v1.5`](https://github.com/hanyouqing/terraform-oci-modules/tree/tf-v1.5):
 

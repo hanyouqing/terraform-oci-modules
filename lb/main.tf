@@ -18,9 +18,11 @@ resource "oci_load_balancer_load_balancer" "this" {
 
   freeform_tags = merge(
     {
-      "ManagedBy"  = "terraform"
-      "Module"     = "github.com/hanyouqing/terraform-oci-modules/lb"
-      "AlwaysFree" = tostring(local.is_always_free)
+      "ManagedBy"   = "terraform"
+      "Module"      = "github.com/hanyouqing/terraform-oci-modules/lb"
+      "Project"     = var.project
+      "Environment" = var.environment
+      "AlwaysFree"  = tostring(local.is_always_free)
     },
     var.freeform_tags
   )

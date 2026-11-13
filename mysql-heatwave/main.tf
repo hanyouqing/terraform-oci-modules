@@ -22,9 +22,11 @@ resource "oci_mysql_mysql_db_system" "this" {
 
   freeform_tags = merge(
     {
-      "ManagedBy"  = "terraform"
-      "Module"     = "github.com/hanyouqing/terraform-oci-modules/mysql-heatwave"
-      "AlwaysFree" = tostring(var.mysql_systems[each.key].shape_name == "MySQL.Free")
+      "ManagedBy"   = "terraform"
+      "Module"      = "github.com/hanyouqing/terraform-oci-modules/mysql-heatwave"
+      "Project"     = var.project
+      "Environment" = var.environment
+      "AlwaysFree"  = tostring(var.mysql_systems[each.key].shape_name == "MySQL.Free")
     },
     var.freeform_tags
   )

@@ -11,6 +11,11 @@ variable "compartment_id" {
 variable "tenancy_ocid" {
   type        = string
   description = "OCID of the tenancy"
+
+  validation {
+    condition     = can(regex("^ocid1\\.tenancy\\.oc1\\.", var.tenancy_ocid))
+    error_message = "tenancy_ocid must be a valid OCI tenancy OCID."
+  }
 }
 
 variable "instance_count" {
@@ -283,12 +288,22 @@ variable "project" {
   type        = string
   description = "Project name for tagging"
   default     = "oci-modules"
+
+  validation {
+    condition     = length(trimspace(var.project)) > 0
+    error_message = "project must be a non-empty string."
+  }
 }
 
 variable "environment" {
   type        = string
   description = "Environment name for tagging"
   default     = "development"
+
+  validation {
+    condition     = length(trimspace(var.environment)) > 0
+    error_message = "environment must be a non-empty string."
+  }
 }
 
 variable "freeform_tags" {
