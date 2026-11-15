@@ -98,7 +98,7 @@ module-name/
 ## 7. Versioning
 
 - **Terraform**: modules declare `>= 1.14.2`. CI, Makefile, and `.terraform-version` track the latest stable line (`~> 1.16`, currently 1.16.6).
-- **OCI Provider**: Pin to `~> 9.11` in every module and example `required_providers` block.
+- **OCI Provider**: Pin to `~> 9.13` in every module and example `required_providers` block.
 
 ## 8. Specific Module Instructions
 
