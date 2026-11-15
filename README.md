@@ -24,7 +24,7 @@ For **Terragrunt** (remote state, generated provider, DRY stack configs), see [t
 ## Prerequisites
 
 - [Terraform](https://www.terraform.io/downloads.html) >= 1.14.2 on this branch (`main`). CI and `.terraform-version` track 1.16.6. Resource Manager stacks are on branch `tf-v1.5` (Terraform 1.5.7). See [OCI Resource Manager](#oci-resource-manager).
-- [OCI Provider for Terraform](https://registry.terraform.io/providers/oracle/oci/latest/docs) `~> 9.11` (latest registry release 9.12.1 as of 2026-11-07; see each module’s `versions.tf`)
+- [OCI Provider for Terraform](https://registry.terraform.io/providers/oracle/oci/latest/docs) `~> 9.13` (latest registry release 9.13.0 as of 2026-11-15; see each module’s `versions.tf`)
 - [OCI CLI](https://docs.oracle.com/en-us/iaas/Content/API/SDKDocs/cliinstall.htm) configured (verify with `oci iam region list --output table`)
 - [OCI credentials](#setting-up-oci-credentials-for-the-terraform-provider) for the Terraform provider — the [OCI CLI](#setting-up-credentials-with-the-oci-cli) (`oci setup config`) is the usual way to create `~/.oci/config`; alternatively use environment variables from `.env.sh` only
 - Oracle Cloud Infrastructure account with appropriate permissions (enable the Always Free tier if you use demo/Always Free defaults)

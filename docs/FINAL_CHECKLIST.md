@@ -22,7 +22,7 @@ December 2024
 ## ✅ 2. Provider Version Management
 
 ### ✅ Version Consistency
-- [x] All modules use the same provider version: `~> 9.11`
+- [x] All modules use the same provider version: `~> 9.13`
 - [x] Terraform Core version requirement: `>= 1.14.2`
 - [x] Version constraint strategy is reasonable (allows patch and minor updates)
 
@@ -166,7 +166,7 @@ Each module's examples contain:
 - **Modules**: 13
 - **Examples**: 26 (2 per module)
 - **README Files**: 40
-- **Provider Version**: Uniformly uses `~> 9.11`
+- **Provider Version**: Uniformly uses `~> 9.13`
 
 ## ✅ 13. Improvement Summary
 
