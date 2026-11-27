@@ -214,12 +214,22 @@ variable "project" {
   type        = string
   description = "Project name recorded on freeform tags."
   default     = "oci-modules"
+
+  validation {
+    condition     = length(trimspace(var.project)) > 0
+    error_message = "project must be a non-empty string."
+  }
 }
 
 variable "environment" {
   type        = string
   description = "Environment name recorded on freeform tags."
   default     = "development"
+
+  validation {
+    condition     = length(trimspace(var.environment)) > 0
+    error_message = "environment must be a non-empty string."
+  }
 }
 
 variable "freeform_tags" {
@@ -247,7 +257,7 @@ variable "deployment" {
     is_public          = optional(bool, false)
     nsg_ids            = optional(set(string), [])
   })
-  description = "Optional GoldenGate deployment. Null keeps this module at the connection only. The admin password is a Vault secret OCID."
+  description = "Optional GoldenGate deployment. Null keeps this module at the connection only. The admin password is a Vault secret OCID. Prefer DATABASE_ORACLE over OGG. Provider 9.15.0 added AI_DATA_CATALOG."
   default     = null
 }
 

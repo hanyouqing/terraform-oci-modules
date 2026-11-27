@@ -40,8 +40,10 @@ resource "oci_core_volume_backup" "this" {
   freeform_tags = merge(
     var.freeform_tags,
     {
-      "ManagedBy" = "terraform"
-      "Module"    = "github.com/hanyouqing/terraform-oci-modules/block-volume/backup"
+      "ManagedBy"   = "terraform"
+      "Module"      = "github.com/hanyouqing/terraform-oci-modules/block-volume/backup"
+      "Project"     = var.project
+      "Environment" = var.environment
     }
   )
 }
@@ -69,8 +71,10 @@ resource "oci_core_volume_backup_policy" "this" {
   freeform_tags = merge(
     var.freeform_tags,
     {
-      "ManagedBy" = "terraform"
-      "Module"    = "github.com/hanyouqing/terraform-oci-modules/block-volume/backup-policy"
+      "ManagedBy"   = "terraform"
+      "Module"      = "github.com/hanyouqing/terraform-oci-modules/block-volume/backup-policy"
+      "Project"     = var.project
+      "Environment" = var.environment
     }
   )
 }
