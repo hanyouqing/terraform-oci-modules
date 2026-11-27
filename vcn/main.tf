@@ -56,8 +56,10 @@ resource "oci_core_internet_gateway" "this" {
   freeform_tags = merge(
     var.freeform_tags,
     {
-      "ManagedBy" = "terraform"
-      "Module"    = "github.com/hanyouqing/terraform-oci-modules/vcn/internet-gateway"
+      "ManagedBy"   = "terraform"
+      "Module"      = "github.com/hanyouqing/terraform-oci-modules/vcn/internet-gateway"
+      "Project"     = var.project
+      "Environment" = var.environment
     }
   )
 }
@@ -73,8 +75,10 @@ resource "oci_core_nat_gateway" "this" {
   freeform_tags = merge(
     var.freeform_tags,
     {
-      "ManagedBy" = "terraform"
-      "Module"    = "github.com/hanyouqing/terraform-oci-modules/vcn/nat-gateway"
+      "ManagedBy"   = "terraform"
+      "Module"      = "github.com/hanyouqing/terraform-oci-modules/vcn/nat-gateway"
+      "Project"     = var.project
+      "Environment" = var.environment
     }
   )
 }
@@ -103,8 +107,10 @@ resource "oci_core_service_gateway" "this" {
   freeform_tags = merge(
     var.freeform_tags,
     {
-      "ManagedBy" = "terraform"
-      "Module"    = "github.com/hanyouqing/terraform-oci-modules/vcn/service-gateway"
+      "ManagedBy"   = "terraform"
+      "Module"      = "github.com/hanyouqing/terraform-oci-modules/vcn/service-gateway"
+      "Project"     = var.project
+      "Environment" = var.environment
     }
   )
 }
@@ -125,9 +131,11 @@ resource "oci_core_subnet" "public" {
   freeform_tags = merge(
     var.freeform_tags,
     {
-      "ManagedBy" = "terraform"
-      "Module"    = "github.com/hanyouqing/terraform-oci-modules/vcn/subnet/public"
-      "Type"      = "public"
+      "ManagedBy"   = "terraform"
+      "Module"      = "github.com/hanyouqing/terraform-oci-modules/vcn/subnet/public"
+      "Project"     = var.project
+      "Environment" = var.environment
+      "Type"        = "public"
     }
   )
 
@@ -150,9 +158,11 @@ resource "oci_core_subnet" "private" {
   freeform_tags = merge(
     var.freeform_tags,
     {
-      "ManagedBy" = "terraform"
-      "Module"    = "github.com/hanyouqing/terraform-oci-modules/vcn/subnet/private"
-      "Type"      = "private"
+      "ManagedBy"   = "terraform"
+      "Module"      = "github.com/hanyouqing/terraform-oci-modules/vcn/subnet/private"
+      "Project"     = var.project
+      "Environment" = var.environment
+      "Type"        = "private"
     }
   )
 
@@ -178,8 +188,10 @@ resource "oci_core_route_table" "public" {
   freeform_tags = merge(
     var.freeform_tags,
     {
-      "ManagedBy" = "terraform"
-      "Module"    = "github.com/hanyouqing/terraform-oci-modules/vcn/route-table/public"
+      "ManagedBy"   = "terraform"
+      "Module"      = "github.com/hanyouqing/terraform-oci-modules/vcn/route-table/public"
+      "Project"     = var.project
+      "Environment" = var.environment
     }
   )
 }
@@ -221,8 +233,10 @@ resource "oci_core_route_table" "private" {
   freeform_tags = merge(
     var.freeform_tags,
     {
-      "ManagedBy" = "terraform"
-      "Module"    = "github.com/hanyouqing/terraform-oci-modules/vcn/route-table/private"
+      "ManagedBy"   = "terraform"
+      "Module"      = "github.com/hanyouqing/terraform-oci-modules/vcn/route-table/private"
+      "Project"     = var.project
+      "Environment" = var.environment
     }
   )
 }
@@ -314,8 +328,10 @@ resource "oci_core_security_list" "public" {
   freeform_tags = merge(
     var.freeform_tags,
     {
-      "ManagedBy" = "terraform"
-      "Module"    = "github.com/hanyouqing/terraform-oci-modules/vcn/security-list/public"
+      "ManagedBy"   = "terraform"
+      "Module"      = "github.com/hanyouqing/terraform-oci-modules/vcn/security-list/public"
+      "Project"     = var.project
+      "Environment" = var.environment
     }
   )
 }
@@ -394,8 +410,10 @@ resource "oci_core_security_list" "private" {
   freeform_tags = merge(
     var.freeform_tags,
     {
-      "ManagedBy" = "terraform"
-      "Module"    = "github.com/hanyouqing/terraform-oci-modules/vcn/security-list/private"
+      "ManagedBy"   = "terraform"
+      "Module"      = "github.com/hanyouqing/terraform-oci-modules/vcn/security-list/private"
+      "Project"     = var.project
+      "Environment" = var.environment
     }
   )
 }

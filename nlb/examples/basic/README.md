@@ -25,4 +25,4 @@ terraform apply \
 | Name | Version |
 |------|---------|
 | terraform | >= 1.14.2 |
-| oci | ~> 9.13 |
+| oci | ~> 9.15 |

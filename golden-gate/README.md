@@ -31,13 +31,13 @@ module "golden_gate" {
 | Name | Version |
 | ---- | ------- |
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.14.2 |
-| <a name="requirement_oci"></a> [oci](#requirement\_oci) | ~> 9.13 |
+| <a name="requirement_oci"></a> [oci](#requirement\_oci) | ~> 9.15 |
 
 ## Providers
 
 | Name | Version |
 | ---- | ------- |
-| <a name="provider_oci"></a> [oci](#provider\_oci) | ~> 9.13 |
+| <a name="provider_oci"></a> [oci](#provider\_oci) | ~> 9.15 |
 
 ## Modules
 
@@ -62,7 +62,7 @@ No modules.
 | <a name="input_connection_type"></a> [connection\_type](#input\_connection\_type) | GoldenGate connection type, for example GOLDENGATE or POSTGRESQL. | `string` | n/a | yes |
 | <a name="input_database_name"></a> [database\_name](#input\_database\_name) | Database name on the source or target. | `string` | `null` | no |
 | <a name="input_defined_tags"></a> [defined\_tags](#input\_defined\_tags) | Defined tags applied to the connection and, when set, the deployment. | `map(string)` | `{}` | no |
-| <a name="input_deployment"></a> [deployment](#input\_deployment) | Optional GoldenGate deployment. Null keeps this module at the connection only. The admin password is a Vault secret OCID. | <pre>object({<br/>    display_name       = string<br/>    subnet_id          = string<br/>    deployment_type    = string<br/>    license_model      = string<br/>    cpu_core_count     = number<br/>    ogg_version        = string<br/>    admin_username     = string<br/>    password_secret_id = string<br/>    is_public          = optional(bool, false)<br/>    nsg_ids            = optional(set(string), [])<br/>  })</pre> | `null` | no |
+| <a name="input_deployment"></a> [deployment](#input\_deployment) | Optional GoldenGate deployment. Null keeps this module at the connection only. The admin password is a Vault secret OCID. Prefer DATABASE\_ORACLE over OGG. Provider 9.15.0 added AI\_DATA\_CATALOG. | <pre>object({<br/>    display_name       = string<br/>    subnet_id          = string<br/>    deployment_type    = string<br/>    license_model      = string<br/>    cpu_core_count     = number<br/>    ogg_version        = string<br/>    admin_username     = string<br/>    password_secret_id = string<br/>    is_public          = optional(bool, false)<br/>    nsg_ids            = optional(set(string), [])<br/>  })</pre> | `null` | no |
 | <a name="input_description"></a> [description](#input\_description) | Description of the connection. | `string` | `null` | no |
 | <a name="input_display_name"></a> [display\_name](#input\_display\_name) | Display name of the connection. | `string` | n/a | yes |
 | <a name="input_does_use_secret_ids"></a> [does\_use\_secret\_ids](#input\_does\_use\_secret\_ids) | Tell GoldenGate that credentials are Vault secret OCIDs. Keep this true. The module does not accept plaintext secrets. | `bool` | `true` | no |
